@@ -1,5 +1,11 @@
-require "reedb/version"
+require_relative "reedb/constants"
 
 module Reedb
-  # Your code goes here...
+
+	class ReedbHandler
+		def initialize
+			puts "Current Reedb version is '#{Reedb::VERSION}'"
+		end
+	end
+
 end
