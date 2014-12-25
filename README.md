@@ -20,14 +20,14 @@ gem 'reedb'
 And then execute:
 
     $ bundle
-
+^^^^^^^^
 Or install it yourself as:
 
     $ gem install reedb
 
 ## Usage
 
-```
+```ruby
 db = Reedb.vault(name='db_name', path='/my/path/').create
 db.keygen('super_secure_password')
 
@@ -39,7 +39,7 @@ db.sync.close # Force syncs data and closes the db.
 ```
 
 Or load a vault from file
-```
+```ruby
 db = Reedb.vault(path='/my/path/db_name').load('super_secure_password')
 db.get('cool entry') #	=> Returns 'Reedb is awesome'
 db.get('custom object') # => Returns my_custom_object_here
