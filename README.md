@@ -8,6 +8,7 @@ Proudly powering [Reepass](https://github.com/2RSoftworks/reepass) (and others).
 
 * json, yaml and marshal files.
 * AES, Twofish, Sha256 and Tiger2 security.
+
 ## Installation
 
 Add this line to your application's Gemfile:
