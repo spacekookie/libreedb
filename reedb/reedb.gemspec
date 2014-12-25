@@ -1,15 +1,15 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'reedb/version'
+require 'reedb/constants'
 
 Gem::Specification.new do |spec|
   spec.name          = "reedb"
   spec.version       = Reedb::VERSION
-  spec.authors       = ["Katharina Sabel"]
+  spec.authors       = ["Random Robot Softworks"]
   spec.email         = ["katharina.sabel@2rsoftworks.de"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Ruby filebased database using encryption from it's core. Used to power reepass}
+  spec.description   = %q{Ruby database. Uses json and yaml files for data storage. Uses aes and twofish for encryption. Sha256 and Tiger2/192 for hashing. Encprytion from the core.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
