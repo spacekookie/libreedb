@@ -8,5 +8,16 @@
 # ====================================================
 
 module Reedb
-	VERSION = "0.1.0"
+
+	class VaultConfig
+
+		# Takes the containing vault as a parameter
+		# 
+		def initialize(master)
+
+
+		end
+
+	end
+
 end
