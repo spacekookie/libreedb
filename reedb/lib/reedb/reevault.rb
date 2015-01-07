@@ -1,10 +1,10 @@
 # ====================================================
-# Copyright 2014 Random Robot Softworks (see @author)
+# Copyright 2015 Random Robot Softworks (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
-# Distributed under the MIT License.
-# (See accompanying file LICENSE or copy at
-# http://opensource.org/licenses/MIT)
+# Distributed under the GNU Lesser GPL Version 2.1
+# (See accompanying LICENSE file or get a copy at
+# 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
 # => Import custom errors
@@ -19,10 +19,8 @@ module Reedb
 	class ReeVault
 
 		def initialize(name, path, encprytion)
-			@path = ""
-			@name = name
 			@already_logging = false
-			construct_path(path, name)
+			construct_path("#{name}", "#{path}")
 
 			begin
 				start_encryption(encprytion)
@@ -32,13 +30,15 @@ module Reedb
 			return self
 		end
 
-		def construct_path(path, name)
+		def construct_path(name, path)
+			(@name = name ; @path = "")
+			path.end_with?("/") ? @path = "#{path}#{name}.reevault" : @path = "#{path}/#{name}.reevault"
 		end
 
 		def create(password)
-
 			begin
-				start_encryption(encprytion)
+				puts "Where did I leave my sandwich?"
+				# start_encryption(encprytion)
 			rescue MissingUserPasswordError => e
 			 	puts e.message
 			end
@@ -98,13 +98,13 @@ module Reedb
 		end
 
 		def start_encryption(crypt)
-			crypt = 'aes' if crypt == 'auto_fill'
+			crypt = :aes if crypt == :auto_fill
 
-			if crypt == 'aes'
+			if crypt == :aes
 				@crypt = Reedb::RAES.new
-			elsif crypt == 'twofish'
+			elsif crypt == :twofish
 				@crypt = Reedb::Fish.new
-			elsif crypt == 'multi'
+			elsif crypt == :multi
 				@crypt = Reedb::MLE.new
 			else
 				raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."

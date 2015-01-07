@@ -1,10 +1,10 @@
 # ====================================================
-# Copyright 2014 Random Robot Softworks (see @author)
+# Copyright 2015 Random Robot Softworks (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
-# Distributed under the MIT License.
-# (See accompanying file LICENSE or copy at
-# http://opensource.org/licenses/MIT)
+# Distributed under the GNU Lesser GPL Version 2.1
+# (See accompanying LICENSE file or get a copy at
+# 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
 module Reedb
@@ -14,8 +14,9 @@ module Reedb
 		# Takes the containing vault as a parameter
 		# 
 		def initialize(master)
-
-
+			@secure_cypher = ""
+			@head = {}
+			@body = {}
 		end
 
 	end
