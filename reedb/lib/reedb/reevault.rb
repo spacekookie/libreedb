@@ -22,7 +22,7 @@ module Reedb
 			@path = ""
 			@name = name
 			@already_logging = false
-
+			construct_path(path, name)
 
 			begin
 				start_encryption(encprytion)
@@ -32,22 +32,7 @@ module Reedb
 			return self
 		end
 
-		def close
-
-		end
-
-		def start_encryption(crypt)
-			crypt = 'aes' if crypt == 'auto_fill'
-
-			if crypt == 'aes'
-				@crypt = Reedb::AES.new
-			elsif crypt == 'twofish'
-				@crypt = Reedb::Fish.new
-			elsif crypt == 'multi'
-				@crypt = Reedb::MLE.new
-			else
-				raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
-			end
+		def construct_path(path, name)
 		end
 
 		def create(password)
@@ -60,6 +45,7 @@ module Reedb
 
 			if password == nil
 				raise MissingUserPasswordError.new, "Encryption failed: Missing user password! Aborting"
+			end
 
 			(puts "PASSWORD CAN'T BE NIL!" ; return) if password == nil
 			@name = name
@@ -105,11 +91,27 @@ module Reedb
 
 			# => Load the vault like it existed before!
 			load(name, path, "#{password}",false)
+		end
+
+		def load(password)
 
 		end
 
+		def start_encryption(crypt)
+			crypt = 'aes' if crypt == 'auto_fill'
 
-		def load(password)
+			if crypt == 'aes'
+				@crypt = Reedb::RAES.new
+			elsif crypt == 'twofish'
+				@crypt = Reedb::Fish.new
+			elsif crypt == 'multi'
+				@crypt = Reedb::MLE.new
+			else
+				raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
+			end
+		end
+
+		def close
 
 		end
 	end

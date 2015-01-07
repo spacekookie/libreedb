@@ -7,52 +7,50 @@
 # # http://opensource.org/licenses/MIT)
 # # ====================================================
 
-# require_relative 'master'
-# require 'aes'
+require_relative 'master'
+require 'aes'
 
-# module Reedb
-# 	class RAES < MCypher
-# 		attr_reader :key
+module Reedb
+	class RAES < MCypher
+		attr_reader :key
 
-# 		def initialize
-# 			super
-# 		end
+		def initialize
+			super
+		end
 
-# 		def init_encryption(password, raw_key = nil)
-# 			if raw_key != nil
-# 				# => Decrypting key with user password
-# 				@key = AES.decrypt(raw_key, password)
-# 			else
-# 				# => Generating new key and encrypting it with user pw
-# 				@key = AES.key
-# 				key_encrypted = AES.encrypt(@key, password)
-# 			end
+		def init_encryption(password, raw_key = nil)
+			if raw_key != nil
+				# => Decrypting key with user password
+				@key = AES.decrypt(raw_key, password)
+			else
+				# => Generating new key and encrypting it with user pw
+				@key = AES.key
+				key_encrypted = AES.encrypt(@key, password)
+			end
 
-# 			# => At this point @key should be the unencrypted key!
-# 			@init = true
+			# => At this point @key should be the unencrypted key!
+			@init = true
+		end
 
+		def stop_encryption
+		end
 
-# 		end
+		def encrypt(string)
+		end
 
-# 		def stop_encryption
-# 		end
+		def decrypt(string)
+		end
+	end
 
-# 		def encrypt(string)
-# 		end
-
-# 		def decrypt(string)
-# 		end
-# 	end
-
-# end
+end
 
 # aes = Reedb::RAES.new
 # aes.init_encryption("abcd")
 # puts aes.key
 
-require 'aes'
+# require 'aes'
 
-puts AES.key(length=64)
+# puts AES.key(length=64)
 
 
 # # Generate a random key
