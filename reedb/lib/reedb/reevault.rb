@@ -23,7 +23,8 @@ require_relative 'security/aes'
 # => Import internals
 require 'fileutils'
 require 'socket'
-require 'yaml'
+require 'yaml' # Used for configuration files.
+require 'bson' # Used for data files.
 
 module Reedb
 	class ReeVault
@@ -157,14 +158,39 @@ module Reedb
 
 		private
 
-		def cache_header(mode = :secure)
-			if mode == :fast
+		def cache_header
+			Dir.glob("#{@path}/data/*.ree") do |file|
+				f = File.open(file, 'r')
 
-			elsif mode == :secure
-				
-			else
-				
+				encrypted = f.read
+				decrypted = @krypt.decrypt_string(encrypted)
+				yaml = YAML.load(decrypted)
+
+				@header["#{Pathname.new("#{file}").basename}"] = {}
+				@header["#{Pathname.new("#{file}").basename}"]['name'] = yaml['header']['name']
+				@header["#{Pathname.new("#{file}").basename}"]['url'] = yaml['header']['url']
+				@header["#{Pathname.new("#{file}").basename}"]['category'] = yaml['header']['category']
+				@header["#{Pathname.new("#{file}").basename}"]['latest'] = yaml['header']['latest']	
 			end
+		end
+
+
+		def cache_header(mode = :secure)
+			@header = {}
+			VaultLogger.write("Starting a cache cycle at #{Reedb::Utilities::get_time} in #{mode} mode.", 'debug')
+
+			Dir.glob(Reedb::Utilities::append_to_path_dir(@path, ['data', '*.ree'])) do |file|
+
+				f = File.open(file, 'r')
+				encryted = f.read
+				decrypted = @crypt.decrypt_string(encrypted)
+
+			end
+			if mode == :fast
+				puts "This isn't implemented yet and you should really stick to secure mode!"
+			end
+
+
 		end
 
 		def cache_files(mode = :secure)

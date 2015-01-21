@@ -52,4 +52,4 @@ Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
 path = File.expand_path('~/Desktop/')
 
 # Default encryption is set to 'aes'
-Reedb.vault(name='default', "#{path}", :aes).create(user_pw)
+Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)
