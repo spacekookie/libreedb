@@ -2,117 +2,255 @@
 # Copyright 2015 Random Robot Softworks (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
-# Distributed under the GNU Lesser GPL Version 2.1
+# Distributed under the GNU Lesser GPL Version 3
 # (See accompanying LICENSE file or get a copy at
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
 # => Import custom errors
 require_relative 'errors/encryption_errors'
+require_relative 'errors/vault_errors'
+
+# => Import utilities and tools
+require_relative 'utils/utilities'
+require_relative 'utils/logger'
 
 # => Import security package classes
 require_relative 'security/multifish'
 require_relative 'security/twofish'
 require_relative 'security/aes'
 
+# => Import internals
+require 'fileutils'
+require 'socket'
+require 'yaml'
+
 module Reedb
 	class ReeVault
 
+		# Constructor for a vault with name, path and encryption enum.
+		# Valid encryption parameters are :aes, :twofish, :multi and :auto_fill
+		#
 		def initialize(name, path, encprytion)
 			@already_logging = false
 			construct_path("#{name}", "#{path}")
-
-			begin
-				start_encryption(encprytion)
-			rescue MissingEncryptionTypeError => e
-			 	puts e.message
-			end
+			init_encryption(encprytion) # => Throws exceptions!
+			self.secure_config(false)
 			return self
 		end
 
-		def construct_path(name, path)
-			(@name = name ; @path = "")
-			path.end_with?("/") ? @path = "#{path}#{name}.reevault" : @path = "#{path}/#{name}.reevault"
+		def secure_config(boolean = true)
+			@secure_config = boolean
+			return self
 		end
 
 		def create(password)
-			begin
-				puts "Where did I leave my sandwich?"
-				# start_encryption(encprytion)
-			rescue MissingUserPasswordError => e
-			 	puts e.message
-			end
-
-			if password == nil
-				raise MissingUserPasswordError.new, "Encryption failed: Missing user password! Aborting"
-			end
-
-			(puts "PASSWORD CAN'T BE NIL!" ; return) if password == nil
-			@name = name
-			construct_path(name, path)
-
-			if File.exists?("#{@path}/global.yml")
-				puts "VAULT ALREADY EXISTS: PLEASE CHANGE NAME OR CHOOSE A DIFFERENT LOCATION!"
-				init_logger
-				VaultLogger.write("Vault already exists. Not overwriting!")
-
-				# TODO: Possibly ask to load the vault instead?
-				# TODO: Stop shouting at the user :)
-				return
-			end
-
-			FileUtils::mkdir_p("#{@path}/data") # => Data dir
-			FileUtils::mkdir("#{@path}/shasums") # => Checksum dir
-			FileUtils::mkdir("#{@path}/logs") # => Logs dir
-
-			FileUtils::chmod_R(0744, "#{@path}") #TODO: Check
-
-			# Now that folder exists => Start logs
-			init_logger
-
-			VaultLogger.write("Vault created on #{Reepass::Utilities.get_time(false)}. All directories created successfully!")
-
-			encrypted_key = @krypt.init_encryption("#{password}")
-			hashed_pw = Robocrypt::CryptUtils.hash_base512("#{password}")
+			return nil unless password?(password)
+			return nil unless encryption?(password)
 			
-			config = {}
-			config['vault_name'] = "#{name}"
-			config['creation_date'] = "#{ReeTime.get_time}"
-			config['last_updated'] = "#{ReeTime.get_time}"
-			config['khash'] = "#{encrypted_key}"
-			config['phash'] = "#{hashed_pw}"
-			config['creation_machine'] = "#{Socket.gethostname}"
-			config['updating_machine'] = "#{Socket.gethostname}"
+			# => Encryption now active and key available under @crypt.key
 
-			ReeLogger.write("Wrote key and pw hashes to config files", "info")
-			config['locked'] = false
+			conf_path = Reedb::Utilities::append_to_path("#{@path}", 'config')
 
-			File.open("#{@path}/global.yml", "w"){ |file| YAML.dump(config, file) }
+			begin
+				needs_creation = true
 
-			# => Load the vault like it existed before!
-			load(name, path, "#{password}",false)
+				if self.includes?('config')
+					raise VaultExistsAtLocationError.new, "Vault already exists at location #{@path}.\nLoading existing vault instead...\n"
+					
+					# => This rules out lots of code to be run
+					needs_creation = false
+				else
+					if Reedb::archos == :unix
+						FileUtils::mkdir_p("#{@path}/data") # => Data dir
+						FileUtils::mkdir("#{@path}/shasums") # => Checksum dir
+						FileUtils::mkdir("#{@path}/logs") # => Logs dir
+
+						FileUtils::chmod_R(0744, "#{@path}")
+					else
+						FileUtils::mkdir_p("#{@path}\\data") # => Data dir
+						FileUtils::mkdir("#{@path}\\shasums") # => Checksum dir
+						FileUtils::mkdir("#{@path}\\logs") # => Logs dir
+					end
+				end
+
+				# Now that the vault directory exists logs can be opened.
+				init_logger(true)
+
+				if needs_creation
+					# Code that will only be run if the vault was just created on the system
+					time = Reedb::Utilities.get_time(false)
+					VaultLogger.write("Vault created on #{time}. All directories created successfully!")
+
+					# => Now creating configuration file
+					config = {}
+					config['vault_name'] = "#{@name}"
+					config['creation_date'] = "#{Utilities.get_time}"
+					config['last_updated'] = "#{Utilities.get_time}"
+					config['creation_machine'] = "#{Socket.gethostname}"
+					config['updating_machine'] = "#{Socket.gethostname}"
+					config['creation_user'] = "nil" # => Think of clever way to do this
+					config['updating_user'] = "nil"
+
+					hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
+
+					# => Writing configuration to disk. Either securely or insecurely
+					if @secure_config
+						update_secure_info('config', config)
+						par_path = Reedb::Utilities::append_to_path("#{@path}", "pom")
+						msg = "Why are you reading this?"
+						File.open("#{par_path}", "wb").write(Base64.encode64("#{msg}"))
+					else
+						File.open("#{conf_path}", "w"){ |f| YAML.dump(config, f) }
+					end
+
+					# Now writing encrypted key to file with ASCII armour
+					update_secure_info("cey", @encrypted_key)
+					remove_instance_variable(:@encrypted_key)
+				end
+
+			# All other errors won't be caught!
+			rescue EncryptionError, VaultError => e
+				puts e.message
+			end
+
+			self.load("#{password}")
 		end
 
 		def load(password)
+			self.includes?('config') # => Returns the existance of the central config
 
-		end
+			init_logger(false)
 
-		def start_encryption(crypt)
-			crypt = :aes if crypt == :auto_fill
-
-			if crypt == :aes
-				@crypt = Reedb::RAES.new
-			elsif crypt == :twofish
-				@crypt = Reedb::Fish.new
-			elsif crypt == :multi
-				@crypt = Reedb::MLE.new
+			# Check if the config needs to be read via ASCII64 or YAML
+			if self.includes?('pom')
+				# Config is stored with ASCII Armour
+				@config = read_secure_info('config')
 			else
-				raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
+				conp = Reedb::Utilities::append_to_path(@path, 'config')
+				@config = YAML.load_file(conp)
 			end
+			puts @config
+
+			return self
+
+			unlock_vault("#{password}") # => Reading config from file
+
+			@header = {}
+
+			# => Cache the vault
+			cache_header
+			cache_files
+			return self
+
 		end
 
 		def close
+			@crypt.stop_encryption if @crypt.init
+		end
 
+		# Quickly returns if a file exists in the vault or it's children.
+		def includes?(file)
+			file_to_check = Reedb::Utilities::append_to_path("#{@path}", "#{file}")
+			return File.exists?("#{file_to_check}")
+		end
+
+		private
+
+		def cache_header(mode = :secure)
+			if mode == :fast
+
+			elsif mode == :secure
+				
+			else
+				
+			end
+		end
+
+		def cache_files(mode = :secure)
+
+		end
+
+		# Builds the vault path from a path, name and trimming
+		# additional slashes from the end.
+		#
+		def construct_path(name, path)
+			(@name = name ; @path = "")
+			if Reedb::archos == :unix
+				path.end_with?("/") ? @path = "#{path}#{name}.reevault" : @path = "#{path}/#{name}.reevault"
+			else
+				path.end_with?("\\") ? @path = "#{path}#{name}.reevault" : @path = "#{path}\\#{name}.reevault"
+			end
+		end
+
+		def update_secure_info(name, data = nil)
+			path = Reedb::Utilities::append_to_path(@path, "#{name}")
+			File.open(path, "wb").write(Base64.encode64("#{data}"))
+		end
+
+		def read_secure_info(name)
+			path = Reedb::Utilities::append_to_path(@path, "#{name}")
+			return Base64.decode64(File.open(path, "r").read())
+		end
+
+		def init_logger(bol)
+			begin
+				unless logger?(bol)
+					raise VaultLoggerError.new, "Logger failed to be initialised" 
+				end
+			rescue VaultError => e
+				puts e.message
+			end
+		end
+
+		def logger?(bol)
+			(return false) if @already_logging && bol
+
+			VaultLogger.setup("#{@path}")
+			(@already_logging = true ; return true)
+		end
+
+		def password?(password)
+			begin
+				raise MissingUserPasswordError.new, "Encryption error: Missing user password!" if password == nil
+
+				raise InsecureUserPasswordError.new, "Encryption error: Password too short!" if password.length < Reedb::passlength
+			rescue EncryptionError => e
+			 	puts e.message
+			 	return false
+			end
+			return true
+		end
+
+		def encryption?(password)
+			begin
+				@encrypted_key = @crypt.start_encryption(password)
+			rescue EncryptionError => e
+				puts e.message
+				return false
+			end
+			return true
+		end
+
+		# This method checks what encryption to use by enums.
+		# This can throw an exception if something was parsed incorrectly
+		# After this call the @crypt object has been initialised.
+		#
+		def init_encryption(type)
+			type = :aes if type == :auto_fill
+			begin
+				if type == :aes
+					@crypt = Reedb::RAES.new
+				elsif type == :twofish
+					@crypt = Reedb::Fish.new
+				elsif type == :multi
+					@crypt = Reedb::MLE.new
+				else
+					raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
+				end
+			rescue EncryptionError => e
+			 	puts e.message
+			end
 		end
 	end
 end

@@ -1,24 +1,25 @@
 # ====================================================
 # Copyright 2015 Random Robot Softworks (see @author)
-# @author: Katharina Sabel | www.2rsoftworks.de
+# @author: Leander Sabel | www.2rsoftworks.de
 #
-# Distributed under the GNU Lesser GPL Version 2.1
+# Distributed under the GNU Lesser GPL Version 3
 # (See accompanying LICENSE file or get a copy at
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
-require_relative 'master'
+require_relative 'encryption'
 require 'aes'
 
 module Reedb
 	class RAES < MCypher
-		attr_reader :key
-
 		def initialize
-			super
+			super # => Super constructor
 		end
 
-		def init_encryption(password, raw_key = nil)
+		# Starts the encryption and loads a key by either generating a new one
+		# or loading an encrypted one from file.
+		#
+		def start_encryption(password, raw_key = nil)
 			if raw_key != nil
 				# => Decrypting key with user password
 				@key = AES.decrypt(raw_key, password)
@@ -27,60 +28,65 @@ module Reedb
 				@key = AES.key
 				key_encrypted = AES.encrypt(@key, password)
 			end
-
+			
 			# => At this point @key should be the unencrypted key!
 			@init = true
+			return key_encrypted
 		end
 
+		# Tries to remove the unencryted key from memory as best as possible.
+		# Stops the encryption and prevents further decrypts to occur.
 		def stop_encryption
+			remove_instance_variable(:@key)
+			@init = false
 		end
 
-		def encrypt(string)
+		# Encrypt the clear text using the encryption key
+		# Returns a base64 encoded string
+		# Throws exceptions
+		#
+		def encrypt(cleartext)
+			begin
+				AES.encrypt(cleartext, @key) unless @key.nil?
+			rescue Exception => e
+				puts e.message
+			end
 		end
 
-		def decrypt(string)
+		# Decrypt the cypher text using the encryption key
+		# Returns the original clear text.
+		# Throws exceptions
+		# 
+		def decrypt(cyphertext)
+			begin
+				AES.decrypt(cyphertext, @key) unless @key.nil?
+			rescue Exception => e
+				puts e.message
+			end
+		end
+
+		# Starts the shift of the main password and creates a new key (cipher) to encrypt with the new pw
+		#
+		def init_shift(fresh)
+			@tmp_key = AES.key
+		end
+
+		# Change the encryption cipher for a file in the vault.
+		#
+		def shift_cipher(file, fresh)
+			temp = AES.decrypt(file, @key) unless @key.nil?
+			return AES.encrypt(temp, @tmp_key)
+		end
+
+		# Returns new encrypted key
+		#
+		def finalise_shift
+			@key = @tmp_key # => Finishing the cipher shift
+			key_encrypted = AES.encrypt(@tmp_key, fresh)
+			remove_instance_variable(:@tmp_key)	# => Removing insecure imprint
+
+			return key_encrypted # => To be stored in the new config file!
 		end
 	end
 
 end
-
-# aes = Reedb::RAES.new
-# aes.init_encryption("abcd")
-# puts aes.key
-
-# require 'aes'
-
-# puts AES.key(length=64)
-
-
-# # Generate a random key
-# key = AES.key
-
-# # Encrypt a string.  Default output is base_64 encoded, init_vector and cipher_text are joined with "$"
-# b64 = AES.encrypt("A super secret message", key)
-
-# # Same as above but minus the base64 encoding, init_vector and cipher_text are shoved into an array
-# plain = AES.encrypt("A super secret message", key, {:format => :plain}) #
-
-# # Generate a random initialization vector
-# iv = AES.iv(:base_64)
-
-# # Encrypt a string, with a provided key and init_vector.  
-# b64_iv = AES.encrypt("A super secret message", key, {:iv => iv})
-
-# AES.decrypt(b64, key)
-
-# AES.decrypt(plain, key, {:format => :plain})
-
-# # By default data is padded to the nearest 16 bytes block.  To turn
-# # this off, you may use the :padding => false (or nil) option.
-# #
-# # In this mode however, the caller is required to pad the data.  In
-# # the following example the message is exactly 16 bytes long, so no
-# # error aries.
-# msg = AES.encrypt("A secret message", key, {:padding => false})
-
-# # Be sure to pass the same padding option when decrypting the
-# # message, as it will fail if you try to decrypt unpadded data and
-# # didn't specify :padding => false.
-# AES.decrypt(msg, key, {:padding => false})

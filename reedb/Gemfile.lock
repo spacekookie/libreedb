@@ -1,0 +1,23 @@
+PATH
+  remote: .
+  specs:
+    reedb (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    aes (0.5.0)
+    digest-tiger (1.0.2)
+    rake (10.4.2)
+    twofish (1.0.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  aes (>= 0.5.0)
+  bundler (~> 1.7)
+  digest-tiger (~> 1.0.2)
+  rake (~> 10.0)
+  reedb!
+  twofish (>= 1.0.5)

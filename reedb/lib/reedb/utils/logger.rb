@@ -18,12 +18,17 @@ module Reedb
 	# 
 	class VaultLogger
 
+		@@logger = nil
+
 		# Sets up a logger on a vault and loads existing logs if they exist.
 		# Logs are limited not in size but only by dates. Vault logs don't contain whitespaces.
 		#
 		def self.setup(path)
-			
-			log_path = "#{path}/logs/#{Reepass::Utilities.get_time(true)}.log"
+			if Reedb::archos == :unix
+				log_path = "#{path}/logs/#{Reedb::Utilities.get_time(true)}.log"
+			else
+				log_path = "#{path}\\logs\\#{Reedb::Utilities.get_time(true)}.log"
+			end
 			@@logger = Logger.new("#{log_path}")
 		end
 

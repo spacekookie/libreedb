@@ -7,14 +7,17 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
-class EncryptionError < StandardError
+class VaultError < StandardError
 end
 
-class MissingEncryptionTypeError < EncryptionError
+class VaultExistsAtLocationError < VaultError
 end
 
-class MissingUserPasswordError < EncryptionError
+class VaultWritePermissionsError < VaultError
 end
 
-class InsecureUserPasswordError < EncryptionError
+class VaultMissingConfigurationError < VaultError
+end
+
+class VaultLoggerError < VaultError
 end
