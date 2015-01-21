@@ -23,8 +23,8 @@ require_relative 'security/aes'
 # => Import internals
 require 'fileutils'
 require 'socket'
-require 'yaml' # Used for configuration files.
-require 'bson' # Used for data files.
+require 'yaml'
+require 'json'
 
 module Reedb
 	class ReeVault
@@ -45,7 +45,14 @@ module Reedb
 			return self
 		end
 
-		def create(password)
+		def keygen(password)
+			@__PW__ = password
+		end
+
+		def create(password = :failed)
+			# If keygen was used to set a user password then fetch it
+			# and remove the variable from memory!
+			(password = @__PW__ ; remove_instance_variable(:@__PW__)) if password == :failed
 			return nil unless password?(password)
 			return nil unless encryption?(password)
 			

@@ -9,9 +9,18 @@
 
 module Reedb
 	class DataFile
-		
-		def initialize(name, category)
-			puts "Bla blub"
+
+		attr_reader :name
+
+		attr_reader :path, :hash
+
+		def initialize(name, parent, category, data)
+			category = 'Unsorted' if category == nil
+			data['note'] = 'Standard data entry' if data['note'] == nil
+
+			# Then go to store the values.
+			@name = name
+			@hash = Reedb::SecurityUtils::sha256_hash("#{name}")
 		end
 	end
 end

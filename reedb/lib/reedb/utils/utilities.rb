@@ -1,13 +1,36 @@
 # ====================================================
-# Copyright 2015 Random Robot Softworks (see @author)
+# Copyright 2014 Random Robot Softworks (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
-# Distributed under the GNU Lesser GPL Version 2.1
+# Distributed under the GNU Lesser GPL Version 3
 # (See accompanying LICENSE file or get a copy at
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
 module Reedb
+
+	class Timestamp
+		attr_accessor :utc
+		def initialize 
+			@utc = Time.now.getutc
+		end
+
+		def < x
+			return (self.utc < x.utc)
+		end
+
+		def > x
+			return (self.utc > x.utc)
+		end
+
+		def == x
+			return (self.utc == x.utc)
+		end
+
+		def to_s
+			return "#{@utc}"
+		end
+	end
 
 	class Utilities
 

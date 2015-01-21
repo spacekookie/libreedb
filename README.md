@@ -1,4 +1,4 @@
-ReeDB
+#ReeDB
 ======
 
 Spicy Ruby database. Json document based, low dependencies, fast and secure. Made for native app development. Protects information that is worth protecting with AES, Twofish and GnuPG/ PGP.
@@ -36,13 +36,11 @@ db = Reedb.vault(name='db_name', path='/my/path/')
 db.keygen('super_secure_password')
 db.create()
 
-# Now add single fields to your DB
-You can either 
+# You can either add single fields to your DB
 db.insert('cool entry').data('Reedb is awesome')
 db.insert('custom object').data(my_custom_object_here)
 
 # Or create a datafile to hold thousands of fields.
-
 db.insert(Datafile.new(name='name', category='category', url='url'))
 
 # Force syncs data and closes the db.
@@ -65,3 +63,10 @@ And much much more.
 
 Like what you see? Want to help out? Great!
 Reedb is published under the ```LGPL 3.0```. So feel free to fork the project, make improvements or changes and create a pull request. All further limitations please get from the license file included in this repository!
+
+## HTTP Socket
+
+Not developing in Ruby? Not to worry! If you make sure that ReeDB is installed on your target system you can use the Vaults with virtually any framework, any language from ANY platform.
+Request data from a vault, store new files, don't worry about having to manage rights and permissions. ReeDB will do it for you.
+
+*** HTTP specification to follow here ***
