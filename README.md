@@ -33,28 +33,24 @@ Or install it yourself as:
 # you can daisychain them into one line.
 
 db = Reedb.vault(name='db_name', path='/my/path/')
-db.keygen('super_secure_password')
-db.create()
-
-# You can either add single fields to your DB
-db.insert('cool entry').data('Reedb is awesome')
-db.insert('custom object').data(my_custom_object_here)
+vault.keygen('super_secure_password')
+vault.create()
 
 # Or create a datafile to hold thousands of fields.
-db.insert(Datafile.new(name='name', category='category', url='url'))
+vault.insert(Datafile.new(name='name', category='category', url='url'))
 
 # Force syncs data and closes the db.
 # Dumps the headers into an encrypted file for the vault to pick up next time.
-db.sync.close
+vault.sync.close
 ```
 
 Or load a vault from file
 ```ruby
-db = Reedb.vault(path='/my/path/db_name').load('super_secure_password')
-db.get('cool entry') #	=> Returns 'Reedb is awesome'
-db.get('custom object') # => Returns my_custom_object_here
+vault = Reedb.vault(path='/my/path/db_name').load('super_secure_password')
+vault.get('cool entry') #	=> Returns 'Reedb is awesome'
+vault.get('custom object') # => Returns my_custom_object_here
 
-db.close # No force sync.
+vault.close # No force sync.
 ```
 
 And much much more.

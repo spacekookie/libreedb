@@ -7,6 +7,9 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
+# => Vault internals
+require_relative 'datafile'
+
 # => Import custom errors
 require_relative 'errors/encryption_errors'
 require_relative 'errors/vault_errors'
@@ -28,6 +31,8 @@ require 'json'
 
 module Reedb
 	class ReeVault
+
+		attr_reader :path
 
 		# Constructor for a vault with name, path and encryption enum.
 		# Valid encryption parameters are :aes, :twofish, :multi and :auto_fill
@@ -138,19 +143,83 @@ module Reedb
 				conp = Reedb::Utilities::append_to_path(@path, 'config')
 				@config = YAML.load_file(conp)
 			end
-			puts @config
+
+			@headers = {}
+			@files = {}
 
 			return self
 
 			unlock_vault("#{password}") # => Reading config from file
 
-			@header = {}
+			
 
 			# => Cache the vault
-			cache_header
+			cache_headers
 			cache_files
 			return self
 
+		end
+
+=begin
+	
+Workflow for this function:
+
+Check cached headers to see if file is included.
+If yes --> Insert data into file.
+If no --> Start new header cache and create temp file with information.
+	If after new header cache file is still not found, save tmp
+	file to the real thing and update headers again.
+
+If after header cache new file was found, migrate tmp file to persistent
+update file and move on.
+
+update_headers --> 	caches headers in seperate thread and returns result
+					to master thread. (Does so for all files)
+
+update_file --> Loads a file, either from a header position (default route)
+				OR if a header position is outdated, while starting a header
+				cache also loads file from disk again (hardfall route)
+=end
+
+
+		# Inserts into a file of the name that's specified in the function.
+		# Data is stored in nested hashes:
+		#
+		# {:headers=>{'name'=>'your_name_here'}, :body=>{'password'=>'secure_password'}}
+		#
+		# !!! OR !!!
+		#
+		# Single strings for field data
+		#
+		# 'some string to be stored'
+		# => { :body=>{ :$some_version=>{ :note=>'some string to be stored' } } }
+		#
+		def insert(name, data)
+			if @headers.key?(name)
+				cache_files
+			else
+
+			end
+			df = DataFile.new(name, self)
+
+			dd = {}
+			dd['password'] = "blume123"
+
+			df.insert(dd)
+			return
+
+			data.each do |key, value|
+				puts "#{key} and some #{value}"
+			end
+		end
+
+		# Loads a file with the clear name from headers.
+		# If file isn't found in headers vault is recached
+		# and file is then loaded from headers.
+		#
+		# If file isn't found in headers error is output.
+		#
+		def load_file name
 		end
 
 		def close
@@ -165,7 +234,12 @@ module Reedb
 
 		private
 
-		def cache_header
+		def scan_vault
+
+		end
+
+		def cache_headers
+			warn "[DEPRECIATED] DO NOT USE! Use 'cache_headers mode' instead."
 			Dir.glob("#{@path}/data/*.ree") do |file|
 				f = File.open(file, 'r')
 
@@ -173,17 +247,19 @@ module Reedb
 				decrypted = @krypt.decrypt_string(encrypted)
 				yaml = YAML.load(decrypted)
 
-				@header["#{Pathname.new("#{file}").basename}"] = {}
-				@header["#{Pathname.new("#{file}").basename}"]['name'] = yaml['header']['name']
-				@header["#{Pathname.new("#{file}").basename}"]['url'] = yaml['header']['url']
-				@header["#{Pathname.new("#{file}").basename}"]['category'] = yaml['header']['category']
-				@header["#{Pathname.new("#{file}").basename}"]['latest'] = yaml['header']['latest']	
+				@headers["#{Pathname.new("#{file}").basename}"] = {}
+				@headers["#{Pathname.new("#{file}").basename}"]['name'] = yaml['headers']['name']
+				@headers["#{Pathname.new("#{file}").basename}"]['url'] = yaml['headers']['url']
+				@headers["#{Pathname.new("#{file}").basename}"]['category'] = yaml['headers']['category']
+				@headers["#{Pathname.new("#{file}").basename}"]['latest'] = yaml['headers']['latest']	
 			end
 		end
 
 
-		def cache_header(mode = :secure)
-			@header = {}
+		def cache_headers(mode = :secure)
+			puts "This isn't implemented yet and you should really stick to secure mode!" if mode == :fast
+
+			@headers = {}
 			VaultLogger.write("Starting a cache cycle at #{Reedb::Utilities::get_time} in #{mode} mode.", 'debug')
 
 			Dir.glob(Reedb::Utilities::append_to_path_dir(@path, ['data', '*.ree'])) do |file|
@@ -191,14 +267,13 @@ module Reedb
 				f = File.open(file, 'r')
 				encryted = f.read
 				decrypted = @crypt.decrypt_string(encrypted)
-
 			end
-			if mode == :fast
-				puts "This isn't implemented yet and you should really stick to secure mode!"
-			end
-
-
 		end
+
+		# def cache_file(name)
+			
+		# 	@files[name] = 
+		# end
 
 		def cache_files(mode = :secure)
 
@@ -282,8 +357,9 @@ module Reedb
 					raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
 				end
 			rescue EncryptionError => e
-			 	puts e.message
+				puts e.message
 			end
 		end
-	end
-end
+	
+	end # class close
+end # module close

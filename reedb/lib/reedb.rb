@@ -31,6 +31,8 @@ module Reedb
 			@@testvar = global_os
 			@@passlength = passlength
 
+			@@vaults = {}
+
 			if global_os == :win
 				# => Do windows shit here
 			else
@@ -38,10 +40,15 @@ module Reedb
 			end
 		end
 
+		def active_vaults
+			return @@vaults
+		end
+
 		# Default encryption type is 'AES'
 		#
 		def vault(name='default', path=nil, encrypt='auto_fill')
-			return ReeVault.new(name, path, encrypt)
+			@@vaults[name] = ReeVault.new(name, path, encrypt)
+			return @@vaults[name]
 		end
 	end
 end
@@ -52,4 +59,14 @@ Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
 path = File.expand_path('~/Desktop/')
 
 # Default encryption is set to 'aes'
-Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)
+Reedb.vault(name='default', "#{path}", :aes).secure_config(true).load(user_pw)
+
+sample_data = {}
+sample_data['header'] = {}
+sample_data['header']['name'] = "Sample"
+sample_data['header']['category'] = "Unsorted"
+sample_data['body'] = {}
+sample_data['body']['username'] = "spacekookie"
+sample_data['body']['password'] = 'the_flying_unicorn_shits_rainbows'
+
+Reedb.active_vaults['default'].insert('Sample', sample_data)

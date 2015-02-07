@@ -1,0 +1,851 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"con",
+				"construct_path"
+			],
+			[
+				"registe",
+				"register_form"
+			],
+			[
+				"sess",
+				"session"
+			],
+			[
+				"login",
+				"login_form"
+			],
+			[
+				"session",
+				"session_params"
+			],
+			[
+				"do",
+				"do"
+			],
+			[
+				"require",
+				"require_relative"
+			],
+			[
+				"ac",
+				"active_vaults"
+			],
+			[
+				"enc",
+				"encrypted_json"
+			],
+			[
+				"json",
+				"json_data"
+			],
+			[
+				"decry",
+				"decrypted_bson"
+			],
+			[
+				"encry",
+				"encrypted_bson"
+			],
+			[
+				"bson",
+				"bson_data"
+			],
+			[
+				"file",
+				"file"
+			],
+			[
+				"if",
+				"ife	if … else … end"
+			],
+			[
+				"vault",
+				"vault_name"
+			],
+			[
+				"app",
+				"append_to_path"
+			],
+			[
+				"secu",
+				"secure_config"
+			],
+			[
+				"Enc",
+				"EncryptionError"
+			],
+			[
+				"Arr",
+				"ArraysGetsBigger"
+			],
+			[
+				"alrea",
+				"already_logging"
+			],
+			[
+				"Vau",
+				"VaultExistsAtLocationError"
+			],
+			[
+				"glo",
+				"global_conf"
+			],
+			[
+				"requi",
+				"require_relative"
+			],
+			[
+				"user",
+				"user_password"
+			],
+			[
+				"init",
+				"init_encryption"
+			],
+			[
+				"Miss",
+				"MissingEncryptionTypeError"
+			],
+			[
+				"Reed",
+				"ReedbHandler"
+			],
+			[
+				"tar",
+				"tarball"
+			],
+			[
+				"form",
+				"format"
+			],
+			[
+				"int",
+				"input_file"
+			],
+			[
+				"si",
+				"sizeY"
+			],
+			[
+				"main",
+				"mainScreenSize"
+			],
+			[
+				"__",
+				"__VALUE__"
+			],
+			[
+				"tmp_",
+				"tmp_opt"
+			],
+			[
+				"tm",
+				"tmp_cut"
+			],
+			[
+				"tmp",
+				"tmp_opt"
+			],
+			[
+				"cmd",
+				"cmd_ranges"
+			],
+			[
+				"mast",
+				"masters"
+			],
+			[
+				"opt",
+				"option_input"
+			],
+			[
+				"option",
+				"option_input"
+			],
+			[
+				"start",
+				"start_index"
+			],
+			[
+				"moun",
+				"mount"
+			],
+			[
+				"ses",
+				"sessions"
+			],
+			[
+				"make",
+				"makepid"
+			],
+			[
+				"se",
+				"sessions"
+			],
+			[
+				"j",
+				"javaMLVersion"
+			],
+			[
+				"prime",
+				"primeCounter"
+			],
+			[
+				"ca",
+				"candidates"
+			],
+			[
+				"n",
+				"number"
+			],
+			[
+				"d",
+				"displayTheStack"
+			],
+			[
+				"array",
+				"arraySize"
+			],
+			[
+				"arrayIn",
+				"arrayIndexHash"
+			],
+			[
+				"arra",
+				"arrayIndexHash"
+			],
+			[
+				"el",
+				"elements"
+			],
+			[
+				"new",
+				"newValue"
+			],
+			[
+				"fi",
+				"fib"
+			],
+			[
+				"pr",
+				"println"
+			],
+			[
+				"repl",
+				"replacement"
+			],
+			[
+				"repla",
+				"replacement"
+			],
+			[
+				"is",
+				"isLeft"
+			],
+			[
+				"vau",
+				"vaults"
+			],
+			[
+				"des",
+				"destroy_log"
+			],
+			[
+				"has",
+				"hash_name"
+			],
+			[
+				"up",
+				"up_zero"
+			],
+			[
+				"act",
+				"active_vault"
+			],
+			[
+				"pw",
+				"pw_hash"
+			],
+			[
+				"stored",
+				"stored_hash"
+			],
+			[
+				"key",
+				"key_hash"
+			],
+			[
+				"vaut",
+				"vault_fields"
+			],
+			[
+				"requ",
+				"require_relative"
+			],
+			[
+				"host",
+				"hostname"
+			],
+			[
+				"hash",
+				"hash_base160"
+			],
+			[
+				"ui",
+				"ui_notepad"
+			],
+			[
+				"in",
+				"insertFirst"
+			],
+			[
+				"Link",
+				"LinkedList"
+			],
+			[
+				"type",
+				"typeParameterClass"
+			]
+		]
+	},
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 450.0,
+		"selected_items":
+		[
+			[
+				"yaml",
+				"Set Syntax: YAML"
+			],
+			[
+				"SASS",
+				"Set Syntax: SCSS"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"go",
+				"Set Syntax: Groovy"
+			],
+			[
+				"ssgroo",
+				"Set Syntax: Groovy"
+			],
+			[
+				"scss",
+				"Set Syntax: SCSS"
+			],
+			[
+				"css",
+				"Set Syntax: CSS"
+			],
+			[
+				"sscss",
+				"Set Syntax: CSS"
+			],
+			[
+				"java",
+				"Set Syntax: Java"
+			],
+			[
+				"ss",
+				"Set Syntax: MATLAB"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"ss ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"ss python",
+				"Set Syntax: Python"
+			],
+			[
+				"groo",
+				"Set Syntax: Groovy"
+			],
+			[
+				"ssgro",
+				"Set Syntax: Groovy"
+			],
+			[
+				"ssg",
+				"Set Syntax: Groovy"
+			],
+			[
+				"ss java",
+				"Set Syntax: Java"
+			],
+			[
+				"r",
+				"Build: Run Java"
+			],
+			[
+				"run",
+				"Build: Run Java"
+			],
+			[
+				"groovy",
+				"Set Syntax: Groovy"
+			],
+			[
+				"gro",
+				"Set Syntax: Groovy"
+			],
+			[
+				"goo",
+				"Set Syntax: Groovy"
+			],
+			[
+				"grooy",
+				"Set Syntax: Groovy"
+			],
+			[
+				"pack",
+				"Preferences: Browse Packages"
+			],
+			[
+				"plain",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"rn",
+				"Build: Run Java"
+			],
+			[
+				"ru",
+				"Build: Run Java"
+			],
+			[
+				"markd",
+				"Set Syntax: Markdown"
+			],
+			[
+				"aml",
+				"Set Syntax: YAML"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"sso",
+				"Set Syntax: OCaml"
+			],
+			[
+				"ss o",
+				"Set Syntax: OCamlyacc"
+			],
+			[
+				"ss py",
+				"Set Syntax: Python"
+			],
+			[
+				"ss yaml",
+				"Set Syntax: YAML"
+			],
+			[
+				"ss plain",
+				"Set Syntax: Plain Text"
+			]
+		],
+		"width": 588.0
+	},
+	"console":
+	{
+		"height": 202.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/spacekookie/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/spacekookie/.config/sublime-text-3/Packages/User/Ruby.sublime-settings",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/	from /home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb.rb",
+		"/home/spacekookie/android_studio.desktop",
+		"/home/spacekookie/documents/code/projects/python/noob/testapp/Makefile",
+		"/home/spacekookie/documents/code/projects/python/noob/src/native_handle.c",
+		"/home/spacekookie/documents/code/projects/java/graviton/.project",
+		"/home/spacekookie/documents/code/projects/java/graviton/build.gradle",
+		"/home/spacekookie/Desktop/WHILE",
+		"/home/spacekookie/Desktop/crashcourse.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/layouts/application.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/config/routes.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/session/login_form.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/session/register_form.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/README.md",
+		"/home/spacekookie/.rvm/gems/ruby-2.1.5/gems/bootstrap-sass-3.3.3/assets/stylesheets/bootstrap/_navbar.scss",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/assets/stylesheets/bootstrap.scss",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/users/_form.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/Gemfile",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/assets/stylesheets/bootstrap/_variables_custom.scss",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/assets/stylesheets/scaffolds.scss",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/models/user.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/assets/javascripts/application.js",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/controllers/users_controller.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/models/ability.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/users/show.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/assets/stylesheets/application.scss",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/controllers/application_controller.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/dashboard/access_denied.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/controllers/dashboard_controller.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/dashboard/index.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/controllers/session_controller.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/models/faux_model.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/models/session.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/config/environments/production.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/assets/stylesheets/application.css",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/app/views/users/index.html.haml",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/config/application.rb",
+		"/home/spacekookie/documents/code/projects/ruby/comicDB/comicdb/config/environments/development.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/README.md",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/errors/encryption_errors.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/peter_pan_ist_scheisse.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/Gemfile",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb.rb",
+		"/home/spacekookie/Desktop/default.reevault/config",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/tests/play.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/errors/vault_errors.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reepass/ReepassAPI/lib/reepass/utilities/general.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/utils/logger.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/undefined method `info' for nil",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/tests/pom",
+		"/usr/lib/ruby/1.9.1/rubygems/custom_require.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reepass/ReepassAPI/lib/reepass.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/security/master.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/LICENSE",
+		"/home/spacekookie/documents/code/projects/ruby/Test/LICENSE",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/utils/utilities.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/utils/logger..rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/security/aes.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/security/multifish.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/security/twofish.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/constants.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/reevault.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/lib/reedb/config.rb",
+		"/home/spacekookie/documents/code/projects/ruby/reedb/reedb/reedb.gemspec",
+		"/usr/share/applications/sublime_text.desktop",
+		"/home/spacekookie/Documents/Projects/Poke/poke/handlers.py",
+		"/home/spacekookie/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/spacekookie/Documents/Projects/R2Soft/interstellar-empires/IEMaster/IEClient/src/main/de/r2soft/empires/client/screens/gameplay/HexMapScreen.java",
+		"/home/spacekookie/Documents/Projects/Poke/poke/settings.py",
+		"/home/spacekookie/Documents/Projects/Poke/poke/errors.py",
+		"/home/spacekookie/Documents/Projects/Poke/poke/constants.py",
+		"/home/spacekookie/Documents/Projects/Poke/setup.py",
+		"/home/spacekookie/Documents/Projects/Poke/poke/__init__.py",
+		"/home/spacekookie/Documents/Projects/Poke/poke/exceptions.py",
+		"/home/spacekookie/Documents/Uni/GDP/code/Querprodukt.java",
+		"/home/spacekookie/Documents/Projects/R2Soft/Project-Meitner/build.gradle",
+		"/home/spacekookie/Desktop/Google/hashing/Tree.java",
+		"/home/spacekookie/Desktop/Google/hashing/HashTable.java",
+		"/home/spacekookie/Desktop/Google/primes.rb",
+		"/tmp/TestIterators.java",
+		"/home/spacekookie/Desktop/Google/Exception in thread \"main\" java.lang.NumberFormatException",
+		"/home/spacekookie/Desktop/Google/The sum is",
+		"/home/spacekookie/Desktop/Google/Problems.java",
+		"/home/spacekookie/Desktop/Google/prime.py",
+		"/home/spacekookie/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/spacekookie/Desktop/push.py",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/init.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/vault_file.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/transposer.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/reevault.rb",
+		"/usr/share/applications/kde4/kleopatra.desktop",
+		"/home/spacekookie/Desktop/private_key.asc",
+		"/home/spacekookie/Desktop/public_key.asc",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/data_file.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/constants.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/interfaces/http_packaging.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/logger/app_logger.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/logger/vault_logger.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/security/integrity_checker.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/config.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/security/robocrypt.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/tests/key_default.reevault/data/f6e0758e1e656ae9f7130d3b8bb04f262ac70bdd.ree",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/test.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/tests/key_default.reevault/data/ea25f97e5a4a2d166b5e7f7ede75632396fe4d71.ree",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/tests/key_default.reevault/global.yml",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/Time elapsed",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/interfaces/http_socket.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/interfaces/mega.json",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/tests/key_default.reevault/logs/2014-10-29.log",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/interfaces/http_handler.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/tests/key_default.reevault/data/da39a3ee5e6b4b0d3255bfef95601890afd80709.ree",
+		"/home/spacekookie/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/monkeys/string.rb",
+		"/home/spacekookie/Documents/Projects/Reepass/API/ReepassAPI/lib/reepass/utilities/hash.rb",
+		"/home/spacekookie/code/training/start.py",
+		"/opt/eclipse/eclipse.desktop",
+		"/home/spacekookie/code/training/Animals.java",
+		"/home/spacekookie/code/training/Data.java",
+		"/home/spacekookie/code/Data.java",
+		"/home/spacekookie/code/data.rb",
+		"/usr/share/applications/Games/Rimworld.desktop",
+		"/home/spacekookie/Documents/Writing/Mirage/#001.scriv/#001.scrivx",
+		"/usr/share/applications/smartgit.desktop",
+		"/usr/share/applications/Games/KSP 0.25.desktop",
+		"/opt/smartgit/bin/smartgithg.sh",
+		"/usr/share/applications/Games/rimworld.desktop"
+	],
+	"find":
+	{
+		"height": 49.0
+	},
+	"find_in_files":
+	{
+		"height": 102.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"header",
+			"headers",
+			"key?",
+			">\n",
+			"Color",
+			"r9",
+			"nextAdd",
+			"counter",
+			"r2",
+			"r1",
+			"r0",
+			"result",
+			"currAdd",
+			"penis",
+			"var",
+			"session",
+			"Session.new",
+			"Session",
+			".open",
+			" .open",
+			" open",
+			".open",
+			"open",
+			"nav-",
+			"=",
+			":",
+			"end",
+			"user",
+			"active_record",
+			"load_file",
+			"db.",
+			"db",
+			"10.",
+			"10",
+			"json",
+			"Reedb::Utilities::",
+			"path",
+			"already_logging",
+			"check",
+			"return nil",
+			"file",
+			"StandardError",
+			"gem_original_require",
+			"ReeTime",
+			"password",
+			"@type ",
+			"crypt",
+			"start_encryption",
+			"S",
+			"encprytion",
+			"'\n",
+			"userexpan",
+			"pass",
+			"    ",
+			" \"",
+			"cmd_ranges",
+			"cmd_range",
+			"parse",
+			"parser",
+			"hasOption",
+			"pass",
+			"stats",
+			"Statics",
+			"settings",
+			"winSituation",
+			"rest",
+			"multiplicativeDigitalRoot",
+			"MultiplicativeDigitalRoot",
+			"appName",
+			"break;",
+			"case",
+			"theHeap",
+			"j",
+			"\"-1\"",
+			"number",
+			"poo",
+			"put",
+			"add",
+			"peter",
+			"put",
+			"length",
+			"iterator",
+			"boolean",
+			"it",
+			"boolean",
+			"int",
+			"vom",
+			"c",
+			"n",
+			"\"null\"",
+			"null",
+			"(this.size - 1)",
+			"this.size",
+			"number",
+			"byte",
+			"long",
+			"Node",
+			"getRepl",
+			"preOrderTransTree",
+			"inOrderTransTree",
+			"true",
+			".\n",
+			"user_password",
+			"self",
+			"return",
+			"version",
+			"file",
+			"transpose",
+			"stored_hash",
+			"pw_hash",
+			"hash",
+			"cache_config",
+			"@krypt",
+			"CryptUtils.",
+			";\n",
+			")}\"",
+			"password",
+			"hash!",
+			"LinkedList",
+			"DataedList",
+			"Link",
+			"link",
+			"Link"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"incremental_find":
+	{
+		"height": 41.0
+	},
+	"input":
+	{
+		"height": 37.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 324.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"replace":
+	{
+		"height": 78.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 575.0,
+		"selected_items":
+		[
+		],
+		"width": 437.0
+	},
+	"select_symbol":
+	{
+		"height": 37.0,
+		"selected_items":
+		[
+		],
+		"width": 450.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 315.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

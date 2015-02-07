@@ -7,6 +7,8 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
+require 'socket'
+
 module Reedb
 
 	class Timestamp
@@ -37,6 +39,9 @@ module Reedb
 		# Takes version string and increments it by 1. Does patch-minor and minor-major steps
 		# TODO: Replace this with a RegEx to split the version string at the dots, and analise it's sub-elements.
 		def self.increment_version(version)
+			# <b>DEPRECATED:</b> Please use <tt>Version class</tt> instead.
+			warn "[DEPRECIATED] `increment_version` is depreciated. Please use Version class instead."
+
 			if version?(version) # Checks if it actually is version
 				i = version[2].to_i
 
@@ -84,6 +89,10 @@ module Reedb
 			elsif platform.end_with?("Mac OS X")
 				return "osx"
 			end
+		end
+
+		def self.parse_host
+			return "#{Socket.gethostname}"
 		end
 
 		# Returns user currently logged in. Not sure for what that will be used but hey!
