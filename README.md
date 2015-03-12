@@ -1,5 +1,5 @@
-#ReeDB
-======
+ReeDB
+===
 
 Spicy Ruby database. Json document based, low dependencies, fast and secure. Made for native app development. Protects information that is worth protecting with AES, Twofish and GnuPG/ PGP.
 
