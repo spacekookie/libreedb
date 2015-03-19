@@ -45,9 +45,9 @@ module Reedb
 		# Returns a base64 encoded string
 		# Throws exceptions
 		#
-		def encrypt(cleartext)
+		def encrypt(data)
 			begin
-				AES.encrypt(cleartext, @key) unless @key.nil?
+				return AES.encrypt(data, @key) unless @key.nil?
 			rescue Exception => e
 				puts e.message
 			end
@@ -57,9 +57,9 @@ module Reedb
 		# Returns the original clear text.
 		# Throws exceptions
 		# 
-		def decrypt(cyphertext)
+		def decrypt(data)
 			begin
-				AES.decrypt(cyphertext, @key) unless @key.nil?
+				return AES.decrypt(data, @key) unless @key.nil?
 			rescue Exception => e
 				puts e.message
 			end

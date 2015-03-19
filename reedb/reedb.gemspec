@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = Reedb::VERSION
   spec.authors       = ["Random Robot Softworks"]
   spec.email         = ["katharina.sabel@2rsoftworks.de"]
-  spec.summary       = %q{Ruby filebased database using encryption from it's core. Used to power reepass}
-  spec.description   = %q{Ruby database. Uses json and yaml files for data storage. Uses aes and twofish for encryption. Sha256 and Tiger2/192 for hashing. Encprytion from the core.}
+  spec.summary       = %q{Ruby file-based database using encryption from it's core. Used to power reepass}
+  spec.description   = %q{Ruby database. Uses json files for data storage. Uses aes and twofish for encryption. Sha256 and Tiger2/192 for hashing and integrety checking. Encprytion from the core.}
   spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.license       = "LGPL v3.0"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

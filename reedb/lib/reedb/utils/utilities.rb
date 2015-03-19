@@ -117,13 +117,5 @@ module Reedb
 				return "[#{val_h} #{val_t}]"
 			end
 		end
-
-
-		def self.append_to_path(path, item)
-			tmp = "#{path}"
-			(tmp << "\\#{item}") if Reedb::archos == :win
-			(tmp << "/#{item}") if Reedb::archos == :unix
-			return tmp
-		end
 	end
 end

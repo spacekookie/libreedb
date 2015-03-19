@@ -59,14 +59,25 @@ Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
 path = File.expand_path('~/Desktop/')
 
 # Default encryption is set to 'aes'
-Reedb.vault(name='default', "#{path}", :aes).secure_config(true).load(user_pw)
+Reedb.vault(name='default', "#{path}", :aes).load(user_pw)
 
-sample_data = {}
-sample_data['header'] = {}
-sample_data['header']['name'] = "Sample"
-sample_data['header']['category'] = "Unsorted"
-sample_data['body'] = {}
-sample_data['body']['username'] = "spacekookie"
-sample_data['body']['password'] = 'the_flying_unicorn_shits_rainbows'
+data = {:header=>{'url'=>'www.reepass.org'}, :body=>{'password'=>'secure_password', 'username'=>'spacekookie'}}
 
-Reedb.active_vaults['default'].insert('Sample', sample_data)
+# Reedb.active_vaults['default'].insert('Sample File', data)
+
+# begin
+# 	Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)
+
+# 	sample_data = {}
+# 	sample_data['header'] = {}
+# 	sample_data['header']['name'] = "Sample"
+# 	sample_data['header']['category'] = "Unsorted"
+# 	sample_data['body'] = {}
+# 	sample_data['body']['username'] = "spacekookie"
+# 	sample_data['body']['password'] = 'the_flying_unicorn_shits_rainbows'
+
+# 	Reedb.active_vaults['default'].insert('Sample', sample_data)
+
+# rescue
+# 	puts "Error occured opening your vault. Does it exist?"
+# end

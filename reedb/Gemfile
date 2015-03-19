@@ -3,10 +3,10 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in reedb.gemspec
 gemspec
 
-# Encryption
+# Security!
 gem 'aes', '>=0.5.0'
 gem 'twofish', '>=1.0.5'
+gem 'digest-tiger', '~> 1.0.2'
 
-# Data management
-gem 'bson', '~> 2.3.0' 
+# Data storage
 gem 'json', '~> 1.8.2' 

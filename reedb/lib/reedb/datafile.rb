@@ -8,6 +8,7 @@
 # ====================================================
 
 require_relative 'utils/version'
+require_relative 'security/encryption'
 
 module Reedb
 	class DataFile
@@ -27,10 +28,22 @@ module Reedb
 		#
 		attr_reader :version
 
+		# attr_reader :dataset
+
 		# Default constructor for a datafile.
 		#
-		def initialize(name, vault)
-			@version = Version.new()
+		def initialize(name, vault, old_file = nil)
+			if old_file
+				@dataset = old_file
+				puts @dataset
+				return
+
+				@name = @dataset['header']['name']
+				@version = Version.new(@dataset['header']['latest'])
+				
+				construct_path(@name, @vault)
+			end
+			@version = Version.new
 			@vault = vault
 			@name = name
 			construct_path(@name, @vault)
@@ -38,50 +51,78 @@ module Reedb
 		end
 
 
-		def insert(f, master = :body)
-			@version.update # => Updates the version of the file
-			@dataset['body']["#{version}"]['note'] = f if f.is_a?(String)
+		def insert(data, mode = :hard)
+			# => Updates the version of the file if neccesary
+			@version.update if @dataset['body'][@version] == {}
+			
+			# @dataset['body']["#{version}"]['note'] = data if data.is_a?(String)
 
-			f.each do |parent, child|
-				if master == :header
-					@dataset['header']["#{version}"] = {}
-					@dataset['header']["#{version}"]["#{parent}"] = "#{child}"
-				elsif master == :body
-					@dataset['body']["#{version}"] = {}
-					@dataset['body']["#{version}"]["#{parent}"] = "#{child}"
-				else
-					puts "Error: Unknown master type."
+			data.each do |master, section|
+				if master == 'body'
+					@dataset[master]["#{@version}"] = {} unless @dataset[master]["#{@version}"]
+				end
+
+				section.each do |key, value|
+					if master == 'header'
+						@dataset[master][key] = value
+						next
+					end
+
+					@dataset[master]["#{@version}"][key] = value
+					@dataset['header']['latest'] = @version
 				end
 			end
+			sync if mode == :hard
+		end
+
+		def read(value, mode = :hard)
+
 		end
 
 		# Has two modes. In soft-mode it schedules a sync with the file system.
-		# In hard-mode (default) it force syncs itself with the filesystem by itself
+		# In hard-mode (default) it force syncs itself with the filesystem by itself after every insert.
 		#
-		def sync mode
-			@mode = :hard if mode == nil
+		def sync
+			json_data = @dataset.to_json
+			#puts json_data
+			crypt_json = @vault.crypt.encrypt(json_data)
 
+			tmp = File.open("#{@path}", "wb+")
+			tmp.write(Base64.encode64("#{crypt_json}"))
+			tmp.close
 		end
 
-		# Closes the file on the file system and dumps the header reference from the
-		# containing vault.
+		# Closes the file on the file system and dumps the header 
+		# reference from the containing vault.
+		# Usually only called on vault close & lock.
 		#
 		def close
 
 		end
 
+		def to_s
+			@dataset
+		end
+
 		private
+
+		def needs_update
+
+		end
 
 		def fill_file
 			@dataset = {}
 			@dataset['header'] = {}
-			@dataset['body'] = {}
 			@dataset['header']['name'] = @name
+			@dataset['header']['latest'] = @version
+			@dataset['body'] = {}
+			@version.update
+			@dataset['body']["#{@version}"] = {}
+			# @dataset['body']["#{@version}"]['name'] = @name
 		end
 
 		def construct_path(name, vault)
-			base_path = Reedb::Utilities::append_to_path("#{vault.path}", "data")
-			@path = "#{Reedb::Utilities::append_to_path(base_path, name)}"
+			@path = "#{vault.path}/data/#{SecurityUtils::tiger_hash(@name)}.ree"
 		end
 	end
 end

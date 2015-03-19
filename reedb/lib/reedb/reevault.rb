@@ -34,6 +34,10 @@ module Reedb
 
 		attr_reader :path
 
+		# Encryption handler to be used by the vault files
+		#
+		attr_reader :crypt
+
 		# Constructor for a vault with name, path and encryption enum.
 		# Valid encryption parameters are :aes, :twofish, :multi and :auto_fill
 		#
@@ -131,7 +135,7 @@ module Reedb
 		end
 
 		def load(password)
-			self.includes?('config') # => Returns the existance of the central config
+			return unless self.includes?('config') # => Returns the existance of the central config
 
 			init_logger(false)
 
@@ -140,18 +144,17 @@ module Reedb
 				# Config is stored with ASCII Armour
 				@config = read_secure_info('config')
 			else
-				conp = Reedb::Utilities::append_to_path(@path, 'config')
-				@config = YAML.load_file(conp)
+				@config = YAML.load_file("#{@path}/config")
 			end
 
 			@headers = {}
 			@files = {}
 
+			return nil unless unlock_vault("#{password}")
+			puts "Just finished loading..."
+			cache_headers
+
 			return self
-
-			unlock_vault("#{password}") # => Reading config from file
-
-			
 
 			# => Cache the vault
 			cache_headers
@@ -196,21 +199,15 @@ update_file --> Loads a file, either from a header position (default route)
 		#
 		def insert(name, data)
 			if @headers.key?(name)
-				cache_files
+				# cache_files
 			else
-
+				puts "File already exists. Going to edit mode."
 			end
 			df = DataFile.new(name, self)
+			df.insert(data)
 
-			dd = {}
-			dd['password'] = "blume123"
-
-			df.insert(dd)
-			return
-
-			data.each do |key, value|
-				puts "#{key} and some #{value}"
-			end
+			# Update the
+			# cache_headers
 		end
 
 		# Loads a file with the clear name from headers.
@@ -228,33 +225,29 @@ update_file --> Loads a file, either from a header position (default route)
 
 		# Quickly returns if a file exists in the vault or it's children.
 		def includes?(file)
-			file_to_check = Reedb::Utilities::append_to_path("#{@path}", "#{file}")
-			return File.exists?("#{file_to_check}")
+			return File.exists?("#{@path}/#{file}")
+		end
+
+		def to_s
+			return "Vault: #{@name}, Path: #{@path}, File count: #{get_filecount}"
 		end
 
 		private
 
-		def scan_vault
-
-		end
-
-		def cache_headers
-			warn "[DEPRECIATED] DO NOT USE! Use 'cache_headers mode' instead."
-			Dir.glob("#{@path}/data/*.ree") do |file|
-				f = File.open(file, 'r')
-
-				encrypted = f.read
-				decrypted = @krypt.decrypt_string(encrypted)
-				yaml = YAML.load(decrypted)
-
-				@headers["#{Pathname.new("#{file}").basename}"] = {}
-				@headers["#{Pathname.new("#{file}").basename}"]['name'] = yaml['headers']['name']
-				@headers["#{Pathname.new("#{file}").basename}"]['url'] = yaml['headers']['url']
-				@headers["#{Pathname.new("#{file}").basename}"]['category'] = yaml['headers']['category']
-				@headers["#{Pathname.new("#{file}").basename}"]['latest'] = yaml['headers']['latest']	
+		# 	@files[name] = 
+		# end
+		def cache_files(mode = :secure)
+			Dir.foreach(@path + "/data") do |item|
+				next if item == "." || item == ".."
 			end
 		end
 
+		def get_filecount
+		end
+
+		def scan_vault
+
+		end
 
 		def cache_headers(mode = :secure)
 			puts "This isn't implemented yet and you should really stick to secure mode!" if mode == :fast
@@ -262,33 +255,32 @@ update_file --> Loads a file, either from a header position (default route)
 			@headers = {}
 			VaultLogger.write("Starting a cache cycle at #{Reedb::Utilities::get_time} in #{mode} mode.", 'debug')
 
-			Dir.glob(Reedb::Utilities::append_to_path_dir(@path, ['data', '*.ree'])) do |file|
-
+			Dir.glob("#{@path}/data/*.ree") do |file|
 				f = File.open(file, 'r')
-				encryted = f.read
-				decrypted = @crypt.decrypt_string(encrypted)
+				encrypted = Base64.decode64(f.read)
+				decrypted = @crypt.decrypt(encrypted)
+
+				data = JSON.parse(decrypted)
+				df = DataFile.new(nil, self, data)
+
+				# decrypted = @krypt.decrypt_string(encrypted)
+				# yaml = YAML.load(decrypted)
+
+				# f = File.open("#{file}", 'r+')
+				# encrypted = f.read
+				# puts encrypted
+				# puts "#{encrypted}"
+				# decrypted = @crypt.decrypt(encrypted)
+				# puts decrypted
 			end
-		end
-
-		# def cache_file(name)
-			
-		# 	@files[name] = 
-		# end
-
-		def cache_files(mode = :secure)
-
 		end
 
 		# Builds the vault path from a path, name and trimming
 		# additional slashes from the end.
-		#
+		#TODO: FIX THIS!
 		def construct_path(name, path)
 			(@name = name ; @path = "")
-			if Reedb::archos == :unix
-				path.end_with?("/") ? @path = "#{path}#{name}.reevault" : @path = "#{path}/#{name}.reevault"
-			else
-				path.end_with?("\\") ? @path = "#{path}#{name}.reevault" : @path = "#{path}\\#{name}.reevault"
-			end
+			path.end_with?("/") ? @path = "#{path}#{name}.reevault" : @path = "#{path}/#{name}.reevault"
 		end
 
 		def update_secure_info(name, data = nil)
@@ -297,7 +289,7 @@ update_file --> Loads a file, either from a header position (default route)
 		end
 
 		def read_secure_info(name)
-			path = Reedb::Utilities::append_to_path(@path, "#{name}")
+			path = "#{@path}/#{name}"
 			return Base64.decode64(File.open(path, "r").read())
 		end
 
@@ -330,7 +322,7 @@ update_file --> Loads a file, either from a header position (default route)
 			return true
 		end
 
-		def encryption?(password)
+		def encryption? password
 			begin
 				@encrypted_key = @crypt.start_encryption(password)
 			rescue EncryptionError => e
@@ -338,6 +330,17 @@ update_file --> Loads a file, either from a header position (default route)
 				return false
 			end
 			return true
+		end
+
+		def unlock_vault pw
+			@encrypted_key = read_secure_info('cey') unless @encrypted_key
+			@crypt.start_encryption(pw, @encrypted_key)
+			remove_instance_variable(:@encrypted_key)
+			return true if @crypt.init
+
+			# If encryption init failed...
+			puts "Wrong user password!"
+			return false
 		end
 
 		# This method checks what encryption to use by enums.

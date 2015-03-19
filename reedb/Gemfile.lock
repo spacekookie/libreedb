@@ -7,7 +7,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     aes (0.5.0)
-    bson (2.3.0)
+    digest-tiger (1.0.2)
     json (1.8.2)
     rake (10.4.2)
     twofish (1.0.5)
@@ -17,8 +17,8 @@ PLATFORMS
 
 DEPENDENCIES
   aes (>= 0.5.0)
-  bson (~> 2.3.0)
   bundler (~> 1.7)
+  digest-tiger (~> 1.0.2)
   json (~> 1.8.2)
   rake (~> 10.0)
   reedb!

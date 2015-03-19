@@ -38,17 +38,17 @@ module Reedb
 	class SecurityUtils
 
 		# => Returns 190 bit tiger hash
+		# DO NOT USE FOR PASSWORD HASHING!
+		# Used to hash file-names in vaults
+		#
 		def self.tiger_hash(string)
 			return Digest::Tiger.hexdigest("#{string}")
 		end
 
-
-		# => Returns 32 byte sha hash.
-		def self.sha256_hash(string)
-			return Digest::SHA256.hexdigest("#{string}")
-		end
-
 		# => Returns 64 byte sha hash.
+		# DO NOT USE FOR PASSWORD HASHING!
+		# Used for integrety checking files
+		#
 		def self.sha512_hash(string)
 			return Digest::SHA512.hexdigest("#{string}")
 		end

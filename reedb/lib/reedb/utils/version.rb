@@ -14,19 +14,35 @@ module Reedb
 
 		attr_reader :host, :timestamp, :numeral
 
-		def initialize
-			@host = host
-			@timestamp = Reedb::Utilities::parse_host
-			@numeral = [1, 0]
+		def initialize(existing = nil)
+			if existing
+				data = existing.split('_')
+				@host = data[0]
+				@numeral = data[1].split('.')
+				@timestamp = data[2]
+				return self
+			end
+			@host = Reedb::Utilities::parse_host
+			@timestamp = DateTime.now.strftime('%Q')
+			@numeral = [0, 0]
 		end
 
 		def update
-			@timestamp = Timestamp.new
+			@timestamp = DateTime.now.strftime('%Q')
 			@host == Reedb::Utilities::parse_host ? incr_last : incr_first
+			@host = Reedb::Utilities::parse_host
 		end
 
+		# def greater(other)
+		# 	if @timestamp > other.timestamp
+		# 		puts "This is greater"
+		# 	else
+		# 		puts "Other is greater"
+		# 	end
+		# end
+
 		def to_s
-			return "#{@host}_#{@numeral}_#{@timestamp}"
+			return [@host, @numeral.join('.'), @timestamp].join('_')
 		end
 
 		private
@@ -39,6 +55,5 @@ module Reedb
 		def incr_last
 			@numeral[-1] += 1
 		end
-
 	end
 end
