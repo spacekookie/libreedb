@@ -21,3 +21,6 @@ end
 
 class VaultLoggerError < VaultError
 end
+
+class BadCacheError < VaultError
+end

@@ -24,11 +24,7 @@ module Reedb
 		# Logs are limited not in size but only by dates. Vault logs don't contain whitespaces.
 		#
 		def self.setup(path)
-			if Reedb::archos == :unix
-				log_path = "#{path}/logs/#{Reedb::Utilities.get_time(true)}.log"
-			else
-				log_path = "#{path}\\logs\\#{Reedb::Utilities.get_time(true)}.log"
-			end
+			log_path = "#{path}/logs/#{Reedb::Utilities.get_time(true)}.log"
 			@@logger = Logger.new("#{log_path}")
 		end
 

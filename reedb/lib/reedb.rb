@@ -59,11 +59,13 @@ Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
 path = File.expand_path('~/Desktop/')
 
 # Default encryption is set to 'aes'
-Reedb.vault(name='default', "#{path}", :aes).load(user_pw)
+Reedb.vault('default', "#{path}", :aes).load(user_pw)
 
-data = {:header=>{'url'=>'www.reepass.org'}, :body=>{'password'=>'secure_password', 'username'=>'spacekookie'}}
+data = {'header'=>{'url'=>'www.reepass.org'}, 'body'=>{'password'=>'secure_password', 'username'=>'spacekookie'}}
 
-# Reedb.active_vaults['default'].insert('Sample File', data)
+# Reedb.active_vaults['default'].insert('lonelyrobot.io', data)
+
+puts Reedb.active_vaults['default'].read_file('Sample File')
 
 # begin
 # 	Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)
@@ -81,3 +83,5 @@ data = {:header=>{'url'=>'www.reepass.org'}, :body=>{'password'=>'secure_passwor
 # rescue
 # 	puts "Error occured opening your vault. Does it exist?"
 # end
+
+Reedb.active_vaults['default'].close

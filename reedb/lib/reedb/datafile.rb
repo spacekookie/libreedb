@@ -35,27 +35,23 @@ module Reedb
 		def initialize(name, vault, old_file = nil)
 			if old_file
 				@dataset = old_file
-				puts @dataset
-				return
-
 				@name = @dataset['header']['name']
 				@version = Version.new(@dataset['header']['latest'])
-				
-				construct_path(@name, @vault)
+				@vault = vault
+			else
+				@version = Version.new
+				@vault = vault
+				@name = name
+				fill_file
 			end
-			@version = Version.new
-			@vault = vault
-			@name = name
 			construct_path(@name, @vault)
-			fill_file
 		end
 
 
 		def insert(data, mode = :hard)
 			# => Updates the version of the file if neccesary
+			# puts (@dataset['body'][@version] == {})
 			@version.update if @dataset['body'][@version] == {}
-			
-			# @dataset['body']["#{version}"]['note'] = data if data.is_a?(String)
 
 			data.each do |master, section|
 				if master == 'body'
@@ -75,8 +71,9 @@ module Reedb
 			sync if mode == :hard
 		end
 
-		def read(value, mode = :hard)
-
+		def cache mode
+			return @dataset['header'] if mode == :header
+			return @dataset if mode == :full
 		end
 
 		# Has two modes. In soft-mode it schedules a sync with the file system.
@@ -90,6 +87,7 @@ module Reedb
 			tmp = File.open("#{@path}", "wb+")
 			tmp.write(Base64.encode64("#{crypt_json}"))
 			tmp.close
+			VaultLogger.write("File #{@name} has been synced", 'debug')
 		end
 
 		# Closes the file on the file system and dumps the header 
@@ -97,7 +95,9 @@ module Reedb
 		# Usually only called on vault close & lock.
 		#
 		def close
-
+			sync
+			remove_instance_variable(:@dataset)
+			VaultLogger.write("Closing file #{name}", 'debug')
 		end
 
 		def to_s
@@ -106,17 +106,13 @@ module Reedb
 
 		private
 
-		def needs_update
-
-		end
-
 		def fill_file
 			@dataset = {}
 			@dataset['header'] = {}
 			@dataset['header']['name'] = @name
 			@dataset['header']['latest'] = @version
 			@dataset['body'] = {}
-			@version.update
+			# @version.update
 			@dataset['body']["#{@version}"] = {}
 			# @dataset['body']["#{@version}"]['name'] = @name
 		end
