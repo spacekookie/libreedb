@@ -53,19 +53,19 @@ end
 user_pw = "1234567890123"
 
 Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
-path = File.expand_path('~/Desktop/')
+path = File.expand_path('~/Desktop/reedb')
 
 # Default encryption is set to 'aes'
 begin
 	Reedb.vault('default', "#{path}", :aes).create(user_pw)
-rescue VaultDoesNotExistError => e
+rescue VaultDoesNotExistError, VaultExistsAtLocationError => e
 	puts e.message
 	puts "If you think this is a bug, please report it <3"
-	exit
+	# exit
 end
-data = {'body'=>{'password'=>'mega_secure_password', 'username'=>'spacekookie'}}
+# data = {'body'=>{'password'=>'mega_secure_password', 'username'=>'spacekookie'}}
 
-Reedb.active_vaults['default'].insert('Peter Pan', data)
+# Reedb.active_vaults['default'].insert('Peter Pan', data)
 
 # puts Reedb.active_vaults['default'].read_file('Sample File')
 
@@ -86,6 +86,5 @@ Reedb.active_vaults['default'].insert('Peter Pan', data)
 # 	puts "Error occured opening your vault. Does it exist?"
 # end
 
-puts Reedb.active_vaults['default'].read_file('Peter Pan')
-
+# puts Reedb.active_vaults['default'].read_file('Peter Pan')
 Reedb.active_vaults['default'].close

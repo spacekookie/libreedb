@@ -44,6 +44,9 @@ module Reedb
 		#
 		def initialize(name, path, encprytion)
 			@already_logging = false
+			@headers = {}
+			@files = {}
+
 			construct_path("#{name}", "#{path}")
 			init_encryption(encprytion) # => Throws exceptions!
 			self.secure_config(false)
@@ -65,9 +68,10 @@ module Reedb
 			(password = @__PW__ ; remove_instance_variable(:@__PW__)) if password == :failed
 			return nil unless password?(password)
 			return nil unless encryption?(password)
+
+			# puts "This is the password: #{password}"
 			
 			# => Encryption now active and key available under @crypt.key
-
 			@conf_path = "#{@path}/config"
 
 			begin
@@ -101,14 +105,14 @@ module Reedb
 					VaultLogger.write("Vault created on #{time}. All directories created successfully!")
 
 					# => Now creating configuration file
-					config = {}
-					config['vault_name'] = "#{@name}"
-					config['creation_date'] = "#{Utilities.get_time}"
-					config['last_updated'] = "#{Utilities.get_time}"
-					config['creation_machine'] = "#{Socket.gethostname}"
-					config['updating_machine'] = "#{Socket.gethostname}"
-					config['creation_user'] = "#{Etc.getlogin}"
-					config['updating_user'] = "#{Etc.getlogin}"
+					@config = {}
+					@config['vault_name'] = "#{@name}"
+					@config['creation_date'] = "#{Utilities.get_time}"
+					@config['last_updated'] = "#{Utilities.get_time}"
+					@config['creation_machine'] = "#{Socket.gethostname}"
+					@config['updating_machine'] = "#{Socket.gethostname}"
+					@config['creation_user'] = "#{Etc.getlogin}"
+					@config['updating_user'] = "#{Etc.getlogin}"
 
 					# hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
 
@@ -117,7 +121,7 @@ module Reedb
 
 					# Now writing encrypted key to file with ASCII armour
 					update_secure_info("cey", @encrypted_key)
-					remove_instance_variable(:@encrypted_key)
+					# remove_instance_variable(:@encrypted_key)
 				end
 
 			# All other errors won't be caught!
@@ -141,9 +145,6 @@ module Reedb
 			else
 				@config = YAML.load_file("#{@path}/config")
 			end
-
-			@headers = {}
-			@files = {}
 
 			return nil unless unlock_vault("#{password}")
 			puts "Just finished loading..."
@@ -362,10 +363,13 @@ module Reedb
 			return true
 		end
 
+		# Unlocks the vault by decrypting the key and loading it into memory
+		# Enables the cryptographic module to decrypt and encrypt files.
+		#
 		def unlock_vault pw
 			@encrypted_key = read_secure_info('cey') unless @encrypted_key
 			@crypt.start_encryption(pw, @encrypted_key)
-			remove_instance_variable(:@encrypted_key)
+			remove_instance_variable(:@encrypted_key) if @encrypted_key
 			return true if @crypt.init
 
 			# If encryption init failed...
