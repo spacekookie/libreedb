@@ -26,8 +26,9 @@ require_relative 'security/aes'
 # => Import internals
 require 'fileutils'
 require 'socket'
-require 'yaml'
 require 'json'
+require 'yaml'
+require 'etc'
 
 module Reedb
 	class ReeVault
@@ -67,7 +68,7 @@ module Reedb
 			
 			# => Encryption now active and key available under @crypt.key
 
-			conf_path = Reedb::Utilities::append_to_path("#{@path}", 'config')
+			@conf_path = "#{@path}/config"
 
 			begin
 				needs_creation = true
@@ -106,20 +107,13 @@ module Reedb
 					config['last_updated'] = "#{Utilities.get_time}"
 					config['creation_machine'] = "#{Socket.gethostname}"
 					config['updating_machine'] = "#{Socket.gethostname}"
-					config['creation_user'] = "nil" # => Think of clever way to do this
-					config['updating_user'] = "nil"
+					config['creation_user'] = "#{Etc.getlogin}"
+					config['updating_user'] = "#{Etc.getlogin}"
 
-					hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
+					# hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
 
 					# => Writing configuration to disk. Either securely or insecurely
-					if @secure_config
-						update_secure_info('config', config)
-						par_path = Reedb::Utilities::append_to_path("#{@path}", "pom")
-						msg = "Why are you reading this?"
-						File.open("#{par_path}", "wb").write(Base64.encode64("#{msg}"))
-					else
-						File.open("#{conf_path}", "w"){ |f| YAML.dump(config, f) }
-					end
+					save_config
 
 					# Now writing encrypted key to file with ASCII armour
 					update_secure_info("cey", @encrypted_key)
@@ -155,15 +149,10 @@ module Reedb
 			cache_headers
 
 			return self
-
-			# => Cache the vault
-			cache_headers
-			cache_files
-			return self
-
 		end
 
 		# Read a single file from the vault in secure mode
+		# Returns the entire file in hashes (so includes all sub-versions)
 		#
 		def read_file name
 			tmp = load_file(name, :secure)
@@ -197,6 +186,10 @@ module Reedb
 			end
 			# => Make sure that everything is up to date.
 			cache_headers
+			@config['updating_user'] = "#{Etc.getlogin}"
+			@config['updating_machine'] = "#{Socket.gethostname}"
+			@config['last_updated'] = "#{Utilities.get_time}"
+			save_config
 
 			# Check for vault sync option here
 			# and then sync in an asynchronous thread or something...
@@ -296,6 +289,18 @@ module Reedb
 				return true
 			else
 				return false
+			end
+		end
+
+		def save_config
+			@conf_path = "#{@path}/config"
+			if @secure_config
+				update_secure_info('config', @config)
+				par_path = "#{@path}/pom"
+				msg = "Why are you reading this?"
+				File.open("#{par_path}", "wb").write(Base64.encode64("#{msg}"))
+			else
+				File.open("#{@conf_path}", "wb+"){ |f| YAML.dump(@config, f) }
 			end
 		end
 

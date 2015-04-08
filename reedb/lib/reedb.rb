@@ -20,9 +20,6 @@ module Reedb
 	class << self
 
 		# Returns the platform/ architecture of the daemon and vault handler
-		# Is only split into two values: unix and win. Determines a lot of file
-		# processes and manipulations in a vault.
-		#
 		def archos() (return @@testvar) end
 
 		def passlength() (return @@passlength) end
@@ -61,11 +58,11 @@ path = File.expand_path('~/Desktop/')
 # Default encryption is set to 'aes'
 Reedb.vault('default', "#{path}", :aes).load(user_pw)
 
-data = {'header'=>{'url'=>'www.reepass.org'}, 'body'=>{'password'=>'secure_password', 'username'=>'spacekookie'}}
+data = {'body'=>{'password'=>'mega_secure_password', 'username'=>'spacekookie'}}
 
-# Reedb.active_vaults['default'].insert('lonelyrobot.io', data)
+Reedb.active_vaults['default'].insert('Peter Pan', data)
 
-puts Reedb.active_vaults['default'].read_file('Sample File')
+# puts Reedb.active_vaults['default'].read_file('Sample File')
 
 # begin
 # 	Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)
@@ -83,5 +80,7 @@ puts Reedb.active_vaults['default'].read_file('Sample File')
 # rescue
 # 	puts "Error occured opening your vault. Does it exist?"
 # end
+
+puts Reedb.active_vaults['default'].read_file('Peter Pan')
 
 Reedb.active_vaults['default'].close
