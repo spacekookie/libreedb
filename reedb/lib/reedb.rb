@@ -32,8 +32,15 @@ module Reedb
 
 			if global_os == :win
 				# => Do windows shit here
+
+				# HOW THE FUCK CARES?
+				#
 			else
-				# => Do unix snazzle here
+				parent_path = "./config/reedb/"
+				master_path = "/etc/reedb/"
+				log_path = "./config/reedb/logs"
+
+				# DaemonLogger.setup(log_path)
 			end
 		end
 
@@ -57,17 +64,42 @@ path = File.expand_path('~/Desktop/reedb')
 
 # Default encryption is set to 'aes'
 begin
-	Reedb.vault('default', "#{path}", :aes).create(user_pw)
+	Reedb.vault('default', "#{path}", :aes).load(user_pw)
 rescue VaultDoesNotExistError, VaultExistsAtLocationError => e
 	puts e.message
 	puts "If you think this is a bug, please report it <3"
 	# exit
 end
-# data = {'body'=>{'password'=>'mega_secure_password', 'username'=>'spacekookie'}}
 
-# Reedb.active_vaults['default'].insert('Peter Pan', data)
+data = {
+	'body'=>{
+		'password'=>'mega_secure_password',
+		'username'=>'spacekookie'
+	}
+}
 
-# puts Reedb.active_vaults['default'].read_file('Sample File')
+data2 = {
+	'body'=>{
+		'password'=>'less_secure',
+	}
+}
+
+Reedb.active_vaults['default'].insert('Peter pan', data)
+
+begin
+	puts Reedb.active_vaults['default'].read_file('Peter pan')
+rescue
+	puts "This error was handled: could not read!"
+end
+
+
+begin
+	Reedb.active_vaults['default'].remove_file('Peter pan')
+rescue
+	puts "This error was handled: could not remove!"
+end
+
+
 
 # begin
 # 	Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)

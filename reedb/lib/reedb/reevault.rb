@@ -159,9 +159,9 @@ module Reedb
 		def read_file name
 			tmp = load_file(name, :secure)
 			unless tmp
-				puts "File not found!"
+				raise FileNotFoundError.new("#{name} could not be read: File not found!")
 			else
-				return load_file(name, :secure)
+				return tmp
 			end
 		end
 
@@ -195,6 +195,17 @@ module Reedb
 
 			# Check for vault sync option here
 			# and then sync in an asynchronous thread or something...
+		end
+
+		def remove_file name
+			path_to_file = load_file_hash(name)
+			if path_to_file
+				FileUtils.rm(path_to_file)
+				puts "Successfullly removed file #{name}"
+				VaultLogger.write("Removed file #{name} from vault.", 'debug')
+			else
+				raise FileNotFoundError.new("#{name} could not be removed: File not found!")
+			end
 		end
 
 		# Dump headers and files from memory in times of
@@ -258,6 +269,16 @@ module Reedb
 				data = JSON.parse(decrypted)
 				df = DataFile.new(nil, self, data)
 				@headers[df.name] = df.cache(:header)
+			end
+		end
+
+		def load_file_hash name
+			cache_headers
+			if @headers.key?(name)
+				name_hash = SecurityUtils::tiger_hash("#{name}")
+				return "#{@path}/data/#{name_hash}.ree"
+			else
+				return false
 			end
 		end
 

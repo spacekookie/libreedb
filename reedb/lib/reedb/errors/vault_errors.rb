@@ -27,3 +27,6 @@ end
 
 class BadCacheError < VaultError
 end
+
+class FileNotFoundError < VaultError
+end

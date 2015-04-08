@@ -47,11 +47,23 @@ module Reedb
 			construct_path(@name, @vault)
 		end
 
-
 		def insert(data, mode = :hard)
 			# => Updates the version of the file if neccesary
 			# puts (@dataset['body'][@version] == {})
-			@version.update if @dataset['body'][@version] == {}
+
+			puts @dataset['body'][@version]
+			curr_time = DateTime.now.strftime('%Q').to_i
+			then_time = @version.timestamp
+			# time_diff = @version.timestamp - curr_time
+			time_dif = curr_time - then_time
+
+			unless @dataset['body'][@version] == {}
+				unless time_dif < 10000
+					@version.update
+				else
+					puts "Not incrementing version because write cycle too short."
+				end
+			end
 
 			data.each do |master, section|
 				if master == 'body'

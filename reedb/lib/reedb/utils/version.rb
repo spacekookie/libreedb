@@ -18,13 +18,20 @@ module Reedb
 			if existing
 				data = existing.split('_')
 				@host = data[0]
+				
+				# Hack to make the version numeral work.
 				@numeral = data[1].split('.')
+				@numeral[0] = @numeral[0].to_i
+				@numeral[1] = @numeral[1].to_i
+
 				@timestamp = data[2]
+				@timestamp = @timestamp.to_i
 				return self
 			end
 			@host = Reedb::Utilities::parse_host
 			@timestamp = DateTime.now.strftime('%Q')
 			@numeral = [0, 0]
+			@timestamp = @timestamp.to_i
 		end
 
 		def update
