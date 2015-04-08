@@ -56,8 +56,13 @@ Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
 path = File.expand_path('~/Desktop/')
 
 # Default encryption is set to 'aes'
-Reedb.vault('default', "#{path}", :aes).load(user_pw)
-
+begin
+	Reedb.vault('default', "#{path}", :aes).create(user_pw)
+rescue VaultDoesNotExistError => e
+	puts e.message
+	puts "If you think this is a bug, please report it <3"
+	exit
+end
 data = {'body'=>{'password'=>'mega_secure_password', 'username'=>'spacekookie'}}
 
 Reedb.active_vaults['default'].insert('Peter Pan', data)

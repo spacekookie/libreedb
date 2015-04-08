@@ -129,8 +129,9 @@ module Reedb
 		end
 
 		def load(password)
-			return unless self.includes?('config') # => Returns the existance of the central config
-
+			unless self.includes?('config')
+				raise VaultDoesNotExistError.new("Loading vault failed because it couldn't be found at the specified path!")
+			end
 			init_logger(false)
 
 			# Check if the config needs to be read via ASCII64 or YAML

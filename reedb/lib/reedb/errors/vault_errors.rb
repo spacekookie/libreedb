@@ -13,6 +13,9 @@ end
 class VaultExistsAtLocationError < VaultError
 end
 
+class VaultDoesNotExistError < VaultError
+end
+
 class VaultWritePermissionsError < VaultError
 end
 
