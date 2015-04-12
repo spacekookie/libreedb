@@ -7,6 +7,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     aes (0.5.0)
+    daemons (1.2.2)
     digest-tiger (1.0.2)
     json (1.8.2)
     rake (10.4.2)
@@ -18,6 +19,7 @@ PLATFORMS
 DEPENDENCIES
   aes (>= 0.5.0)
   bundler (~> 1.7)
+  daemons (~> 1.2.2)
   digest-tiger (~> 1.0.2)
   json (~> 1.8.2)
   rake (~> 10.0)

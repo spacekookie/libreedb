@@ -8,5 +8,6 @@ gem 'aes', '>=0.5.0'
 gem 'twofish', '>=1.0.5'
 gem 'digest-tiger', '~> 1.0.2'
 
-# Data storage
-gem 'json', '~> 1.8.2' 
+# Other stuff that's important
+gem 'json', '~> 1.8.2'
+gem 'daemons', '~> 1.2.2'
