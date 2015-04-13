@@ -1,0 +1,38 @@
+# Reedb HTTP interface
+In the following WIKI I will try to describe how the HTTP interface works and how you can make your applications interface with a Reedb daemon.
+
+THE DEFAULT PORT FOR REEDB IS 55736.
+
+## Get vaults list
+
+In the beginning of each so called vault transaction should be the request to list vaults on a system. The Reedb daemon will keep an list of vault indices (name, size?, path, etc.) that an application can request.
+There the request should follow a standard pattern:
+
+`localhost:PORT/vaults`
+
+# Request Token
+
+To request a token Reedb needs to know the name of the application, the vault that the application wants to access and the user passphrase to unlock the vault.
+
+The Reedb daemon will check it's cache if the application had already been registered in the past. If not, a user alert will be fired, alerting the user that one of their vaults (name displayed) is about to be accessed. If the user grants that request the process is continued.
+
+If the request is granted OR the application (name + hostname) has had an authentication token in the past the Reedb daemon will try to unlock the vault in question with the user passphrase.
+
+If the unlock fails an error will be transmitted. If it is successful a generated token will be sent to the application.
+
+The token will also be kept in a store alongside the vault to authenticate read and write actions with the daemon in the future.
+
+A token request needs to look like this:
+
+`localhost:PORT/*/request_token?passphrase=$USER_PASSPHRASE`
+
+where * is the name of the vault as provided by the previous step from the Reedb daemon.
+
+## Get headers
+This is probably the most important action to perform on a Reedb daemon. Providing that an application has a valid authentication token (that is sent along every future request) it can request headers from a vault. You can read about headers in Reedb HERE.
+
+However most importantly headers can be requested with a search queury, depending on a few fields. The database will then return a list of headers that fit the provided search queury. If no search queury is provided the vault will, by default, return all headers. This is particularly useful when rendering an overview or list of all entries!
+
+An 'empty' header request should look like this:
+
+`localhost:PORT/*/headers`

@@ -26,7 +26,7 @@ if __FILE__ == $PROGRAM_NAME
 	opts.on('-p', '--port INTEGER', "Change the listener port. May break your setup!") { |o| options[:port] = o }
 
 	opts.on('-v', '--verbose', "Enable verbose logging about the Reedb daemon.") { options[:verbose] = false }
-	opts.on('-d', '--daemon', "Run Reedb as a background daemon. Log to file instead of STOUT.") { |o| options[:daemon] = o }
+	opts.on('-d', '--no-daemon', "Don't run Reedb as a background daemon. Log to STOUT instead of log file.") { |o| options[:daemon] = o }
 
 	if ARGV == []
 		puts opts.help
