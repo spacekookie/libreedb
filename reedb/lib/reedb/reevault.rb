@@ -1,5 +1,5 @@
 # ====================================================
-# Copyright 2015 Random Robot Softworks (see @author)
+# Copyright 2015 Lonely Robot (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
 # Distributed under the GNU Lesser GPL Version 3

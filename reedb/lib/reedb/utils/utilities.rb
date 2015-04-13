@@ -1,5 +1,5 @@
 # ====================================================
-# Copyright 2014 Random Robot Softworks (see @author)
+# Copyright 2015 Lonely Robot (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
 # Distributed under the GNU Lesser GPL Version 3
@@ -83,11 +83,11 @@ module Reedb
 		def self.parse_os
 			platform = RUBY_PLATFORM
 			if platform.end_with?("linux")
-				return "tux"
+				return :linux
 			elsif platform.end_with?("Windows")
-				return "win"
+				return :win
 			elsif platform.end_with?("Mac OS X")
-				return "osx"
+				return :osx
 			end
 		end
 
@@ -98,7 +98,7 @@ module Reedb
 		# Returns user currently logged in. Not sure for what that will be used but hey!
 		#
 		def self.parse_user
-			if parse_os == "win"
+			if parse_os == :win
 				return ENV['USERNAME']
 			else
 				return ENV['USER']

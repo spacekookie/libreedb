@@ -1,8 +1,8 @@
 # ====================================================
-# Copyright 2015 Random Robot Softworks (see @author)
+# Copyright 2015 Lonely Robot (see @author)
 # @author: Katharina Sabel | www.2rsoftworks.de
 #
-# Distributed under the GNU Lesser GPL Version 2.1
+# Distributed under the GNU Lesser GPL Version 3
 # (See accompanying LICENSE file or get a copy at
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
@@ -63,7 +63,7 @@ module Reedb
 		# Logs are limited not in size but only by dates. Vault logs don't contain whitespaces.
 		#
 		def self.setup(path)
-			log_path = "#{path}/logs/#{Reedb::Utilities.get_time(true)}.log"
+			log_path = "#{path}/#{Reedb::Utilities.get_time(true)}.log"
 			@@logger = Logger.new("#{log_path}")
 		end
 
