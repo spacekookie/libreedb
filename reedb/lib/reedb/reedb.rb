@@ -70,8 +70,8 @@ platform = Reedb::Utilities::parse_os
 # Setup Reedb handler
 @handle = Reedb::init(platform, 12)
 
-
-# This sets up the server
+# Server functions being registered
+#
 set :port, 55736
 
 get '/vaults' do
@@ -91,7 +91,6 @@ get '/*/*/body' do
 	file = params['splat'][1]
   # params['password']
 end
-
 
 get '/*/*/history' do
 	vault = params['splat'][0]
