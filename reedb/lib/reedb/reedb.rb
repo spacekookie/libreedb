@@ -14,7 +14,6 @@ require_relative "constants"
 require_relative "reevault"
 
 # System requirements
-# require 'socket'
 require 'sinatra'
 require 'json'
 
@@ -65,9 +64,14 @@ module Reedb
 	end
 end
 
-#
-# This sets up the server
+# General preparation
+platform = Reedb::Utilities::parse_os
 
+# Setup Reedb handler
+@handle = Reedb::init(platform, 12)
+
+
+# This sets up the server
 set :port, 55736
 
 get '/vaults' do
@@ -75,13 +79,29 @@ get '/vaults' do
 end
 
 get '/*/request_token' do
-  params['password']
+	vault = params['splat'][0]
 end
 
 get '/*/headers' do
+	vault = params['splat'][0]
+end
+
+get '/*/*/body' do
+	vault = params['splat'][0]
+	file = params['splat'][1]
   # params['password']
 end
 
+
+get '/*/*/history' do
+	vault = params['splat'][0]
+	file = params['splat'][1]
+end
+
+post '/*/*/insert' do
+	vault = params['splat'][0]
+	file = params['splat'][1]
+end
 
 =begin
 user_pw = "1234567890123"

@@ -36,3 +36,13 @@ However most importantly headers can be requested with a search queury, dependin
 An 'empty' header request should look like this:
 
 `localhost:PORT/*/headers`
+
+Search queuries can be done by 'name', 'url' and 'category'. Read more about this in the FILE specification.
+
+`localhost:PORT/*/headers?name=Social Network Here`
+
+OR
+
+`localhost:PORT/*/headers?url=m.socialnetwork.com`
+
+Both queuries may return one or more header as JSON.
