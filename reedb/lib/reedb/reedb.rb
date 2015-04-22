@@ -14,12 +14,12 @@ require_relative "constants"
 require_relative "reevault"
 
 # System requirements
-require 'sinatra'
+require 'optparse'
 require 'json'
 
-# Main module embedded as a system daemon.
-# Handles new vaults, loading vaults and caching multiple vaults per
-# name and/ or id.
+# Main Reedb module that handles the operation of vaults.
+# This can be called from a gem dependency from another ruby app
+# or used with the reedb daemon.
 #
 module Reedb
 	class << self
@@ -64,43 +64,77 @@ module Reedb
 	end
 end
 
-# General preparation
-platform = Reedb::Utilities::parse_os
-
-# Setup Reedb handler
-@handle = Reedb::init(platform, 12)
-
-# Server functions being registered
+# Entry hook for the daemon wrapper.
 #
-set :port, 55736
+if File.basename($PROGRAM_NAME, '.rb') == "reedbd"
 
-get '/vaults' do
+	# Setting default options
+	options = {}
+	options[:pw_length] = 12
+	options[:verbose] = false
+	options[:daemon] = true
+	options[:port] = Reddb::NET_PORT
 
+	#create parsers
+	opts = OptionParser.new()
+	#opts.banner = "Usage: #{NAME} [daemon options] -- [reedb options]\n\n\tAvailable [reedb options]:"
+
+	opts.on('-l', '--pw-length INTEGER') { |o| options[:pw_length] = o }
+	opts.on('-p', '--port INTEGER') { |o| options[:port] = o }
+	opts.on('-v', '--verbose') { options[:verbose] = true }
+	opts.on('-d', '--no-daemon') { options[:daemon] = false }
+	opts.parse! unless ARGV == []
+
+	puts options
+
+	#Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => 55736, :BindAddress => "localhost"})
 end
 
-get '/*/request_token' do
-	vault = params['splat'][0]
+require 'sinatra'
+require 'rack'
+
+
+# HTTP handler class
+#
+class ReedbHandler < Sinatra::Base
+	
+	configure :production, :development do
+		enable :logging
+	end
+
+	get '/vaults' do
+		"List of vaults: 1 2 3"
+	end
+
+	get '/*/request_token' do
+		vault = params['splat'][0]
+	end
+
+	get '/*/headers' do
+		vault = params['splat'][0]
+	end
+
+	get '/*/*/body' do
+		vault = params['splat'][0]
+		file = params['splat'][1]
+	  # params['password']
+	end
+
+	get '/*/*/history' do
+		vault = params['splat'][0]
+		file = params['splat'][1]
+	end
+
+	post '/insert' do
+		# vault = params['splat'][0]
+		# file = params['splat'][1]
+		data = params['data']
+		puts data
+		return "SOMETHING AWESOME: #{data}"
+	end
 end
 
-get '/*/headers' do
-	vault = params['splat'][0]
-end
-
-get '/*/*/body' do
-	vault = params['splat'][0]
-	file = params['splat'][1]
-  # params['password']
-end
-
-get '/*/*/history' do
-	vault = params['splat'][0]
-	file = params['splat'][1]
-end
-
-post '/*/*/insert' do
-	vault = params['splat'][0]
-	file = params['splat'][1]
-end
+# puts "LALALA"
 
 =begin
 user_pw = "1234567890123"

@@ -9,50 +9,43 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
-
 # Very simple wrapper script to start the Reedb daemon.
-require 'optparse'
 require 'daemons'
+require_relative 'reedb/constants.rb'
 
 NAME = 'reedb'
 
-if __FILE__ == $PROGRAM_NAME
+if __FILE__ == $PROGRAM_NAME	
 
-	options = {}
-	options[:pw_length] = 8
-	options[:verbose] = false
-	options[:daemon] = true
-	options[:port] = 55736
-	
+	if ARGV.include? '--version'
+		puts Reedb::VERSION
+	end
 
-	#create parsers
-	opts = OptionParser.new()
-	opts.banner = "Usage: #{NAME} [daemon options] -- [reedb options]\n\n\tAvailable [reedb options]:"
+	if ARGV == []
+		# First prints out some help stuff
+		puts "Usage: reedb [daemon options] -- [reedb options]
 
-	opts.on('-l', '--pw-length INTEGER', "Define minimal passphrase length (Default: 12)") { |o| options[:pw_length] = o }
-	opts.on('-p', '--port INTEGER', "Change the listener port. May break your setup!") { |o| options[:port] = o }
+  Available [reedb options]:
+     -l, --pw-length INTEGER     Define minimal passphrase length (Default: 12)
+     -p, --port INTEGER          Change the listener port. May break your setup!
+     -v, --verbose               Enable verbose logging about the Reedb daemon.
+     -d, --no-daemon             Don't run Reedb as a background daemon. Log to STOUT instead of log file.
 
-	opts.on('-v', '--verbose', "Enable verbose logging about the Reedb daemon.") { options[:verbose] = true }
-	opts.on('-d', '--no-daemon', "Don't run Reedb as a background daemon. Log to STOUT instead of log file.") { options[:daemon] = false }
+  Available [daemon options]:
+     start                       Start an instance of the #{NAME} daemon
+     stop                        Stop all instances of the #{NAME} daemon
+     restart                     Stop all and restart a new instance of #{NAME} afterwards
+     status                      Show status (PID) of #{NAME} daemon instance
 
-	# if ARGV == []
-	# 	puts opts.help
+  Common options:
+         --version               Show #{NAME} version"
 
-	# 	puts "
- #  Available [daemon options]:
-	# 	start                            Start an instance of the #{NAME} daemon
-	# 	stop                             Stop all instances of the #{NAME} daemon
-	# 	restart                          Stop all and restart a new instance of #{NAME} afterwards
-	# 	status                           Show status (PID) of #{NAME} daemon instance
+		# Then exits the application
+		exit()
+	end
 
-	# Common options:
- #    -?, --help                       Show this message
- #        --version                    Show #{NAME} version"
+	# If it went through it then runs the daemon with the desired options
+	# path = File.join(File.dirname(__FILE__), 'reedb')
+	# Daemons.run(File.join(path, 'reedb.rb'))
 
-	# else
-	# 	opts.parse!
-	# end
-
-	puts options
-	Daemons.run(File.join(File.dirname("#{__FILE__}/reedb"), 'reedb.rb'), options)
 end
