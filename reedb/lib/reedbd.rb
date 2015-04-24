@@ -19,6 +19,7 @@ if __FILE__ == $PROGRAM_NAME
 
 	if ARGV.include? '--version'
 		puts Reedb::VERSION
+		exit
 	end
 
 	if ARGV == []
@@ -41,11 +42,18 @@ if __FILE__ == $PROGRAM_NAME
          --version               Show #{NAME} version"
 
 		# Then exits the application
-		exit()
+		exit
 	end
 
+	options = {
+		# :app_name   => "myproc",
+		:backtrace  => true,
+		# :monitor    => true,
+		# :ontop      => true
+	}
+
 	# If it went through it then runs the daemon with the desired options
-	# path = File.join(File.dirname(__FILE__), 'reedb')
-	# Daemons.run(File.join(path, 'reedb.rb'))
+	path = File.join(File.dirname(__FILE__), 'reedb')
+	Daemons.run(File.join(path, 'reedb.rb'), options)
 
 end

@@ -1,0 +1,109 @@
+# Logfile created on 2015-04-23 22:27:47 +0200 by logger.rb/31641
+I, [2015-04-23T22:27:47.609789 #6794]  INFO -- : *** below you find the most recent exception thrown, this will be likely (but not certainly) the exception that made the application exit abnormally ***
+E, [2015-04-23T22:27:47.610195 #6794] ERROR -- : cannot load such file -- sinatra (LoadError)
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/home/spacekookie/documents/projects/reedb/reedb/lib/reedb/reedb.rb:17:in `<top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `start_load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:297:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:144:in `block in run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:143:in `run'
+lib/reedbd.rb:57:in `<main>'
+I, [2015-04-23T22:27:47.610587 #6794]  INFO -- : *** below you find all exception objects found in memory, some of them may have been thrown in your application, others may just be in memory because they are standard exceptions ***
+E, [2015-04-23T22:27:47.615301 #6794] ERROR -- : stream closed (IOError)
+
+E, [2015-04-23T22:27:47.615822 #6794] ERROR -- : failed to allocate memory (NoMemoryError)
+
+E, [2015-04-23T22:27:47.616193 #6794] ERROR -- : stack level too deep (SystemStackError)
+
+E, [2015-04-23T22:27:47.617547 #6794] ERROR -- : exception reentered (fatal)
+
+E, [2015-04-23T22:27:47.621888 #6794] ERROR -- : cannot load such file -- sinatra (LoadError)
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/home/spacekookie/documents/projects/reedb/reedb/lib/reedb/reedb.rb:17:in `<top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `start_load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:297:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:144:in `block in run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:143:in `run'
+lib/reedbd.rb:57:in `<main>'
+I, [2015-04-23T22:29:38.899798 #7075]  INFO -- : *** below you find the most recent exception thrown, this will be likely (but not certainly) the exception that made the application exit abnormally ***
+E, [2015-04-23T22:29:38.900224 #7075] ERROR -- : cannot load such file -- sinatra (LoadError)
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/home/spacekookie/documents/projects/reedb/reedb/lib/reedb/reedb.rb:17:in `<top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `start_load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:297:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:144:in `block in run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:143:in `run'
+lib/reedbd.rb:57:in `<main>'
+I, [2015-04-23T22:29:38.900582 #7075]  INFO -- : *** below you find all exception objects found in memory, some of them may have been thrown in your application, others may just be in memory because they are standard exceptions ***
+E, [2015-04-23T22:29:38.905189 #7075] ERROR -- : stream closed (IOError)
+
+E, [2015-04-23T22:29:38.905707 #7075] ERROR -- : failed to allocate memory (NoMemoryError)
+
+E, [2015-04-23T22:29:38.906157 #7075] ERROR -- : stack level too deep (SystemStackError)
+
+E, [2015-04-23T22:29:38.907573 #7075] ERROR -- : exception reentered (fatal)
+
+E, [2015-04-23T22:29:38.911443 #7075] ERROR -- : cannot load such file -- sinatra (LoadError)
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/home/spacekookie/documents/projects/reedb/reedb/lib/reedb/reedb.rb:17:in `<top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `start_load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:297:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:144:in `block in run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:143:in `run'
+lib/reedbd.rb:57:in `<main>'
+I, [2015-04-23T22:45:06.740168 #8257]  INFO -- : *** below you find the most recent exception thrown, this will be likely (but not certainly) the exception that made the application exit abnormally ***
+E, [2015-04-23T22:45:06.740604 #8257] ERROR -- : cannot load such file -- sinatra (LoadError)
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/home/spacekookie/documents/projects/reedb/reedb/lib/reedb/reedb.rb:17:in `<top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `start_load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:297:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:144:in `block in run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:143:in `run'
+lib/reedbd.rb:57:in `<main>'
+I, [2015-04-23T22:45:06.740987 #8257]  INFO -- : *** below you find all exception objects found in memory, some of them may have been thrown in your application, others may just be in memory because they are standard exceptions ***
+E, [2015-04-23T22:45:06.746816 #8257] ERROR -- : stream closed (IOError)
+
+E, [2015-04-23T22:45:06.747376 #8257] ERROR -- : failed to allocate memory (NoMemoryError)
+
+E, [2015-04-23T22:45:06.747742 #8257] ERROR -- : stack level too deep (SystemStackError)
+
+E, [2015-04-23T22:45:06.749090 #8257] ERROR -- : exception reentered (fatal)
+
+E, [2015-04-23T22:45:06.753025 #8257] ERROR -- : cannot load such file -- sinatra (LoadError)
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'
+/home/spacekookie/documents/projects/reedb/reedb/lib/reedb/reedb.rb:17:in `<top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:218:in `start_load'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/application.rb:297:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:144:in `block in run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.2/lib/daemons.rb:143:in `run'
+lib/reedbd.rb:57:in `<main>'

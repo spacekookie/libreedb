@@ -64,76 +64,6 @@ module Reedb
 	end
 end
 
-# Entry hook for the daemon wrapper.
-#
-if File.basename($PROGRAM_NAME, '.rb') == "reedbd"
-
-	# Setting default options
-	options = {}
-	options[:pw_length] = 12
-	options[:verbose] = false
-	options[:daemon] = true
-	options[:port] = Reddb::NET_PORT
-
-	#create parsers
-	opts = OptionParser.new()
-	#opts.banner = "Usage: #{NAME} [daemon options] -- [reedb options]\n\n\tAvailable [reedb options]:"
-
-	opts.on('-l', '--pw-length INTEGER') { |o| options[:pw_length] = o }
-	opts.on('-p', '--port INTEGER') { |o| options[:port] = o }
-	opts.on('-v', '--verbose') { options[:verbose] = true }
-	opts.on('-d', '--no-daemon') { options[:daemon] = false }
-	opts.parse! unless ARGV == []
-
-	puts options
-
-	#Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => 55736, :BindAddress => "localhost"})
-end
-
-require 'sinatra'
-require 'rack'
-
-
-# HTTP handler class
-#
-class ReedbHandler < Sinatra::Base
-	
-	configure :production, :development do
-		enable :logging
-	end
-
-	get '/vaults' do
-		"List of vaults: 1 2 3"
-	end
-
-	get '/*/request_token' do
-		vault = params['splat'][0]
-	end
-
-	get '/*/headers' do
-		vault = params['splat'][0]
-	end
-
-	get '/*/*/body' do
-		vault = params['splat'][0]
-		file = params['splat'][1]
-	  # params['password']
-	end
-
-	get '/*/*/history' do
-		vault = params['splat'][0]
-		file = params['splat'][1]
-	end
-
-	post '/insert' do
-		# vault = params['splat'][0]
-		# file = params['splat'][1]
-		data = params['data']
-		puts data
-		return "SOMETHING AWESOME: #{data}"
-	end
-end
-
 # puts "LALALA"
 
 =begin
@@ -208,20 +138,3 @@ end
 # rescue
 # 	puts "Error occured opening your vault. Does it exist?"
 # end
-
-
-
-=begin
-puts Reedb.active_vaults['default'].read_file('facebook')
-Reedb.active_vaults['default'].close
-=end
-
-# def setup_listener port
-# 	@server = TCPServer.open(port)
-# end
-
-# loop {
-#   client = server.accept
-#   params = JSON.parse(client.gets)
-#   Reedb::DaemonLogger.write(params)
-# }
