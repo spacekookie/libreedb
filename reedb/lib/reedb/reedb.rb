@@ -56,16 +56,12 @@ module Reedb
 			@@tokens = {} unless @@no_token
 
 			if @@archos == :linux
-				parent_path = File.expand_path('~/.config/reedb/')
-				# master_path = File.expand_path('/etc/reedb/')
+				master_path = File.expand_path('~/.config/reedb/')
 				log_path = File.expand_path('~/.config/reedb/logs/')
+				@config_path = File.join("#{master_path}", "master.cfg")
 
-				# FileUtils::mkdir_p(master_path) # 744 (owned by root)
 				FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
-
-				# FileUtils::chmod_R(0744, "#{master_path}")
 				FileUtils::chmod_R(0744, "#{log_path}")
-				# Now adjust the access levels
 			else
 
 			 
@@ -74,6 +70,24 @@ module Reedb
 			Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
 
 			# Now read vault information and put it into @@vaults field
+			if File.exist?("#{@config_path}")
+				read_config
+			else
+				@config = {}
+				@config[:global] = {}
+				@config[:global][:name] = "spacekookie"
+
+				# Writes the config to file with Base64 encoding
+				write_config
+			end
+
+			# track_vault('default', '/home/spacekookie/Desktop',
+			# 	generate_token('default', '/home/spacekookie/Desktop'))
+
+			# update_tracked_vault('default', '/home/spacekookie/Desktop', 60, 
+			# 	generate_token('default', '/home/spacekookie/Desktop'))
+
+			puts @config
 		end
 
 		# Returns a list of all vaults tracked by Reedb (by the current user).
@@ -139,7 +153,7 @@ module Reedb
 
 		# Ends the exchange with a vault. Removes token from active vault record
 		#
-		def close_vault vault
+		def close_vault(vault, token)
 
 		end
 
@@ -174,7 +188,50 @@ module Reedb
 		# 			tokens => Authentication token for applications
 		#
 		def track_vault(name, path, token)
+			nv = "#{name}::#{path}"
+			@config[nv] = {} unless @config.include?(nv)
+
+			@config[nv][:meta] = MetaVault.new(name, path, 5)#@@vaults[name].size)
+			@config[nv][:tokens] = [] unless @config[nv][:tokens]
+			@config[nv][:tokens] << token
+
+			write_config
+		end
+
+		def update_tracked_vault(name, path, size, token)
+			nv = "#{name}::#{path}"
+			return nil unless @config.include?(nv)
+
+			@config[nv][:meta].name = name if name
+			@config[nv][:meta].path = path if path
+			@config[nv][:meta].size = size if size
+
+			@config[nv][:tokens] = [] unless @config[nv][:tokens]
+			@config[nv][:tokens] << token if token
+
+			write_config
+		end
+
+		# Removes a token from a vault config thus removing any access that token had.
+		#
+		def remove_token(name, path, token)
+			nv = "#{name}::#{path}"
+
+			return nil unless @config.include?(nv)
+			return nil unless @config[nv][:tokens].include?(token)
 			
+			@config[nv][:tokens].delete(token)
+			write_config
+		end
+
+		def write_config
+			str = Marshal.dump(@config)
+			File.open(@config_path, "wb").write(Base64.encode64(str))
+		end
+
+		def read_config
+			data = Base64.decode64(File.open(@config_path, "r").read())
+			@config = Marshal.load(data)
 		end
 
 		# THIS REALLY EXPOSES TOO MUCH SHIT!!!
@@ -192,9 +249,9 @@ path = "/home/spacekookie/Desktop"
 
 Reedb::init({:os=>:linux, :pw_length=>12})
 # token = Reedb::create_vault(name, path, user_pw)
-token = Reedb::request_token(name, user_pw)
+# token = Reedb::request_token(name, user_pw)
 
-puts token
+# puts token
 
 =begin
 

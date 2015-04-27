@@ -24,4 +24,12 @@ module Reedb
 		def includes?(name, path) return (@name == name && @path == path) end
 		def to_s() return "#{@name}: #{@path}, size: #{@size}" end
 	end
+
+	class NanoVault
+		attr_accessor :name, :path
+		def initialize(name, path)
+			@name = name
+			@path = path
+		end
+	end
 end

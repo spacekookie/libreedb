@@ -39,6 +39,11 @@ module Reedb
 		#
 		attr_reader :crypt
 
+		# Indicates the size of the vault as per data file entries.
+		# Is updated with every header cache and write cycle.
+		#
+		attr_reader :size
+
 		# Constructor for a vault with name, path and encryption enum.
 		# Valid encryption parameters are :aes, :twofish, :multi and :auto_fill
 		#
