@@ -58,14 +58,9 @@ module Reedb
 			return self
 		end
 
-		def keygen(password)
-			@__PW__ = password
-		end
-
 		def create(password = :failed)
 			# If keygen was used to set a user password then fetch it
 			# and remove the variable from memory!
-			(password = @__PW__ ; remove_instance_variable(:@__PW__)) if password == :failed
 			return nil unless password?(password)
 			return nil unless encryption?(password)
 
@@ -74,61 +69,53 @@ module Reedb
 			# => Encryption now active and key available under @crypt.key
 			@conf_path = "#{@path}/config"
 
-			begin
-				needs_creation = true
+			needs_creation = true
 
-				if self.includes?('config')
-					raise VaultExistsAtLocationError.new, "Vault already exists at location #{@path}.\nLoading existing vault instead...\n"
-					
-					# => This rules out lots of code to be run
-					needs_creation = false
+			if self.includes?('config')
+				raise VaultExistsAtLocationError.new, "Vault already exists at location #{@path}.\nLoading existing vault instead...\n"
+				
+				# => This rules out lots of code to be run
+				needs_creation = false
+			else
+				if Reedb::archos == :linux || Reedb::archos == :osx
+					FileUtils::mkdir_p(File.expand_path("#{@path}/data")) # => Data dir
+					FileUtils::mkdir(File.expand_path("#{@path}/shasums")) # => Checksum dir
+					FileUtils::mkdir(File.expand_path("#{@path}/logs")) # => Logs dir
+
+					FileUtils::chmod_R(0744, "#{@path}")
 				else
-					if Reedb::archos == :unix
-						FileUtils::mkdir_p("#{@path}/data") # => Data dir
-						FileUtils::mkdir("#{@path}/shasums") # => Checksum dir
-						FileUtils::mkdir("#{@path}/logs") # => Logs dir
-
-						FileUtils::chmod_R(0744, "#{@path}")
-					else
-						FileUtils::mkdir_p("#{@path}\\data") # => Data dir
-						FileUtils::mkdir("#{@path}\\shasums") # => Checksum dir
-						FileUtils::mkdir("#{@path}\\logs") # => Logs dir
-					end
+					FileUtils::mkdir_p(File.expand_path("#{@path}/data")) # => Data dir
+					FileUtils::mkdir(File.expand_path("#{@path}/shasums")) # => Checksum dir
+					FileUtils::mkdir(File.expand_path("#{@path}/logs")) # => Logs dir
 				end
-
-				# Now that the vault directory exists logs can be opened.
-				init_logger(true)
-
-				if needs_creation
-					# Code that will only be run if the vault was just created on the system
-					time = Reedb::Utilities.get_time(false)
-					VaultLogger.write("Vault created on #{time}. All directories created successfully!")
-
-					# => Now creating configuration file
-					@config = {}
-					@config['vault_name'] = "#{@name}"
-					@config['creation_date'] = "#{Utilities.get_time}"
-					@config['last_updated'] = "#{Utilities.get_time}"
-					@config['creation_machine'] = "#{Socket.gethostname}"
-					@config['updating_machine'] = "#{Socket.gethostname}"
-					@config['creation_user'] = "#{Etc.getlogin}"
-					@config['updating_user'] = "#{Etc.getlogin}"
-
-					# hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
-
-					# => Writing configuration to disk. Either securely or insecurely
-					save_config
-
-					# Now writing encrypted key to file with ASCII armour
-					update_secure_info("cey", @encrypted_key)
-					# remove_instance_variable(:@encrypted_key)
-				end
-
-			# All other errors won't be caught!
-			rescue EncryptionError, VaultError => e
-				puts e.message
 			end
 
+			# Now that the vault directory exists logs can be opened.
+			init_logger(true)
+
+			if needs_creation
+				# Code that will only be run if the vault was just created on the system
+				time = Reedb::Utilities.get_time(false)
+				VaultLogger.write("Vault created on #{time}. All directories created successfully!")
+
+				# => Now creating configuration file
+				@config = {}
+				@config['vault_name'] = "#{@name}"
+				@config['creation_date'] = "#{Utilities.get_time}"
+				@config['last_updated'] = "#{Utilities.get_time}"
+				@config['creation_machine'] = "#{Socket.gethostname}"
+				@config['updating_machine'] = "#{Socket.gethostname}"
+				@config['creation_user'] = "#{Etc.getlogin}"
+				@config['updating_user'] = "#{Etc.getlogin}"
+
+				# hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
+				# => Writing configuration to disk. Either securely or insecurely
+				save_config
+				
+				# Now writing encrypted key to file with ASCII armour
+				update_secure_info("cey", @encrypted_key)
+				# remove_instance_variable(:@encrypted_key)
+			end
 			self.load("#{password}")
 		end
 
@@ -403,7 +390,7 @@ module Reedb
 		# After this call the @crypt object has been initialised.
 		#
 		def init_encryption type
-			type = :aes if type == :auto_fill
+			type = :aes if type == :auto
 			begin
 				if type == :aes
 					@crypt = Reedb::RAES.new

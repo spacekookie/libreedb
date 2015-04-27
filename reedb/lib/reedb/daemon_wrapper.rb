@@ -12,7 +12,7 @@
 # DO NOT USE THIS FILE WHEN USING REEDB AS A GEM DEPENDENCY!
 # (unless you know what you're doing...)
 
-# System requirements
+# System requirements (HTTP stuff)
 require 'sinatra'
 require 'rack'
 
@@ -21,6 +21,7 @@ require_relative 'reedb'
 
 # Registers global options handle for the Reedb module
 @@options = {}
+@@reedb = nil
 
 # HTTP handler class that registers the functions
 # for the vault interface
@@ -30,7 +31,6 @@ class ReedbHandler < Sinatra::Base
 	configure :production, :development do
 		enable :logging
 	end
-
 
 	# Require authentication to access basic  vault functionality.
 	get '/vaults' do
@@ -75,6 +75,8 @@ if __FILE__ == $PROGRAM_NAME
 	@@options[:verbose] = false
 	@@options[:daemon] = true
 	@@options[:port] = Reedb::NET_PORT
+	@@options[:os] = Reedb::parse_os
+
 
 	#create parsers
 	opts = OptionParser.new()
@@ -85,6 +87,11 @@ if __FILE__ == $PROGRAM_NAME
 
 	opts.parse! unless ARGV == []
 	
-	# Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => @@options[:port], :BindAddress => "localhost"})
+	# This creates the Reedb module and binds it to a variable to be interacted with in the future
+	@@reedb = Reedb::init({:os => @@options[:os], :pw_length => @@options[:pw_length], 
+		:daemon => @@options[:daemon], :verbose => @@options[:verbose]})
+
+	# Next up we start the HTTP server and that's that. We're up and running :)
+	Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => @@options[:port], :BindAddress => "localhost"})
 end
 

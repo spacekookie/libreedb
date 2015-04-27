@@ -8,13 +8,14 @@
 # ====================================================
 
 # Internal requirements
-require_relative "utils/utilities"
-require_relative "utils/logger"
-require_relative "constants"
-require_relative "reevault"
+require_relative 'utils/meta_vault'
+require_relative 'utils/utilities'
+require_relative 'utils/logger'
+require_relative 'constants'
+require_relative 'reevault'
 
 # System requirements
-require 'optparse'
+require 'securerandom'
 require 'json'
 
 # Main Reedb module that handles the operation of vaults.
@@ -27,47 +28,175 @@ module Reedb
 		# Returns the platform/ architecture of the daemon and vault handler
 		def archos() (return @@archos) end
 
+		# Returns whether or not this is a daemon
 		def daemon?() (return @@daemon) end
 
-		def passlength() (return @@passlength) end
+		# Returns the minimum passphrase length is
+		def passlength() (return @@pw_length) end
 
-		def init(global_os, passlength = 8, d = true)
-			@@daemon = d
-			@@archos = global_os
-			@@passlength = passlength
+		# Returns whether verbose mode is enabled
+		def verbose?() (return @@verbose) end
 
+		def init(options)
+			@@daemon = if options.include?(:daemon) then options[:daemon] else true end
+			@@archos = options[:os]
+			@@pw_length = options[:pw_length]
+			@@verbose = if options.include?(:verbose) then options[:verbose] else false end
+			@@no_token = if options.include?(:no_token) then options[:no_token] else false end
+
+			# Set of vaults that map a VaultBuffer to the vault itself.
+			# Never exposed outside the API
+			#
 			@@vaults = {}
+			
+			# List of tokens authorised for this daemon. Maps tokens to vault names.
+			# This is used for authentication and never exposed to the outside API
+			# NOTE! This is not used when the :no_token option is enabled
+			#
+			@@tokens = {} unless @@no_token
 
-			# if global_os == :linux
-			# 	parent_path = File.expand_path('~/.config/reedb/')
-			# 	master_path = File.expand_path('/etc/reedb/')
-			# 	log_path = File.expand_path('~/.config/reedb/logs')
+			if @@archos == :linux
+				parent_path = File.expand_path('~/.config/reedb/')
+				# master_path = File.expand_path('/etc/reedb/')
+				log_path = File.expand_path('~/.config/reedb/logs/')
 
-			# else
+				# FileUtils::mkdir_p(master_path) # 744 (owned by root)
+				FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
 
-			# 	# 
-			# end
-			# Reedb::DaemonLogger.setup("#{log_path}")
+				# FileUtils::chmod_R(0744, "#{master_path}")
+				FileUtils::chmod_R(0744, "#{log_path}")
+				# Now adjust the access levels
+			else
 
+			 
+			end
+			Reedb::DaemonLogger.setup("#{log_path}")
+			Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
+
+			# Now read vault information and put it into @@vaults field
 		end
 
-		def active_vaults
-			return @@vaults
-		end
-
-		# Default encryption type is 'AES'
+		# Returns a list of all vaults tracked by Reedb (by the current user).
+		# Note that sensitive information is being abstracted away with this function.
 		#
-		def vault(name='default', path=nil, encrypt='auto_fill')
+		#
+		# => A compiled JSON of vaults with name, path and size
+		#
+		def available_vaults
+			vaults = {}
+
+			@@vaults.each do |key, value|
+				vaults[key.name] = {}
+				vaults[key.name][:path] = key.path
+				vaults[key.name][:size] = key.size
+			end
+		end
+
+		# Creates a new vault on the current system. Returns nil if vault already existed at
+		# location. Returns a token if the creation and authentication was successful on the
+		# user side.
+		# Also adds that token to the @@tokens list
+		#
+		# Params: 	
+		# 			'name' of the vault
+		# 			'path' of the vault
+		# 			user 'passphrase'
+		# 			'encryption' method (:aes, :twofish, :auto)
+		#
+		# => Base64 encoded token | nil if errors occured.
+		#
+		def create_vault(name, path, passphrase, encryption = :auto)
+			begin
+				tmp_vault = ReeVault.new("#{name}", "#{path}", encryption).create("#{passphrase}")
+			rescue VaultExistsAtLocationError => e
+				DaemonLogger.write("Tried to write over vault '#{name}' at '#{path}'. Action aborted.", 'warn')
+				return nil
+			end
+			tmp_meta = MetaVault.new("#{name}", "#{path}", 0)
+			@@vaults[tmp_meta] = tmp_vault # => Add to @@vaults set
+
+			unless @no_token
+				return generate_token(name, path)
+			end
+			return nil
+		end
+
+		# Request token for a vault permanently.
+		# Only used if @@no_token == false. Unlocks a vault as well
+		# with the user passphrase
+		#
+		def request_token(name, passphrase)
+			return "nil" unless @@vaults.include?(name)
+		end
+
+		# Used to access a vault with a specific token
+		#
+		# => A vault if the token was legitimate. Nil if it was not
+		#
+		def access_vault_with_token(vault, token)
+
+		end
+
+		# Ends the exchange with a vault. Removes token from active vault record
+		#
+		def close_vault vault
+
+		end
+
+
+		private
+
+		# Generates an authentication token for vault access.
+		# The function also adds the token, bound to the vault name, to the
+		# @@tokens set.
+		#
+		# Params: 	name of the vault
+		# 			path of the vault
+		#
+		# => Base64 encoded token
+		#
+		def generate_token(name, path)
+			rnd = SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)
+
+			# Concatinates the token together and base64 encodes it
+			token = Base64.encode64("#{name}::#{path}::#{rnd}")
+			@@tokens[token] = [] unless @@tokens.include?(token)
+			@@tokens[token] << "#{name}"
+			return token
+		end
+
+		# Writes a vault into a tracking file for the user
+		# That means that the vault will be tracked next time
+		# Reedb starts
+		#
+		# Params: 	name => Public vault name
+		# 			path => Location on the system
+		# 			tokens => Authentication token for applications
+		#
+		def track_vault(name, path, token)
+			
+		end
+
+		# THIS REALLY EXPOSES TOO MUCH SHIT!!!
+		#
+		def vault(name='default', path=nil, encrypt=:auto)
 			@@vaults[name] = ReeVault.new(name, path, encrypt)
 			return @@vaults[name]
 		end
 	end
 end
 
-# puts "LALALA"
+user_pw = "1234567890123"
+name = "default"
+path = "/home/spacekookie/Desktop"
+
+Reedb::init({:os=>:linux, :pw_length=>12})
+# token = Reedb::create_vault(name, path, user_pw)
+token = Reedb::request_token(name, user_pw)
+
+puts token
 
 =begin
-user_pw = "1234567890123"
 
 Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
 path = File.expand_path('~/Desktop/reedb')

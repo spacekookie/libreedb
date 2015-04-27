@@ -54,6 +54,6 @@ if __FILE__ == $PROGRAM_NAME
 
 	# If it went through it then runs the daemon with the desired options
 	path = File.join(File.dirname(__FILE__), 'reedb')
-	Daemons.run(File.join(path, 'reedb.rb'), options)
+	Daemons.run(File.join(path, 'daemon_wrapper.rb'), options)
 
 end
