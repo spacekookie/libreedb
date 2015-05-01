@@ -87,18 +87,19 @@ module Reedb
 		end
 
 		# Returns a list of all vaults tracked by Reedb (by the current user).
-		# Note that sensitive information is being abstracted away with this function.
+		# Vaults are ordered in a dictionary under their UUID that's used by the
+		# Reedb daemon.
 		#
-		#
-		# => A compiled JSON of vaults with name, path and size
+		# => A compiled JSON of vaults with uuid, name, path and size
 		#
 		def available_vaults
 			available = {}
 
-			@config[:vaults].each do |key, value|
-				available[value[:meta].name] = {}
-				available[value[:meta].name][:path] = value[:meta].path
-				available[value[:meta].name][:size] = value[:meta].size
+			@config[:vaults].each do |uuid, value|
+				available["#{uuid}"] = {}
+				available["#{uuid}"][:name] = value[:meta].name
+				available["#{uuid}"][:path] = value[:meta].path
+				available["#{uuid}"][:size] = value[:meta].size
 			end
 			return available
 		end
@@ -117,26 +118,36 @@ module Reedb
 		# => Base64 encoded token | nil if errors occured.
 		#
 		def create_vault(name, path, passphrase, encryption = :auto)
-			uuid = UUID::create_v1
+			# Creates new UUIDs until one is found that doesn't already exist in the scope
+			uuid = nil
+			loop do
+				uuid = UUID::create_v1
+				(break) unless @config[:vaults].include?(uuid)
+			end
 
-			daemon
+			# Create actual Vault object
 			begin
 				tmp_vault = ReeVault.new("#{name}", "#{path}", encryption).create("#{passphrase}")
 			rescue VaultExistsAtLocationError => e
 				DaemonLogger.write("Tried to write over vault '#{name}' at '#{path}'. Action aborted.", 'warn')
 				return nil
 			end
-			tmp_meta = MetaVault.new("#{name}", "#{path}", 0)
-			@@active_vaults[tmp_meta] = tmp_vault # => Add to @@active_vaults set
 
+			# Creates a metavault with name, path, size and uuid to be tracked on the system
+			metavault = MetaVault.new("#{name}", "#{path}", 0, "#{uuid}")
+
+			# Adds vault to the active set of vaults
+			@@active_vaults[metavault] = tmp_vault
+
+			# Generates a token
 			unless @no_token
-				token = generate_token(name, path)
-				track_vault(name, path, token)
+				token = generate_token(uuid, path)
+				track_vault(name, path, 0, uuid)
 				return token
 			end
 
 			# In case token authentication was disabled
-			track_vault(name, path, nil)
+			track_vault(uuid, nil)
 			return nil
 		end
 
@@ -148,21 +159,28 @@ module Reedb
 		# 			'path' on the systen
 		#
 		def scope_vault(name, path)
-			tmp_vault = ReeVault.new("#{name}", "#{path}", :auto)
-			if tmp_vault.try?
-				nv = nanovault(name, path)
-				if @config[:vaults].include?(nv)
+			# Checks if that specific vault was already scoped
+			@config[:vaults].each do |key, value|
+				if value[:meta].name == "#{name}" && value[:meta].path == "#{path}"
 					DaemonLogger.write("Vault already scoped at #{path}", 'info')
 					return false
-				else
-					# Tracks the vault, writes it to config and then loads the config again
-					track_vault(name, path, nil)
 				end
+			end
+			vault = ReeVault.new("#{name}", "#{path}", :auto)
+			# If it hasn't, proceed here
+			if vault.try?
+				uuid = nil
+				loop do
+					uuid = UUID::create_v1
+					(break) unless @config[:vaults].include?(uuid)
+				end
+
+				# At this point a vault has been confirmed and a UUID generated
+				track_vault(name, path, vault.count, "#{uuid}")
 			else
 				DaemonLogger.write("Tried to scope empty target at #{path}", 'warn')
 				return false
 			end
-			
 		end
 
 		# Request token for a vault permanently.
@@ -174,7 +192,7 @@ module Reedb
 		#
 		# => Returns token for vault
 		#
-		def request_token(name, path, passphrase)
+		def request_token(uuid, passphrase)
 			return nil unless @@active_vaults.include?(name)
 
 			#
@@ -192,16 +210,16 @@ module Reedb
 		#
 		# => A vault if the token was legitimate. Nil if it was not
 		#
-		def access_vault_with_token(name, path, token)
+		def access_vault_with_token(uuid, token)
 
 		end
 
 		# Ends the exchange with a vault. Removes token from active vault record
 		#
-		def close_vault(vault, token)
-			return nil unless @@tokens[token].include?(vault)
-			@@vaults[vault].close
-			@@vaults[vault] = nil
+		def close_vault(uuid, token)
+			return nil unless @@tokens[token].include?(uuid)
+			@@vaults["#{uuid}"].close
+			@@vaults["#{uuid}"] = nil
 
 			# Removes the token from authentication
 			@@tokens[token] = nil
@@ -226,13 +244,13 @@ module Reedb
 		#
 		# => Base64 encoded token
 		#
-		def generate_token(name, path)
+		def generate_token(uuid, path)
 			rnd = SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)
 
 			# Concatinates the token together and base64 encodes it
-			token = Base64.encode64("#{name}::#{path}::#{rnd}")
+			token = Base64.encode64("#{uuid}::#{path}::#{rnd}")
 			@@tokens[token] = [] unless @@tokens.include?(token)
-			@@tokens[token] << "#{name}"
+			@@tokens[token] << uuid
 			return token
 		end
 
@@ -244,51 +262,42 @@ module Reedb
 		# 			path => Location on the system
 		# 			tokens => Authentication token for applications
 		#
-		def track_vault(name, path, token)
-			nv = nanovault(name, path)
-			@config[:vaults][nv] = {} unless @config[:vaults].include?(nv)
+		def track_vault(name, path, size, uuid)
+			@config[:vaults]["#{uuid}"] = {} unless @config[:vaults].include?(uuid)
 
 			# Adds actual size as soon as the vault gets unlocked by an application
-			@config[:vaults][nv][:meta] = MetaVault.new(name, path, -1)
-			@config[:vaults][nv][:tokens] = [] unless @config[:vaults][nv][:tokens]
-			@config[:vaults][nv][:tokens] << token
+			@config[:vaults]["#{uuid}"][:meta] = MetaVault.new("#{name}", "#{path}", size, "#{uuid}")
+			@config[:vaults]["#{uuid}"][:tokens] = [] unless @config[:vaults]["#{uuid}"][:tokens]
+			@config[:vaults]["#{uuid}"][:tokens] << nil
 
 			write_config
 		end
 
-		def untrack_vault(name, path)
-			nv = nanovault(name, path)
-			@config[:vaults][nv] = nil if @config[:vaults].include?(nv)
+		def untrack_vault uuid
+			@config[:vaults]["#{uuid}"] = nil if @config[:vaults].include?(uuid)
 		end
 
-		def update_tracked_vault(name, path, size, token)
-			nv = nanovault(name, path)
-			return nil unless @config[:vaults].include?(nv)
+		def update_tracked_vault(uuid, name, path, size, token)
+			return nil unless @config[:vaults].include?(uuid)
 
-			@config[:vaults][nv][:meta].name = name if name
-			@config[:vaults][nv][:meta].path = path if path
-			@config[:vaults][nv][:meta].size = size if size
+			@config[:vaults]["#{uuid}"][:meta].name = name if name
+			@config[:vaults]["#{uuid}"][:meta].path = path if path
+			@config[:vaults]["#{uuid}"][:meta].size = size if size
 
-			@config[:vaults][nv][:tokens] = [] unless @config[:vaults][nv][:tokens]
-			@config[:vaults][nv][:tokens] << token if token
+			@config[:vaults]["#{uuid}"][:tokens] = [] unless @config[:vaults]["#{uuid}"][:tokens]
+			@config[:vaults]["#{uuid}"][:tokens] << token if token
 
 			write_config
 		end
 
 		# Removes a token from a vault config thus removing any access that token had.
 		#
-		def remove_token(name, path, token)
-			nv = nanovault(name, path)
-
-			return nil unless @config[:vaults].include?(nv)
-			return nil unless @config[:vaults][nv][:tokens].include?(token)
+		def remove_token(uuid, token)
+			return nil unless @config[:vaults].include?(uuid)
+			return nil unless @config[:vaults]["#{uuid}"][:tokens].include?(token)
 			
-			@config[:vaults][nv][:tokens].delete(token)
+			@config[:vaults]["#{uuid}"][:tokens].delete(token)
 			write_config
-		end
-
-		def nanovault(name, path)
-			return "#{name}::#{path}"
 		end
 
 		# Caches the config file to @config
@@ -318,7 +327,6 @@ module Reedb
 		def write_config
 			data = Marshal.dump(@config)
 			File.open(@config_path, 'wb+') { |file| file.write(data) }
-			# File.open(@config_path, "wb+").write(str)
 			read_config
 		end
 
@@ -329,16 +337,16 @@ module Reedb
 	end
 end
 
-# user_pw = "1234567890123"
-# name = "default"
-# path = "/home/spacekookie/Desktop"
-# 
+user_pw = "1234567890123"
+name = "default"
+path = "/home/spacekookie/Desktop"
+
 # Reedb::init({:os=>:linux, :pw_length=>12})
-# # Reedb::scope_vault(name, path)
+# Reedb::scope_vault(name, path)
 # puts Reedb::available_vaults
 
-# puts Reedb::available_vaults
 # token = Reedb::create_vault(name, path, user_pw)
+# puts Reedb::available_vaults
 # token = Reedb::request_token(name, user_pw)
 
 # puts token

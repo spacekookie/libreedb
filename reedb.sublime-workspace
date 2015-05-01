@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"na",
+				"nanovault"
+			],
+			[
+				"active",
+				"active_vaults"
+			],
+			[
+				"av",
+				"available_vaults"
+			],
+			[
+				"gene",
+				"generate_token"
+			],
+			[
 				"js",
 				"json_data"
 			],
@@ -82,14 +98,21 @@
 	},
 	"file_history":
 	[
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/reevault.rb",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/	from /home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/reedb.rb",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/utils/meta_vault.rb",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/utils/uuids.rb",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/reedb.gemspec",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/.ruby-version",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/reedb.rb",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/.ruby-gemset",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/Gemfile",
+		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/reedb.log",
 		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/constants.rb",
 		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/{:global=>{",
 		"/usr/share/ruby/xmlrpc/marshal.rb",
 		"/usr/share/ruby/xmlrpc/parser.rb",
-		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/reevault.rb",
-		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/utils/meta_vault.rb",
 		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/utils/vault_buffer.rb",
-		"/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb/lib/reedb/reedb.rb",
 		"/home/spacekookie/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
 		"/home/spacekookie/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings"
 	],
@@ -102,6 +125,7 @@
 		"height": 136.0,
 		"where_history":
 		[
+			"/usr/share/ruby,/home/spacekookie/Documents/code/projects/LonelyRobot/reedb/reedb",
 			"/usr/share/ruby",
 			""
 		]
@@ -111,6 +135,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Just finished loading",
+			"value",
+			"[uuid]",
+			"uuid",
+			"nv",
+			"uuid,",
+			"nv",
+			"@@options",
+			"\"nil\"",
+			"ApplicationSupport",
 			"key",
 			"tmp_vaults",
 			"@@vaults",
@@ -242,7 +276,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 301.0,
+	"side_bar_width": 264.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

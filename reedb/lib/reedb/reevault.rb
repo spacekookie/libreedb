@@ -68,6 +68,17 @@ module Reedb
 			return self.includes?('config')
 		end
 
+		# Counts the vault contents and returns an Integer
+		# WITHOUT HAVING TO UNLOCK THE VAULT!
+		#
+		def count
+			counter = 0
+			Dir.glob("#{@path}/data/*.ree") do |f|
+				counter += 1
+			end
+			return counter
+		end
+
 		def create(password = :failed)
 			# If keygen was used to set a user password then fetch it
 			# and remove the variable from memory!
@@ -144,7 +155,7 @@ module Reedb
 			end
 
 			return nil unless unlock_vault("#{password}")
-			puts "Just finished loading..."
+			VaultLogger.write("Finished loading vault", 'debug')
 			cache_headers
 
 			return self
