@@ -63,6 +63,11 @@ module Reedb
 			return self
 		end
 
+		# Pokes if a vault exists
+		def try?
+			return self.includes?('config')
+		end
+
 		def create(password = :failed)
 			# If keygen was used to set a user password then fetch it
 			# and remove the variable from memory!
@@ -164,6 +169,11 @@ module Reedb
 		#
 		#
 		def insert(name, data)
+			#
+			# TODO: Check if file is locked and return nil
+			#
+			# TODO: Lock this file
+			#
 			if @headers.key?(name)
 				VaultLogger.write("File #{name} already exists. Going to edit mode.", 'debug')
 				
@@ -185,8 +195,9 @@ module Reedb
 			@config['last_updated'] = "#{Utilities.get_time}"
 			save_config
 
-			# Check for vault sync option here
-			# and then sync in an asynchronous thread or something...
+			#
+			# TODO: Unlock this file
+			#
 		end
 
 		def remove_file name
@@ -396,18 +407,14 @@ module Reedb
 		#
 		def init_encryption type
 			type = :aes if type == :auto
-			begin
-				if type == :aes
-					@crypt = Reedb::RAES.new
-				elsif type == :twofish
-					@crypt = Reedb::Fish.new
-				elsif type == :multi
-					@crypt = Reedb::MLE.new
-				else
-					raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
-				end
-			rescue EncryptionError => e
-				puts e.message
+			if type == :aes
+				@crypt = Reedb::RAES.new
+			elsif type == :twofish
+				@crypt = Reedb::Fish.new
+			elsif type == :multi
+				@crypt = Reedb::MLE.new
+			else
+				raise MissingEncryptionTypeError.new, "Encryption failed: Missing type. Aborting..."
 			end
 		end
 	

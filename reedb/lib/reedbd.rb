@@ -23,12 +23,13 @@ if __FILE__ == $PROGRAM_NAME
 	end
 
 	if ARGV == []
-		# First prints out some help stuff
+		puts "[ERROR]: Invalid application arguments!"
 		puts "Usage: reedb [daemon options] -- [reedb options]
 
   Available [reedb options]:
      -l, --pw-length INTEGER     Define minimal passphrase length (Default: 12)
      -p, --port INTEGER          Change the listener port. May break your setup!
+     -a, --app-path STRING      Change the path for the reedb config files/ logs. (default in ~)
      -v, --verbose               Enable verbose logging about the Reedb daemon.
      -d, --no-daemon             Don't run Reedb as a background daemon. Log to STOUT instead of log file.
 
@@ -46,7 +47,7 @@ if __FILE__ == $PROGRAM_NAME
 	end
 
 	options = {
-		# :app_name   => "myproc",
+		:app_name   => "reedb",
 		:backtrace  => true,
 		# :monitor    => true,
 		# :ontop      => true
@@ -55,5 +56,4 @@ if __FILE__ == $PROGRAM_NAME
 	# If it went through it then runs the daemon with the desired options
 	path = File.join(File.dirname(__FILE__), 'reedb')
 	Daemons.run(File.join(path, 'daemon_wrapper.rb'), options)
-
 end

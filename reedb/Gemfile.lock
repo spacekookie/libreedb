@@ -9,6 +9,7 @@ GEM
     aes (0.5.0)
     daemons (1.2.2)
     digest-tiger (1.0.2)
+    hashids (1.0.2)
     json (1.8.2)
     rack (1.6.0)
     rack-protection (1.5.3)
@@ -29,6 +30,7 @@ DEPENDENCIES
   bundler (~> 1.7)
   daemons (~> 1.2.2)
   digest-tiger (~> 1.0.2)
+  hashids (~> 1.0.2)
   json (~> 1.8.2)
   rake (~> 10.0)
   reedb!
