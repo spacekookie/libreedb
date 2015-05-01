@@ -28,7 +28,7 @@ class ReedbHandler < Sinatra::Base
 	#
 	# funct 		url 									descr
 	#
-	#  GET 			/vaults 									List of all vaults
+	#CHECK#  GET 			/vaults 									List of all vaults
 	#  GET 			/vaults/*vault-id*							Vault with ID
 
 	#  GET 			/vaults/*vault-id*/files/*file-id*/body		Returns body of a file
@@ -38,7 +38,7 @@ class ReedbHandler < Sinatra::Base
 	#  POST 		/vaults/*vault-id*/files/*file-id*			Update file contents
 
 	#  PUT 			/vaults										Create new vault
-	#  DELETE 		/vaults/*vault-id*							Deletes a vault
+# DELETE 		/vaults/*vault-id*							Deletes a vault
 	#
 
 	configure :production, :development do

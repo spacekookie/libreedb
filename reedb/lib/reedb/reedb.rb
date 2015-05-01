@@ -17,7 +17,6 @@ require_relative 'reevault'
 
 # System requirements
 require 'securerandom'
-require 'json'
 
 # Main Reedb module that handles the operation of vaults.
 # This can be called from a gem dependency from another ruby app
@@ -177,11 +176,26 @@ module Reedb
 
 				# At this point a vault has been confirmed and a UUID generated
 				track_vault(name, path, vault.count, "#{uuid}")
+				return true
 			else
 				DaemonLogger.write("Tried to scope empty target at #{path}", 'warn')
 				return false
 			end
 		end
+
+		# Removes a vault from the application scope with a uuid.
+		# Closes the vault from the active vault set.
+		#
+		# Returns nil if no such vault was scoped before.
+		#
+		def unscope_vault(uuid)
+			return nil unless @config[:vaults]["#{uuid}"]
+			path = @config[:vaults]["#{uuid}"][:path]
+			DaemonLogger.write("Unscoping vault #{uuid} at #{path}")
+			@@active_vaults["#{uuid}"].close if @@active_vaults["#{uuid}"]
+			@config[:vaults].delete("#{uuid}")
+		end
+
 
 		# Request token for a vault permanently.
 		# Only used if @@no_token == false. Unlocks a vault as well
@@ -193,17 +207,14 @@ module Reedb
 		# => Returns token for vault
 		#
 		def request_token(uuid, passphrase)
-			return nil unless @@active_vaults.include?(name)
+			return nil unless @@active_vaults.include?(uuid)
 
 			#
 			# FIGURE OUT A GOOD WAY TO ALERT USER HERE!
 			#
 
-			nv = nanovault(name, path)
 			token = generate_token(name, path)
-			return nil if @@tokens.include?(token)
-
-			
+			return nil if @@tokens.include?(token)			
 		end
 
 		# Used to access a vault with a specific token
@@ -218,11 +229,11 @@ module Reedb
 		#
 		def close_vault(uuid, token)
 			return nil unless @@tokens[token].include?(uuid)
-			@@vaults["#{uuid}"].close
-			@@vaults["#{uuid}"] = nil
+			@@active_vaults["#{uuid}"].close
+			@@active_vaults.delete("#{uuid}")
 
 			# Removes the token from authentication
-			@@tokens[token] = nil
+			@@tokens.delete(token)
 		end
 
 		######################################################
@@ -341,9 +352,16 @@ user_pw = "1234567890123"
 name = "default"
 path = "/home/spacekookie/Desktop"
 
-# Reedb::init({:os=>:linux, :pw_length=>12})
+Reedb::init({:os=>:linux, :pw_length=>12})
 # Reedb::scope_vault(name, path)
-# puts Reedb::available_vaults
+available = Reedb::available_vaults
+# puts available
+
+available.each do |key, value|
+	Reedb::unscope_vault("#{key}") if value[:name] == "default2"
+	#  if value[:name] == 'default2'
+end
+puts Reedb::available_vaults
 
 # token = Reedb::create_vault(name, path, user_pw)
 # puts Reedb::available_vaults
