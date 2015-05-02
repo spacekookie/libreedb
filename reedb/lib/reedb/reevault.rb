@@ -49,8 +49,15 @@ module Reedb
 		#
 		def initialize(name, path, encprytion)
 			@already_logging = false
+			
+			# Header maps
 			@headers = {}
+			@tags = {}
+			@urls = {}
+
+			# Fileset
 			@files = {}
+			@locked = false
 
 			construct_path("#{name}", "#{path}")
 			init_encryption(encprytion) # => Throws exceptions!
@@ -78,6 +85,12 @@ module Reedb
 			end
 			return counter
 		end
+
+		# Little helper method to determine if a vault is in the middle of 
+		# a write cycle. Which would cause horrible crashes on other applications
+		# and errors on the file system if things are moved around inside
+		#
+		def locked?() return @locked end
 
 		def create(password = :failed)
 			# If keygen was used to set a user password then fetch it
@@ -222,6 +235,18 @@ module Reedb
 			end
 		end
 
+		# Returns headers according to a search queury
+		#
+		# { 'name' => '__name__',
+		# 	'url' => '__url__',
+		# 	'tags' => '__tags__'
+		# }
+		#
+		def list_headers search
+			cache_headers
+
+		end
+
 		# Dump headers and files from memory in times of
 		# inactivity for security reasons
 		def unload
@@ -273,6 +298,8 @@ module Reedb
 
 		def cache_headers
 			@headers = {}
+			@tags = {}
+			@urls = {}
 			VaultLogger.write("Starting a cache cycle at #{Reedb::Utilities::get_time}.", 'debug')
 
 			Dir.glob("#{@path}/data/*.ree") do |file|
@@ -283,6 +310,10 @@ module Reedb
 				data = JSON.parse(decrypted)
 				df = DataFile.new(nil, self, data)
 				@headers[df.name] = df.cache(:header)
+				
+				@headers[df.name].each do |key, value|
+					puts key, value
+				end
 			end
 		end
 

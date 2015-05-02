@@ -109,10 +109,10 @@ module Reedb
 		# Also adds that token to the @@tokens list
 		#
 		# Params: 	
-		# 			'name' of the vault
-		# 			'path' of the vault
-		# 			user 'passphrase'
-		# 			'encryption' method (:aes, :twofish, :auto)
+		# 					'name' of the vault
+		# 					'path' of the vault
+		# 					user 'passphrase'
+		# 					'encryption' method (:aes, :twofish, :auto)
 		#
 		# => Base64 encoded token | nil if errors occured.
 		#
@@ -133,10 +133,10 @@ module Reedb
 			end
 
 			# Creates a metavault with name, path, size and uuid to be tracked on the system
-			metavault = MetaVault.new("#{name}", "#{path}", 0, "#{uuid}")
+			# metavault = MetaVault.new("#{name}", "#{path}", 0, "#{uuid}")
 
 			# Adds vault to the active set of vaults
-			@@active_vaults[metavault] = tmp_vault
+			@@active_vaults[uuid] = tmp_vault
 
 			# Generates a token
 			unless @no_token
@@ -150,12 +150,40 @@ module Reedb
 			return nil
 		end
 
+
+		# Removes a vault from the file system. This requires special privileges 
+		# to do via this interface to prevent deleting vaults without the users 
+		# permission. Will also fire a user interrupt to alert them of this 
+		# behaviour depending on platform.
+		#
+		# Params:   
+		#       		'uuid' of the vault
+		#       		'passphrase' of the vault
+		#       		'token' of an application that needs to be authorised
+		#
+		# => Returns boolean describing success
+		#
+		def remove_vault(uuid, passphrase, token)
+			# Returns false if that token isn't authorised
+			return false unless @@tokens[token].include?(uuid)
+
+			# Return false if vault has never been scoped before
+			return false unless @config[:vaults].include?(uuid)
+
+			# Return false if vault is currently locked
+			return false if @@active_vaults[uuid].locked?
+
+			# Mark a vault for removal and only actually
+			puts "THIS HAS NOT BEEN IMPLEMENTED YET! DON'T DO THIS!!11ELEVEN!!!!"
+			return false
+		end
+
 		# Adds a new vault to the tracking scope of this Reedb daemon. Does not grant access
 		# or generate a new token for application interaction.
 		# On a new install usually called just before requesting a token
 		# 
 		# Params: 	'name' of the vault
-		# 			'path' on the systen
+		# 					'path' on the systen
 		#
 		def scope_vault(name, path)
 			# Checks if that specific vault was already scoped
@@ -202,7 +230,7 @@ module Reedb
 		# with the user passphrase
 		#
 		# Params: 	'name' of the vault
-		# 			'passphrase' to unlock
+		# 					'passphrase' to unlock
 		#
 		# => Returns token for vault
 		#
@@ -214,15 +242,38 @@ module Reedb
 			#
 
 			token = generate_token(name, path)
-			return nil if @@tokens.include?(token)			
+			return nil if @@tokens[token].include?(uuid)
+			@@tokens[token] << uuid
+			return token
 		end
 
-		# Used to access a vault with a specific token
+		# Request token for a vault permanently.
+		# Only used if @@no_token == false. Unlocks a vault as well
+		# with the user passphrase
 		#
-		# => A vault if the token was legitimate. Nil if it was not
+		# Params:   'uuid' of the vault
+		#       		'search' search queury as described in the wiki
 		#
-		def access_vault_with_token(uuid, token)
+		# => Returns list of headers present in the vault
+		#   according to the search queury
+		#
+		def access_headers(uuid, token, search)
+			# return nil unless @@tokens[token].include?(uuid)
+			@@active_vaults["#{uuid}"].list_headers(nil)
+		end
 
+
+		# Request token for a vault permanently.
+		# Only used if @@no_token == false. Unlocks a vault as well
+		# with the user passphrase
+		#
+		# Params:   'uuid' of the vault
+		#       		'file_name' file identifier to access
+		#
+		# => Returns contents of a file either as it's current
+		#   version or it's edit history
+		#
+		def access_file(uuid, file_name, history = false)
 		end
 
 		# Ends the exchange with a vault. Removes token from active vault record
@@ -251,7 +302,7 @@ module Reedb
 		# @@tokens set.
 		#
 		# Params: 	'name' of the vault
-		# 			'path' of the vault
+		# 					'path' of the vault
 		#
 		# => Base64 encoded token
 		#
@@ -270,8 +321,8 @@ module Reedb
 		# Reedb starts
 		#
 		# Params: 	name => Public vault name
-		# 			path => Location on the system
-		# 			tokens => Authentication token for applications
+		# 					path => Location on the system
+		# 					tokens => Authentication token for applications
 		#
 		def track_vault(name, path, size, uuid)
 			@config[:vaults]["#{uuid}"] = {} unless @config[:vaults].include?(uuid)
@@ -354,14 +405,17 @@ path = "/home/spacekookie/Desktop"
 
 Reedb::init({:os=>:linux, :pw_length=>12})
 # Reedb::scope_vault(name, path)
-available = Reedb::available_vaults
-# puts available
 
-available.each do |key, value|
-	Reedb::unscope_vault("#{key}") if value[:name] == "default2"
-	#  if value[:name] == 'default2'
-end
-puts Reedb::available_vaults
+# Reedb::create_vault(name, path, user_pw)
+
+available = Reedb::available_vaults
+puts available
+
+# available.each do |key, value|
+# 	Reedb::unscope_vault("#{key}") if value[:name] == "default2"
+# 	#  if value[:name] == 'default2'
+# end
+# puts Reedb::available_vaults
 
 # token = Reedb::create_vault(name, path, user_pw)
 # puts Reedb::available_vaults
