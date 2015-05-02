@@ -51,7 +51,7 @@ module Reedb
 			# => Updates the version of the file if neccesary
 			# puts (@dataset['body'][@version] == {})
 
-			puts @dataset['body'][@version]
+			# puts @dataset['body'][@version]
 			curr_time = DateTime.now.strftime('%Q').to_i
 			then_time = @version.timestamp
 			# time_diff = @version.timestamp - curr_time
@@ -93,7 +93,7 @@ module Reedb
 		#
 		def sync
 			json_data = @dataset.to_json
-			#puts json_data
+			# puts json_data
 			crypt_json = @vault.crypt.encrypt(json_data)
 
 			tmp = File.open("#{@path}", "wb+")

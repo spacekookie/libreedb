@@ -42,7 +42,9 @@ module Reedb
 		# Used to hash file-names in vaults
 		#
 		def self.tiger_hash(string)
-			return self.sha512_hash("#{string}")# Digest::Tiger.hexdigest("#{string}")
+			DaemonLogger.write("FIX ME: THash is using a broken function!", "warn")
+			return self.sha512_hash("#{string}")
+			# Digest::Tiger.hexdigest("#{string}")
 		end
 
 		# => Returns 64 byte sha hash.
@@ -54,7 +56,7 @@ module Reedb
 		end
 
 		def self.name_col_hash(string)
-			return "TROL#{string}"
+			return "---#{string}"
 		end
 	end
 end

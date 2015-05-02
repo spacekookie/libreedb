@@ -244,7 +244,7 @@ module Reedb
 		#
 		def list_headers search
 			cache_headers
-
+			return @headers
 		end
 
 		# Dump headers and files from memory in times of
@@ -311,9 +311,12 @@ module Reedb
 				df = DataFile.new(nil, self, data)
 				@headers[df.name] = df.cache(:header)
 				
-				@headers[df.name].each do |key, value|
-					puts key, value
-				end
+				# Sort values into @tags and @urls here!
+				# @headers[df.name].each do |key, value|
+				# 	if key == "url"
+				# 		value.each { |url| @urls[url] = [] unless @urls[url] ; @urls[url] <<  }
+				# 	end
+				# end
 			end
 		end
 

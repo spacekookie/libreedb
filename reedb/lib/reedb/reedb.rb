@@ -41,6 +41,10 @@ module Reedb
 		# Returns whether verbose mode is enabled
 		def verbose?() (return @@verbose) end
 
+		def terminate reason
+			DaemonLogger.write("Terminating the Reedb daemon because of #{reason}")
+		end
+
 		def init(options)
 			@@daemon = if options.include?(:daemon) then options[:daemon] else true end
 			@@archos = options[:os]
@@ -71,6 +75,8 @@ module Reedb
 
 				FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
 				FileUtils::chmod_R(0744, "#{log_path}")
+				FileUtils::chmod_R(0744, "#{master_path}")
+				FileUtils::chmod_R(0744, "#{@config_path}")
 
 			elsif @@archos == :osx
 				master_path = File.expand_path('~/Library/Application\ Support/reedb/')
@@ -81,7 +87,6 @@ module Reedb
 			end
 			Reedb::DaemonLogger.setup("#{log_path}")
 			Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
-
 			cache_config
 		end
 
@@ -269,7 +274,8 @@ module Reedb
 		#   according to the search queury
 		#
 		def access_headers(uuid, token, search = nil)
-			# return nil unless @@tokens[token].include?(uuid)
+			return nil unless @@active_vaults["#{uuid}"]
+			return nil unless @@tokens[token].include?(uuid)
 			@@active_vaults["#{uuid}"].list_headers(search)
 		end
 
@@ -428,28 +434,40 @@ user_pw = "1234567890123"
 name = "default"
 path = "/home/spacekookie/Desktop"
 
-# Reedb::init({:os=>:linux, :pw_length=>12})
-# Reedb::scope_vault(name, path)
+Reedb::init({:os=>:linux, :pw_length=>12})
+Reedb::scope_vault(name, path)
 
-# # Reedb::create_vault(name, path, user_pw)
+# Reedb::create_vault(name, path, user_pw)
 
-# available = Reedb::available_vaults
-# puts "Available vaults: #{available}\n\n"
+available = Reedb::available_vaults
+puts "Available vaults: #{available}\n\n"
 
-# target = nil
-# available.each do |uuid, meta|
-# 	(target = uuid) if meta[:name] == "default"
-# end 
+target = nil
+available.each do |uuid, meta|
+	(target = uuid) if meta[:name] == "default"
+end 
 
-# my_token = Reedb::request_token(target, user_pw)
-# puts "My token: #{my_token}\n\n"
+my_token = Reedb::request_token(target, user_pw)
+puts "My token: #{my_token}\n\n"
 
-# headers = access_headers(target, my_token)
-# puts "Vault headers: #{headers}\n\n"
+headers = Reedb::access_headers(target, my_token)
+puts "Vault headers: #{headers}\n\n"
 
-# Reedb::close_vault(target, my_token)
+Reedb::close_vault(target, my_token)
 
-Reedb::ReeVault.new(name, path, :aes).load(user_pw).insert("Lonely Robot", {'url'=>'www.lonelyrobot.io'})
+Reedb::terminate("user")
+# data = {
+# 	'header'=>{
+# 		'url'=>'www.facebook.com',
+# 		'category'=>'Web Login'
+# 		},
+# 	'body'=>{
+# 		'password'=>'mega_secure_password',
+# 		'username'=>'spacekookie'
+# 	}
+# }
+
+# Reedb::ReeVault.new(name, path, :aes).load(user_pw).insert("Lonely Robot", data)
 
 ##
 #####
