@@ -235,15 +235,26 @@ module Reedb
 		# => Returns token for vault
 		#
 		def request_token(uuid, passphrase)
-			return nil unless @@active_vaults.include?(uuid)
+
+			# If the vault is not currently open
+			unless @@active_vaults.include?(uuid)
+				unless @config[:vaults][uuid]
+					DaemonLogger.write("The requested vault is unknown to this system. Aborting operation!", 'error')
+					return nil
+				end
+
+				# Continue
+				name = @config[:vaults][uuid][:meta].name
+				path = @config[:vaults][uuid][:meta].path
+
+				@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load(passphrase)
+			end
 
 			#
 			# FIGURE OUT A GOOD WAY TO ALERT USER HERE!
 			#
 
-			token = generate_token(name, path)
-			return nil if @@tokens[token].include?(uuid)
-			@@tokens[token] << uuid
+			token = generate_token(uuid, path)
 			return token
 		end
 
@@ -257,9 +268,9 @@ module Reedb
 		# => Returns list of headers present in the vault
 		#   according to the search queury
 		#
-		def access_headers(uuid, token, search)
+		def access_headers(uuid, token, search = nil)
 			# return nil unless @@tokens[token].include?(uuid)
-			@@active_vaults["#{uuid}"].list_headers(nil)
+			@@active_vaults["#{uuid}"].list_headers(search)
 		end
 
 
@@ -279,12 +290,26 @@ module Reedb
 		# Ends the exchange with a vault. Removes token from active vault record
 		#
 		def close_vault(uuid, token)
+			return nil unless @@tokens[token]
 			return nil unless @@tokens[token].include?(uuid)
+
+			DaemonLogger.write("Closing vault with #{uuid}.", "debug")
+
+			# Close the vault
 			@@active_vaults["#{uuid}"].close
+
+			# Delete the vault from the active_vault record with UUID
 			@@active_vaults.delete("#{uuid}")
 
-			# Removes the token from authentication
+			# TODO: Alert other applications
+			# TODO: Don't delete the token if it is being used to access
+			# 			other vaults on the system!
 			@@tokens.delete(token)
+
+			# Removes token from config
+			# TODO: FIX ME?!
+			@config[:vaults]["#{uuid}"][:tokens].delete(token)
+			write_config
 		end
 
 		######################################################
@@ -310,9 +335,10 @@ module Reedb
 			rnd = SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)
 
 			# Concatinates the token together and base64 encodes it
-			token = Base64.encode64("#{uuid}::#{path}::#{rnd}")
+			token = Base64.encode64("#{uuid}--#{path}--#{rnd}")
 			@@tokens[token] = [] unless @@tokens.include?(token)
 			@@tokens[token] << uuid
+			update_tracked_vault("#{uuid}", nil, nil, nil, token)
 			return token
 		end
 
@@ -330,7 +356,7 @@ module Reedb
 			# Adds actual size as soon as the vault gets unlocked by an application
 			@config[:vaults]["#{uuid}"][:meta] = MetaVault.new("#{name}", "#{path}", size, "#{uuid}")
 			@config[:vaults]["#{uuid}"][:tokens] = [] unless @config[:vaults]["#{uuid}"][:tokens]
-			@config[:vaults]["#{uuid}"][:tokens] << nil
+			@config[:vaults]["#{uuid}"][:tokens] = []
 
 			write_config
 		end
@@ -381,9 +407,8 @@ module Reedb
 			end
 
 			# At this point @config has been loaded
-			@config[:vaults].each do |key, value|
-
-			end
+			vault_count = @config[:vaults].size
+			DaemonLogger.write("Found #{vault_count} vault(s) on the system.", "debug")
 		end
 
 		def write_config
@@ -403,13 +428,32 @@ user_pw = "1234567890123"
 name = "default"
 path = "/home/spacekookie/Desktop"
 
-Reedb::init({:os=>:linux, :pw_length=>12})
+# Reedb::init({:os=>:linux, :pw_length=>12})
 # Reedb::scope_vault(name, path)
 
-# Reedb::create_vault(name, path, user_pw)
+# # Reedb::create_vault(name, path, user_pw)
 
-available = Reedb::available_vaults
-puts available
+# available = Reedb::available_vaults
+# puts "Available vaults: #{available}\n\n"
+
+# target = nil
+# available.each do |uuid, meta|
+# 	(target = uuid) if meta[:name] == "default"
+# end 
+
+# my_token = Reedb::request_token(target, user_pw)
+# puts "My token: #{my_token}\n\n"
+
+# headers = access_headers(target, my_token)
+# puts "Vault headers: #{headers}\n\n"
+
+# Reedb::close_vault(target, my_token)
+
+Reedb::ReeVault.new(name, path, :aes).load(user_pw).insert("Lonely Robot", {'url'=>'www.lonelyrobot.io'})
+
+##
+#####
+##########
 
 # available.each do |key, value|
 # 	Reedb::unscope_vault("#{key}") if value[:name] == "default2"

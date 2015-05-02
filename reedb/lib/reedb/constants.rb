@@ -10,6 +10,6 @@
 module Reedb
 	VERSION = "0.9.0"
 	NET_PORT = 55736
-	TOKEN_BYTE_SIZE = 24
+	TOKEN_BYTE_SIZE = 12
 	MASTER_PATH = "&&HOME&&"
 end

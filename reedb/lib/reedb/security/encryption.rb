@@ -42,7 +42,7 @@ module Reedb
 		# Used to hash file-names in vaults
 		#
 		def self.tiger_hash(string)
-			return Digest::Tiger.hexdigest("#{string}")
+			return self.sha512_hash("#{string}")# Digest::Tiger.hexdigest("#{string}")
 		end
 
 		# => Returns 64 byte sha hash.
@@ -50,7 +50,11 @@ module Reedb
 		# Used for integrety checking files
 		#
 		def self.sha512_hash(string)
-			return Digest::SHA512.hexdigest("#{string}")
+			return Digest::SHA256.hexdigest("#{string}")
+		end
+
+		def self.name_col_hash(string)
+			return "TROL#{string}"
 		end
 	end
 end
