@@ -312,6 +312,16 @@ module Reedb
 				@headers[df.name] = df.cache(:header)
 				
 				# Sort values into @tags and @urls here!
+
+				@headers[df.name].each do |key, value|
+					if key == "urls"
+						@urls[value] = [] unless @urls[value]
+						@urls[value] << @headers[df.name]['name']
+					elsif key == "tags"
+
+				end
+
+
 				# @headers[df.name].each do |key, value|
 				# 	if key == "url"
 				# 		value.each { |url| @urls[url] = [] unless @urls[url] ; @urls[url] <<  }

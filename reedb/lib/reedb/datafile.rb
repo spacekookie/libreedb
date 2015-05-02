@@ -47,6 +47,10 @@ module Reedb
 			construct_path(@name, @vault)
 		end
 
+		def insertv2(data, mode = :hard)
+			sync if mode == :hard
+		end
+
 		def insert(data, mode = :hard)
 			# => Updates the version of the file if neccesary
 			# puts (@dataset['body'][@version] == {})
@@ -61,7 +65,8 @@ module Reedb
 				unless time_dif < 10000
 					@version.update
 				else
-					puts "Not incrementing version because write cycle too short."
+					# Does this really need an output??
+					# puts "Not incrementing version because write cycle too short."
 				end
 			end
 
