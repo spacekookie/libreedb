@@ -23,6 +23,6 @@ module Reedb
 		# Used to compare vaults
 		def includes?(name) return (@name == name) end
 		def includes?(name, path) return (@name == name && @path == path) end
-		def to_s() return "#{@name}@#{@path}, size: #{@size}" end
+		def to_s() return "'#{@name}'@'#{@path}', size: #{@size}" end
 	end
 end

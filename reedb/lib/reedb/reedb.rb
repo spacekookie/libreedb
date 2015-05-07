@@ -42,6 +42,10 @@ module Reedb
 		def verbose?() (return @@verbose) end
 
 		def terminate reason
+			new_reason = "unknown reason"
+			new_reason = "user request" if reason == "user"
+			new_reason = "system request" if reason == "root"
+
 			DaemonLogger.write("Terminating the Reedb daemon because of #{reason}")
 		end
 
@@ -52,6 +56,9 @@ module Reedb
 			@@verbose = if options.include?(:verbose) then options[:verbose] else false end
 			@@no_token = if options.include?(:no_token) then options[:no_token] else false end
 			@@path = if options.include?(:path) then options[:path] else "&&HOME&&" end
+
+			# Enable cleanup mode
+			@@cleanup = if options.include?(:cleanup) then options[:cleanup] else true end
 
 			# Set of vaults that map a VaultBuffer to the vault itself.
 			# Never exposed outside the API
@@ -71,17 +78,16 @@ module Reedb
 				master_path = "/etc/reedb" if Utilities::parse_user == 'root'
 
 				log_path = File.expand_path('~/.config/reedb/logs/')
-				@config_path = File.join("#{master_path}", "master.cfg")
+				@@config_path = File.join("#{master_path}", "master.cfg")
 
 				FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
 				FileUtils::chmod_R(0744, "#{log_path}")
 				FileUtils::chmod_R(0744, "#{master_path}")
-				FileUtils::chmod_R(0744, "#{@config_path}")
 
 			elsif @@archos == :osx
 				master_path = File.expand_path('~/Library/Application\ Support/reedb/')
 				log_path = File.expand_path('~/Library/Application\ Support/reedb/logs/')
-				@config_path = File.join("#{master_path}", "master.cfg")
+				@@config_path = File.join("#{master_path}", "master.cfg")
 			else
 				# Windows crap
 			end
@@ -99,7 +105,7 @@ module Reedb
 		def available_vaults
 			available = {}
 
-			@config[:vaults].each do |uuid, value|
+			@@config[:vaults].each do |uuid, value|
 				available["#{uuid}"] = {}
 				available["#{uuid}"][:name] = value[:meta].name
 				available["#{uuid}"][:path] = value[:meta].path
@@ -126,7 +132,7 @@ module Reedb
 			uuid = nil
 			loop do
 				uuid = UUID::create_v1
-				(break) unless @config[:vaults].include?(uuid)
+				(break) unless @@config[:vaults].include?(uuid)
 			end
 
 			# Create actual Vault object
@@ -173,11 +179,11 @@ module Reedb
 			return false unless @@tokens[token].include?(uuid)
 
 			# Return false if vault has never been scoped before
-			return false unless @config[:vaults].include?(uuid)
+			return false unless @@config[:vaults].include?(uuid)
 
 			# Return false if vault is currently locked
 			return false if @@active_vaults[uuid].locked?
-
+ 
 			# Mark a vault for removal and only actually
 			puts "THIS HAS NOT BEEN IMPLEMENTED YET! DON'T DO THIS!!11ELEVEN!!!!"
 			return false
@@ -192,7 +198,7 @@ module Reedb
 		#
 		def scope_vault(name, path)
 			# Checks if that specific vault was already scoped
-			@config[:vaults].each do |key, value|
+			@@config[:vaults].each do |key, value|
 				if value[:meta].name == "#{name}" && value[:meta].path == "#{path}"
 					DaemonLogger.write("Vault already scoped at #{path}", 'info')
 					return false
@@ -204,11 +210,13 @@ module Reedb
 				uuid = nil
 				loop do
 					uuid = UUID::create_v1
-					(break) unless @config[:vaults].include?(uuid)
+					(break) unless @@config[:vaults].include?(uuid)
 				end
 
 				# At this point a vault has been confirmed and a UUID generated
 				track_vault(name, path, vault.count, "#{uuid}")
+				DaemonLogger.write("Vault successfully scoped at #{path}", 'info')
+				cache_config
 				return true
 			else
 				DaemonLogger.write("Tried to scope empty target at #{path}", 'warn')
@@ -222,11 +230,12 @@ module Reedb
 		# Returns nil if no such vault was scoped before.
 		#
 		def unscope_vault(uuid)
-			return nil unless @config[:vaults]["#{uuid}"]
-			path = @config[:vaults]["#{uuid}"][:path]
+			return nil unless @@config[:vaults]["#{uuid}"]
+			path = @@config[:vaults]["#{uuid}"][:path]
 			DaemonLogger.write("Unscoping vault #{uuid} at #{path}")
 			@@active_vaults["#{uuid}"].close if @@active_vaults["#{uuid}"]
-			@config[:vaults].delete("#{uuid}")
+			@@config[:vaults].delete("#{uuid}")
+			cache_config
 		end
 
 
@@ -243,14 +252,14 @@ module Reedb
 
 			# If the vault is not currently open
 			unless @@active_vaults.include?(uuid)
-				unless @config[:vaults][uuid]
+				unless @@config[:vaults][uuid]
 					DaemonLogger.write("The requested vault is unknown to this system. Aborting operation!", 'error')
 					return nil
 				end
 
 				# Continue
-				name = @config[:vaults][uuid][:meta].name
-				path = @config[:vaults][uuid][:meta].path
+				name = @@config[:vaults][uuid][:meta].name
+				path = @@config[:vaults][uuid][:meta].path
 
 				@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load(passphrase)
 			end
@@ -314,7 +323,7 @@ module Reedb
 
 			# Removes token from config
 			# TODO: FIX ME?!
-			@config[:vaults]["#{uuid}"][:tokens].delete(token)
+			@@config[:vaults]["#{uuid}"][:tokens].delete(token)
 			write_config
 		end
 
@@ -357,29 +366,29 @@ module Reedb
 		# 					tokens => Authentication token for applications
 		#
 		def track_vault(name, path, size, uuid)
-			@config[:vaults]["#{uuid}"] = {} unless @config[:vaults].include?(uuid)
+			@@config[:vaults]["#{uuid}"] = {} unless @@config[:vaults].include?(uuid)
 
 			# Adds actual size as soon as the vault gets unlocked by an application
-			@config[:vaults]["#{uuid}"][:meta] = MetaVault.new("#{name}", "#{path}", size, "#{uuid}")
-			@config[:vaults]["#{uuid}"][:tokens] = [] unless @config[:vaults]["#{uuid}"][:tokens]
-			@config[:vaults]["#{uuid}"][:tokens] = []
+			@@config[:vaults]["#{uuid}"][:meta] = MetaVault.new("#{name}", "#{path}", size, "#{uuid}")
+			@@config[:vaults]["#{uuid}"][:tokens] = [] unless @@config[:vaults]["#{uuid}"][:tokens]
+			@@config[:vaults]["#{uuid}"][:tokens] = []
 
 			write_config
 		end
 
 		def untrack_vault uuid
-			@config[:vaults]["#{uuid}"] = nil if @config[:vaults].include?(uuid)
+			@@config[:vaults]["#{uuid}"] = nil if @@config[:vaults].include?(uuid)
 		end
 
 		def update_tracked_vault(uuid, name, path, size, token)
-			return nil unless @config[:vaults].include?(uuid)
+			return nil unless @@config[:vaults].include?(uuid)
 
-			@config[:vaults]["#{uuid}"][:meta].name = name if name
-			@config[:vaults]["#{uuid}"][:meta].path = path if path
-			@config[:vaults]["#{uuid}"][:meta].size = size if size
+			@@config[:vaults]["#{uuid}"][:meta].name = name if name
+			@@config[:vaults]["#{uuid}"][:meta].path = path if path
+			@@config[:vaults]["#{uuid}"][:meta].size = size if size
 
-			@config[:vaults]["#{uuid}"][:tokens] = [] unless @config[:vaults]["#{uuid}"][:tokens]
-			@config[:vaults]["#{uuid}"][:tokens] << token if token
+			@@config[:vaults]["#{uuid}"][:tokens] = [] unless @@config[:vaults]["#{uuid}"][:tokens]
+			@@config[:vaults]["#{uuid}"][:tokens] << token if token
 
 			write_config
 		end
@@ -387,45 +396,69 @@ module Reedb
 		# Removes a token from a vault config thus removing any access that token had.
 		#
 		def remove_token(uuid, token)
-			return nil unless @config[:vaults].include?(uuid)
-			return nil unless @config[:vaults]["#{uuid}"][:tokens].include?(token)
+			return nil unless @@config[:vaults].include?(uuid)
+			return nil unless @@config[:vaults]["#{uuid}"][:tokens].include?(token)
 			
-			@config[:vaults]["#{uuid}"][:tokens].delete(token)
+			@@config[:vaults]["#{uuid}"][:tokens].delete(token)
 			write_config
 		end
 
-		# Caches the config file to @config
+		# Caches the config file to @@config
 		#
 		#
 		def cache_config
 			# Now read vault information and put it into @@active_vaults field
-			if File.exist?("#{@config_path}")
+			if File.exist?("#{@@config_path}")
 				read_config
 			else
 				# Creates some dummy info
-				@config = {}
-				@config[:global] = {}
-				@config[:global][:logs] = :default
-				@config[:vaults] = {}
+				@@config = {}
+				@@config[:global] = {}
+				@@config[:global][:logs] = :default
+				@@config[:vaults] = {}
 
 				# Writes the config to file with Base64 encoding
 				write_config
+				FileUtils::chmod_R(0744, "#{@@config_path}")
 			end
 
-			# At this point @config has been loaded
-			vault_count = @config[:vaults].size
+			check_vault_integreties if @@cleanup
+
+			# At this point @@config has been loaded
+			vault_count = @@config[:vaults].size
 			DaemonLogger.write("Found #{vault_count} vault(s) on the system.", "debug")
 		end
 
+		# Check vault integreties here!
+		# Will try every vault in the config and remove the ones that are no longer 
+		# available to avoid errors and access corruptions
+		#
+		def check_vault_integreties
+			# Vaults that will be marked for removal
+			marked = []
+			@@config[:vaults].each do |uuid, data|
+				unless ReeVault.new(data[:meta].name, data[:meta].path, :auto).try?
+					marked << uuid
+				end
+			end
+
+			marked.each do |uuid|
+				# puts "Removing: #{uuid}"
+				DaemonLogger.write("Removing corrupted vault #{uuid}", 'warn')
+				@@config[:vaults].delete(uuid)
+			end
+			write_config
+		end
+
 		def write_config
-			data = Marshal.dump(@config)
-			File.open(@config_path, 'wb+') { |file| file.write(data) }
+			data = Marshal.dump(@@config)
+			File.open(@@config_path, 'wb+') { |file| file.write(data) }
 			read_config
 		end
 
 		def read_config
-			data = File.open(@config_path, "rb").read()
-			@config = Marshal.load(data)
+			data = File.open(@@config_path, "rb").read()
+			@@config = Marshal.load(data)
 		end
 	end
 end
@@ -439,21 +472,21 @@ Reedb::scope_vault(name, path)
 
 # Reedb::create_vault(name, path, user_pw)
 
-available = Reedb::available_vaults
-puts "Available vaults: #{available}\n\n"
+# available = Reedb::available_vaults
+# puts "Available vaults: #{available}\n\n"
 
-target = nil
-available.each do |uuid, meta|
-	(target = uuid) if meta[:name] == "default"
-end 
+# target = nil
+# available.each do |uuid, meta|
+# 	(target = uuid) if meta[:name] == "default"
+# end 
 
-my_token = Reedb::request_token(target, user_pw)
-puts "My token: #{my_token}\n\n"
+# my_token = Reedb::request_token(target, user_pw)
+# puts "My token: #{my_token}\n\n"
 
-headers = Reedb::access_headers(target, my_token)
-puts "Vault headers: #{headers}\n\n"
+# headers = Reedb::access_headers(target, my_token)
+# puts "Vault headers: #{headers}\n\n"
 
-Reedb::close_vault(target, my_token)
+# Reedb::close_vault(target, my_token)
 
 Reedb::terminate("user")
 # data = {

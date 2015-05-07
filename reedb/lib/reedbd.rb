@@ -15,7 +15,7 @@ require_relative 'reedb/constants.rb'
 
 NAME = 'reedb'
 
-if __FILE__ == $PROGRAM_NAME	
+if __FILE__ == $PROGRAM_NAME
 
 	if ARGV.include? '--version'
 		puts Reedb::VERSION
