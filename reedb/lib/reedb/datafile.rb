@@ -47,7 +47,6 @@ module Reedb
 
 			# The header set is defined by the vault and specifies the fields that can
 			# be specified in the header part of a file.
-			@header_set = vault.header_set
 			construct_path(@name, @vault)
 		end
 
@@ -62,8 +61,26 @@ module Reedb
 		# 	}
 		# }
 		#
-		# Malformed data will be ignored and reported in the vault logging
+		# Malformed data will be ignored and reported in the vault logging.
 		#
+		# Writing into body is farely straight forward. A value needs a field and is
+		# assigned a version automatically depending on the time in the cache cycle
+		# of the file
+		#
+		# Writing to header is much more interesting.
+		# There is a header_set defined in the parent vault that specifies what fields
+		# are valid and what types they allow. For example, by default, there is a 'urls'
+		# field that is a list of urls.
+		#
+		# WRITING THE SAME VALUE INTO A FIELD AS EXISTS BEFORE WILL RESET THAT VALUE!
+		# That's how you can delete a field with this same function in the same step as
+		# adding new information (I know...hacky. But clever)
+		#
+		# For further documentation on this function, please check with the Reedb wiki
+		#
+		# Params:
+		# 			data => specifically formatted JSON data set (see docs)
+		# 			mode => overwrite default file/ vault caching mode.
 		#
 		def insertv2(data, mode = :hard)
 			sync if mode == :hard
@@ -94,13 +111,12 @@ module Reedb
 			if to_head
 				to_head.each do |key, value|
 					@dataset['header']['name'] if key == 'name'
-
-					# Now check all the special shit
-					if @header_set.include?(key)
-						# This means that the value can be stored
+					
+					# This means that the value can be stored
+					if vault.header_set.include?(key)
 						
 						# If inserting into a header single field
-						if @header_set[key] == 'single'
+						if vault.header_set[key] == 'single'
 							if @dataset['header'][key]
 								@dataset['header'][key] = nil
 							else
@@ -108,7 +124,7 @@ module Reedb
 							end
 
 						# If inserting into a header list
-						elsif @header_set[key] == 'list'
+						elsif vault.header_set[key] == 'list'
 							if @dataset['header'][key].include?(value)
 								@dataset['header'][key].delete(value)
 							else
@@ -116,7 +132,7 @@ module Reedb
 							end
 
 						# If inserting into a header tree
-						elsif @header_set[key] == 'tree'
+						elsif vault.header_set[key] == 'tree'
 							if @dataset['header'][key].include?(value)
 								@dataset['header'][key].delete(value)
 							else
@@ -130,8 +146,11 @@ module Reedb
 				end
 			end
 
+			#  BOOORING! :C
 			if to_body
-
+				to_body.each do |field, value|
+					@dataset['body']["#{@version}"]["#{field}"] = value
+				end
 			end
 		end
 
@@ -141,6 +160,7 @@ module Reedb
 
 		def insert(data, mode = :hard)
 			puts "[LEGACY MODE]: This function has been depreciated. Use 'insertv2' instead!"
+			VaultLogger.write("[LEGACY MODE]: Using broken function. Aborting action!", 'error')
 			return
 
 			# => Updates the version of the file if neccesary
@@ -219,7 +239,7 @@ module Reedb
 			@dataset['header']['latest'] = @version
 
 			# Adds the header fields that were specified by the parent vault here
-			@header_set.each do |field, type|
+			vault.header_set.each do |field, type|
 				@dataset['header']["#{field}"] = nil if type == 'single'
 				@dataset['header']["#{field}"] = [] if type == 'list'
 				@dataset['header']["#{field}"] = {} if type == 'tree'
