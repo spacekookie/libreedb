@@ -64,6 +64,7 @@ module Reedb
 			# Fileset
 			@files = {}
 			@locked = false
+			@locks = []
 
 			# Defines the default (and boring vanilla) header set
 			@header_set = {'urls'=>'list', 'tags'=>'list'}
@@ -207,32 +208,30 @@ module Reedb
 			end
 		end
 
-		# Inserts into a file of the name that's specified in the function.
-		# Data is stored in nested hashes:
+		# Check the file API or the wiki to learn how this function works.
+		# This function is also used to delete fields from header space.
 		#
-		# {:headers=>{'name'=>'your_name_here'}, :body=>{'password'=>'secure_password'}}
-		#
-		#
-		def insert(name, data)
-			#
-			# TODO: Check if file is locked and return nil
-			#
-			# TODO: Lock this file
-			#
+		def update(name, data)
+			(raise FileBusyError.new, "File #{name} busy" ; return) if @locks.include?(name)
+			@locks << name
+
 			if @headers.key?(name)
-				VaultLogger.write("File #{name} already exists. Going to edit mode.", 'debug')
 				
+				# Triggers a re-cache that should be up to date.
 				unless load_file(name, :fast)
 					VaultLogger.write("Discrepency between two header cache cycles detected! Aborting insertion. Output warning to user!", 'fatal')
 					raise BadCacheError.new, "Insertion failed because of an invalid cache. Check your filesystem and try again!"
 					return nil
 				end
+				
+				# Loads the existing file
 				df = DataFile.new(name, self, @files[name])
-				df.insert(data)
+				df.insertv2(data, :hard) # Default cache mode
 			else
 				df = DataFile.new(name, self)
-				df.insert(data)
+				df.insertv2(data, :hard) # Default cache mode
 			end
+
 			# => Make sure that everything is up to date.
 			cache_headers
 			@config['updating_user'] = "#{Etc.getlogin}"
@@ -240,9 +239,8 @@ module Reedb
 			@config['last_updated'] = "#{Utilities.get_time}"
 			save_config
 
-			#
-			# TODO: Unlock this file
-			#
+			# Unlocks the file again
+			@locks.delete(name)
 		end
 
 		def remove_file name

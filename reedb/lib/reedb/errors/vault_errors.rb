@@ -30,3 +30,6 @@ end
 
 class FileNotFoundError < VaultError
 end
+
+class FileBusyError < VaultError
+end

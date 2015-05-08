@@ -87,8 +87,8 @@ module Reedb
 			# Add option for :fast sync mode here at some point
 
 			# First split up the data and check what's actually there
-			to_head = data['header'] if data['header'] else false end
-			to_body = data['body'] if data['body'] else false end
+			to_head = if data['header'] then data['header'] else false end
+			to_body = if data['body'] then data['body'] else false end
 
 			# Returns an error code for malformed data
 			return FILE_MALFORMED_DATA_ERROR unless to_body && to_head

@@ -46,7 +46,10 @@ module Reedb
 			new_reason = "user request" if reason == "user"
 			new_reason = "system request" if reason == "root"
 
-			DaemonLogger.write("Terminating the Reedb daemon because of #{reason}")
+			DaemonLogger.write("[TERMINATION] Scheduling termination because of #{new_reason}...")
+			counter = 0
+			@@active_vaults.each { |k, v| v.close; counter += 1 }
+			DaemonLogger.write("[TERMINATION] Closed #{counter} vaults. Done!")
 		end
 
 		def init(options)
@@ -58,6 +61,10 @@ module Reedb
 			@@path = if options.include?(:path) then options[:path] else "&&HOME&&" end
 
 			# Enable cleanup mode
+			# This means that the config will be cleaned and unused tokens removed
+			# instead of leaving them in the file and configurations.
+			# It is recommended to use cleanup mode.
+			#
 			@@cleanup = if options.include?(:cleanup) then options[:cleanup] else true end
 
 			# Set of vaults that map a VaultBuffer to the vault itself.
@@ -108,7 +115,10 @@ module Reedb
 		def available_vaults
 			available = {}
 
+
+
 			@@config[:vaults].each do |uuid, value|
+				# puts @@config[:vaults]["#{uuid}"]
 				available["#{uuid}"] = {}
 				available["#{uuid}"][:name] = value[:meta].name
 				available["#{uuid}"][:path] = value[:meta].path
@@ -275,6 +285,14 @@ module Reedb
 			return token
 		end
 
+		# This function should be used by recurring applications that already own
+		# an authentication token for a vault.
+		#
+		def access_with_token(uuid, token, passphrase)
+
+		end
+
+
 		# Request token for a vault permanently.
 		# Only used if @@no_token == false. Unlocks a vault as well
 		# with the user passphrase
@@ -350,10 +368,8 @@ module Reedb
 		# => Base64 encoded token
 		#
 		def generate_token(uuid, path)
-			rnd = SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)
-
 			# Concatinates the token together and base64 encodes it
-			token = Base64.encode64("#{uuid}--#{path}--#{rnd}")
+			token = Base64.encode64("#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{uuid}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{path}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}")
 			@@tokens[token] = [] unless @@tokens.include?(token)
 			@@tokens[token] << uuid
 			update_tracked_vault("#{uuid}", nil, nil, nil, token)
@@ -465,7 +481,7 @@ module Reedb
 		end
 
 		def debounce_handler
-			
+
 		end
 	end
 end
@@ -475,26 +491,29 @@ name = "default"
 path = "/home/spacekookie/Desktop"
 
 Reedb::init({:os=>:linux, :pw_length=>12})
-Reedb::scope_vault(name, path)
+# Reedb::scope_vault(name, path)
 
+# puts Reedb::available_vaults
 # Reedb::create_vault(name, path, user_pw)
 
-# available = Reedb::available_vaults
-# puts "Available vaults: #{available}\n\n"
+available = Reedb::available_vaults
+puts "Available vaults: #{available}\n\n"
 
-# target = nil
-# available.each do |uuid, meta|
-# 	(target = uuid) if meta[:name] == "default"
-# end 
+target = nil
+available.each do |uuid, meta|
+	(target = uuid) if meta[:name] == "default"
+end 
 
-# my_token = Reedb::request_token(target, user_pw)
+#puts "Target: #{target}"
+
+my_token = Reedb::request_token(target, user_pw)
+puts my_token
 # puts "My token: #{my_token}\n\n"
 
 # headers = Reedb::access_headers(target, my_token)
 # puts "Vault headers: #{headers}\n\n"
 
-# Reedb::close_vault(target, my_token)
-
+Reedb::close_vault(target, my_token)
 Reedb::terminate("user")
 # data = {
 # 	'header'=>{
