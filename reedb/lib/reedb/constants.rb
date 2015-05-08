@@ -10,6 +10,15 @@
 module Reedb
 	VERSION = "0.9.9"
 	NET_PORT = 55736
-	TOKEN_BYTE_SIZE = 16
-	MASTER_PATH = "&&HOME&&"
+	TOKEN_BYTE_SIZE = 16 # in bytes
+	MASTER_PATH = "&&HOME&&" # Placeholder
+	FILE_CACHE_TIME = 2500 # Time in ms
+ 	KEY_CACHE_TIME = 30 * 60 # (30 minutes * 60 seconds for seconds)
+
+
+
+ 	#
+ 	# THIS SECTION WILL BE RESERVED FOR ERROR CODES AS RETURN VALUES
+ 	#
+ 	FILE_MALFORMED_DATA_ERROR = 0x11
 end

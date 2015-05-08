@@ -10,11 +10,45 @@
 require_relative 'utilities'
 
 module Reedb
-	class Version
+	class Version1
+		attr_reader :timestamp, :revision
+
+		def initialize(existing = nil)
+
+			# If a version is created from an existing pattern
+			if existing
+				data = existing.split('::')
+				@revision = data[0].to_i
+				@timestamp = data[1].to_i
+				return self
+			end
+
+			# This creates a new version
+			@revision = 1
+			@timestamp = DateTime.now.strftime('%Q')
+		end
+
+		def update
+			@revision += 1
+			@timestamp = DateTime.now.strftime('%Q')
+		end
+
+		# This formatting is actually used in the dataset
+		def to_s
+			return "R#{@revision}::#{@timestamp}"
+		end
+	end
+
+	# Has been depreciated in version 0.9.9 (of Reedb, not the class)
+	# Too specific and broad usecase. Was replaced with the new Version
+	# DO NOT USE!
+	#
+	class Version_spec
 
 		attr_reader :host, :timestamp, :numeral
 
 		def initialize(existing = nil)
+			puts "DO NOT USE! Use 'Reedb::Version' INSTEAD!"
 			if existing
 				data = existing.split('_')
 				@host = data[0]

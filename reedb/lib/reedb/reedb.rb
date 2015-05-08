@@ -94,6 +94,9 @@ module Reedb
 			Reedb::DaemonLogger.setup("#{log_path}")
 			Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
 			cache_config
+
+			# Open debounce tread and mirror current vault information onto it.
+			debounce_handler
 		end
 
 		# Returns a list of all vaults tracked by Reedb (by the current user).
@@ -459,6 +462,10 @@ module Reedb
 		def read_config
 			data = File.open(@@config_path, "rb").read()
 			@@config = Marshal.load(data)
+		end
+
+		def debounce_handler
+			
 		end
 	end
 end

@@ -44,6 +44,12 @@ module Reedb
 		#
 		attr_reader :size
 
+		# Holds a hash of possible values that header files in this vault
+		# can have. Fields need to be specified by name and a type. To choose
+		# from 'single', 'list' and 'tree' (var, list, dict)
+		#
+		attr_reader :header_set
+
 		# Constructor for a vault with name, path and encryption enum.
 		# Valid encryption parameters are :aes, :twofish, :multi and :auto_fill
 		#
@@ -59,6 +65,9 @@ module Reedb
 			@files = {}
 			@locked = false
 
+			# Defines the default (and boring vanilla) header set
+			@header_set = {'urls'=>'list', 'tags'=>'list'}
+
 			construct_path("#{name}", "#{path}")
 			init_encryption(encprytion) # => Throws exceptions!
 			self.secure_config(false)
@@ -69,6 +78,17 @@ module Reedb
 			@secure_config = boolean
 			return self
 		end
+
+		# Fields can be added to a vault header BUT NOT REMOVED AGAIN!
+		# So be careful what you put in your header.
+		# (aka upgrade yes, downgrade noooo)
+		# Unused fields can remain blank but need to stay in a vaults header list
+		# for backwards compatiblity
+		#
+		def add_header_field(name, type)
+			@header_set[name] = type unless @header_set[name]
+		end
+
 
 		# Pokes if a vault exists
 		def try?
@@ -141,6 +161,7 @@ module Reedb
 				@config['updating_machine'] = "#{Socket.gethostname}"
 				@config['creation_user'] = "#{Etc.getlogin}"
 				@config['updating_user'] = "#{Etc.getlogin}"
+				@config['header_set'] = "#{@header_set}"
 
 				# hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
 				# => Writing configuration to disk. Either securely or insecurely
