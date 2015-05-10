@@ -62,7 +62,6 @@ module Reedb
 			@urls = {}
 
 			# Fileset
-			@files = {}
 			@locked = false
 			@locks = []
 
@@ -189,6 +188,9 @@ module Reedb
 				@config = YAML.load_file("#{@path}/config")
 			end
 
+			puts @config['header_set']
+			# @header_set = @config['header_set']
+
 			return nil unless unlock_vault("#{password}")
 			VaultLogger.write("Finished loading vault", 'debug')
 			cache_headers
@@ -199,12 +201,18 @@ module Reedb
 		# Read a single file from the vault in secure mode
 		# Returns the entire file in hashes (so includes all sub-versions)
 		#
-		def read_file name
-			tmp = load_file(name, :secure)
+		def read_file(name, history = false)
+			tmp = load_file_data(name)
 			unless tmp
 				raise FileNotFoundError.new("#{name} could not be read: File not found!")
 			else
-				return tmp
+
+				if history
+					puts tmp
+					return tmp
+				else
+					return tmp
+				end
 			end
 		end
 
@@ -212,20 +220,14 @@ module Reedb
 		# This function is also used to delete fields from header space.
 		#
 		def update(name, data)
+			cache_headers # Cache headers first to be sure
+
 			(raise FileBusyError.new, "File #{name} busy" ; return) if @locks.include?(name)
 			@locks << name
 
 			if @headers.key?(name)
-				
-				# Triggers a re-cache that should be up to date.
-				unless load_file(name, :fast)
-					VaultLogger.write("Discrepency between two header cache cycles detected! Aborting insertion. Output warning to user!", 'fatal')
-					raise BadCacheError.new, "Insertion failed because of an invalid cache. Check your filesystem and try again!"
-					return nil
-				end
-
-				# Loads the existing file
-				df = DataFile.new(name, self, @files[name])
+				# Creates file object from existing file object.
+				df = DataFile.new(name, self, load_file_data(name, :secure))
 				df.insertv2(data, :hard) # Default cache mode
 			else
 				df = DataFile.new(name, self)
@@ -239,9 +241,10 @@ module Reedb
 			@config['last_updated'] = "#{Utilities.get_time}"
 			save_config
 
+			# Sync and close the file.
 			df.sync.close
 
-			# Unlocks the file again
+			# Unlocks the file again for other processes to edit.
 			@locks.delete(name)
 		end
 
@@ -260,7 +263,8 @@ module Reedb
 		#
 		# { 'name' => '__name__',
 		# 	'url' => '__url__',
-		# 	'tags' => '__tags__'
+		# 	'tags' => '__tags__',
+		# 	'generic_field' => '__generic_information__'
 		# }
 		#
 		def list_headers search
@@ -271,8 +275,6 @@ module Reedb
 		# Dump headers and files from memory in times of
 		# inactivity for security reasons
 		def unload
-			remove_instance_variable(:@files)
-			@files = {}
 			remove_instance_variable(:@headers)
 			@headers = {}
 
@@ -285,7 +287,6 @@ module Reedb
 
 			# Removing class variables for cleanup
 			remove_instance_variable(:@crypt)
-			remove_instance_variable(:@files)
 			remove_instance_variable(:@headers)
 		end
 
@@ -300,28 +301,13 @@ module Reedb
 
 		private
 
-		# Caches the file contents of the vault for every file.
-		# This is considered insecure!
-		# def cache_files(mode = :default)
-		# 	@files = {}
-		# 	VaultLogger.write("Starting a full file cache cycle at #{Reedb::Utilities::get_time} in #{mode} mode.", 'debug')
-
-		# 	Dir.glob("#{@path}/data/*.ree") do |file|
-		# 		f = File.open(file, 'r')
-		# 		encrypted = Base64.decode64(f.read)
-		# 		decrypted = @crypt.decrypt(encrypted)
-
-		# 		data = JSON.parse(decrypted)
-		# 		df = DataFile.new(nil, self, data)
-		# 		@files[df.name] = df.cache(:full)
-		# 	end
-		# end
-
+		# Caches the current set of headers on a vault.
+		# 
 		def cache_headers
 			@headers = {}
 			@tags = {}
 			@urls = {}
-			VaultLogger.write("Starting a cache cycle at #{Reedb::Utilities::get_time}.", 'debug')
+			VaultLogger.write("Starting a cache cycle.", 'debug')
 
 			Dir.glob("#{@path}/data/*.ree") do |file|
 				f = File.open(file, 'r')
@@ -369,7 +355,7 @@ module Reedb
 		#
 		# If file isn't found in headers error is output.
 		#
-		def load_file(name, mode = :secure)
+		def load_file_data(name, mode = :secure)
 			cache_headers
 			VaultLogger.write("Loading file #{name} from vault", 'debug')
 			if @headers.key?(name)
@@ -379,20 +365,9 @@ module Reedb
 				encrypted = Base64.decode64(f.read)
 				decrypted = @crypt.decrypt(encrypted)
 
-				data = JSON.parse(decrypted)
-
-				df = DataFile.new(nil, self, data)
-				@files[df.name] = df.cache(:full)
-
-				if mode == :secure
-					tmp = @files[name]
-					df.close 
-					@files[name] = nil
-					return tmp
-				end
-				return true
+				return JSON.parse(decrypted) if mode == :secure
 			else
-				return false
+				return nil
 			end
 		end
 

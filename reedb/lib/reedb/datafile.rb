@@ -83,10 +83,8 @@ module Reedb
 		# 			mode => overwrite default file/ vault caching mode.
 		#
 		def insertv2(data, mode = :hard)
-			sync if mode == :hard
 			# Add option for :fast sync mode here at some point
-
-			# puts data
+			sync if mode == :hard
 
 			# First split up the data and check what's actually there
 			to_head = if data['header'] then data['header'] else false end
@@ -98,7 +96,7 @@ module Reedb
 			# Gets the time difference between edits.
 			# If it's not big enough (5 seconds) will not increment version number
 			current_time = DateTime.now.strftime('%Q').to_i
-			old_time = @version.timestamp
+			old_time = @version.timestamp.to_i
 			version_needs_changing = (current_time - old_time >= FILE_CACHE_TIME) && to_body
 
 			# Actually updates the version if neccessary

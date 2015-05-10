@@ -17,6 +17,7 @@ module Reedb
 
 			# If a version is created from an existing pattern
 			if existing
+				# existing["R"] = ""
 				data = existing.split('::')
 				@revision = data[0].to_i
 				@timestamp = data[1].to_i

@@ -321,6 +321,7 @@ module Reedb
 		#   version or it's edit history
 		#
 		def access_file(uuid, token, file_name, history = false)
+			@@active_vaults["#{uuid}"].read_file(file_name, false)
 		end
 
 		# Request token for a vault permanently.
@@ -517,7 +518,7 @@ Reedb::init({:os=>:linux, :pw_length=>12})
 # Reedb::create_vault(name, path, user_pw)
 
 available = Reedb::available_vaults
-puts "Available vaults: #{available}\n\n"
+puts "Available vaults: #{available}\n"
 
 target = nil
 available.each do |uuid, meta|
@@ -530,17 +531,37 @@ my_token = Reedb::request_token(target, user_pw)
 # puts my_token
 # puts "My token: #{my_token}\n\n"
 
+# data = {
+# 	'header' => {
+# 		'urls' => 'www.lonelyrobot.io',
+# 		'tags' => ['website', 'awsome']
+# 	},
+# 	'body' => {
+# 		'username' => 'spacekookie',
+# 		'password' => 'reedb_is_awesome'
+# 	}
+# }
+
+# data = {
+# 	'header' => {
+# 		'urls' => 'pornhub.com',
+# 		'tags' => 'website'
+# 	},
+# }
+
 data = {
-	'header' => {
-		'urls' => 'www.lonelyrobot.io',
-		'tags' => ['website', 'awsome']
-	}
-}
+ 	'body' => {
+ 		'password' => 'new_password',
+ 		'note' => 'awesome stuff'
+ 	},
+ }
 
 Reedb::insert(target, my_token, "Lonely Robot", data)
 
-headers = Reedb::access_headers(target, my_token)
-puts "Vault headers: #{headers}\n\n"
+puts Reedb::access_file(target, my_token, "Lonely Robot", false)
+
+#headers = Reedb::access_headers(target, my_token)
+#puts "Vault headers: #{headers}\n\n"
 
 Reedb::close_vault(target, my_token)
 Reedb::terminate("user")
