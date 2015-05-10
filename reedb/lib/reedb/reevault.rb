@@ -223,7 +223,7 @@ module Reedb
 					raise BadCacheError.new, "Insertion failed because of an invalid cache. Check your filesystem and try again!"
 					return nil
 				end
-				
+
 				# Loads the existing file
 				df = DataFile.new(name, self, @files[name])
 				df.insertv2(data, :hard) # Default cache mode
@@ -238,6 +238,8 @@ module Reedb
 			@config['updating_machine'] = "#{Socket.gethostname}"
 			@config['last_updated'] = "#{Utilities.get_time}"
 			save_config
+
+			df.sync.close
 
 			# Unlocks the file again
 			@locks.delete(name)

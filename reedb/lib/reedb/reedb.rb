@@ -320,7 +320,27 @@ module Reedb
 		# => Returns contents of a file either as it's current
 		#   version or it's edit history
 		#
-		def access_file(uuid, file_name, history = false)
+		def access_file(uuid, token, file_name, history = false)
+		end
+
+		# Request token for a vault permanently.
+		# Only used if @@no_token == false. Unlocks a vault as well
+		# with the user passphrase
+		#
+		# Params:   'uuid' of the vault
+		#       		'file_name' file identifier to access
+		#
+		# => Returns contents of a file either as it's current
+		#   version or it's edit history
+		#
+		def insert(uuid, token, file_name, data)
+			return Reedb::RETURN_UNKNOWN_TOKEN_ERROR unless @@tokens[token]
+			return Reedb::RETURN_UNAUTHORISED_TOKEN_ERROR unless @@tokens[token].include?(uuid)
+			return Reedb::RETURN_INACTIVE_VAULT_ERROR unless @@active_vaults["#{uuid}"]
+
+			DaemonLogger.write("Writing data to #{uuid}", 'debug')
+
+			@@active_vaults["#{uuid}"].update(file_name, data)
 		end
 
 		# Ends the exchange with a vault. Removes token from active vault record
@@ -507,11 +527,20 @@ end
 #puts "Target: #{target}"
 
 my_token = Reedb::request_token(target, user_pw)
-puts my_token
+# puts my_token
 # puts "My token: #{my_token}\n\n"
 
-# headers = Reedb::access_headers(target, my_token)
-# puts "Vault headers: #{headers}\n\n"
+data = {
+	'header' => {
+		'urls' => 'www.lonelyrobot.io',
+		'tags' => ['website', 'awsome']
+	}
+}
+
+Reedb::insert(target, my_token, "Lonely Robot", data)
+
+headers = Reedb::access_headers(target, my_token)
+puts "Vault headers: #{headers}\n\n"
 
 Reedb::close_vault(target, my_token)
 Reedb::terminate("user")

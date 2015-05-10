@@ -36,10 +36,10 @@ module Reedb
 			if old_file
 				@dataset = old_file
 				@name = @dataset['header']['name']
-				@version = Version.new(@dataset['header']['latest'])
+				@version = Version1.new(@dataset['header']['latest'])
 				@vault = vault
 			else
-				@version = Version.new
+				@version = Version1.new
 				@vault = vault
 				@name = name
 				fill_file
@@ -86,12 +86,14 @@ module Reedb
 			sync if mode == :hard
 			# Add option for :fast sync mode here at some point
 
+			# puts data
+
 			# First split up the data and check what's actually there
 			to_head = if data['header'] then data['header'] else false end
 			to_body = if data['body'] then data['body'] else false end
 
 			# Returns an error code for malformed data
-			return FILE_MALFORMED_DATA_ERROR unless to_body && to_head
+			return FILE_MALFORMED_DATA_ERROR unless to_body || to_head
 
 			# Gets the time difference between edits.
 			# If it's not big enough (5 seconds) will not increment version number
@@ -113,10 +115,10 @@ module Reedb
 					@dataset['header']['name'] if key == 'name'
 					
 					# This means that the value can be stored
-					if vault.header_set.include?(key)
-						
+					if @vault.header_set.include?(key)
+
 						# If inserting into a header single field
-						if vault.header_set[key] == 'single'
+						if @vault.header_set[key] == 'single'
 							if @dataset['header'][key]
 								@dataset['header'][key] = nil
 							else
@@ -124,15 +126,25 @@ module Reedb
 							end
 
 						# If inserting into a header list
-						elsif vault.header_set[key] == 'list'
-							if @dataset['header'][key].include?(value)
-								@dataset['header'][key].delete(value)
-							else
-								@dataset['header'][key] << value
+						elsif @vault.header_set[key] == 'list'
+							if value.instance_of? String
+								if @dataset['header'][key].include?(value)
+									@dataset['header'][key].delete(value)
+								else
+									@dataset['header'][key] << value
+								end
+							elsif value.instance_of? Array
+								value.each do |sub_value|
+									if @dataset['header'][key].include?(sub_value)
+										@dataset['header'][key].delete(sub_value)
+									else
+										@dataset['header'][key] << sub_value
+									end
+								end
 							end
 
 						# If inserting into a header tree
-						elsif vault.header_set[key] == 'tree'
+						elsif @vault.header_set[key] == 'tree'
 							if @dataset['header'][key].include?(value)
 								@dataset['header'][key].delete(value)
 							else
@@ -152,6 +164,8 @@ module Reedb
 					@dataset['body']["#{@version}"]["#{field}"] = value
 				end
 			end
+
+			return self
 		end
 
 		#
@@ -218,6 +232,7 @@ module Reedb
 			tmp.write(Base64.encode64("#{crypt_json}"))
 			tmp.close
 			VaultLogger.write("File #{@name} has been synced", 'debug')
+			return self
 		end
 
 		# Closes the file on the file system and dumps the header 
@@ -239,7 +254,7 @@ module Reedb
 			@dataset['header']['latest'] = @version
 
 			# Adds the header fields that were specified by the parent vault here
-			vault.header_set.each do |field, type|
+			@vault.header_set.each do |field, type|
 				@dataset['header']["#{field}"] = nil if type == 'single'
 				@dataset['header']["#{field}"] = [] if type == 'list'
 				@dataset['header']["#{field}"] = {} if type == 'tree'
