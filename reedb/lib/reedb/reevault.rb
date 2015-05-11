@@ -16,6 +16,7 @@ require_relative 'errors/vault_errors'
 
 # => Import utilities and tools
 require_relative 'utils/utilities'
+require_relative 'utils/sorting'
 require_relative 'utils/logger'
 
 # => Import security package classes
@@ -162,9 +163,6 @@ module Reedb
 				@config['creation_user'] = "#{Etc.getlogin}"
 				@config['updating_user'] = "#{Etc.getlogin}"
 				@config['header_set'] = "#{@header_set}"
-
-				# hashed_pw = SecurityUtils::tiger_hash("#{password}") #TODO: Decide what to do with this.
-				# => Writing configuration to disk. Either securely or insecurely
 				save_config
 				
 				# Now writing encrypted key to file with ASCII armour
@@ -188,7 +186,6 @@ module Reedb
 				@config = YAML.load_file("#{@path}/config")
 			end
 
-			puts @config['header_set']
 			# @header_set = @config['header_set']
 
 			return nil unless unlock_vault("#{password}")
@@ -202,17 +199,43 @@ module Reedb
 		# Returns the entire file in hashes (so includes all sub-versions)
 		#
 		def read_file(name, history = false)
-			tmp = load_file_data(name)
-			unless tmp
+
+			# Loads the file data into a local variable if it exists
+			file_data = load_file_data(name) 
+			if file_data == nil
 				raise FileNotFoundError.new("#{name} could not be read: File not found!")
+				return VAULT_FILE_NOT_FOUND_ERROR # If the exception isn't handled correctly
 			else
+				# This code is executed if the file was found (thus data is in file_data)
+				compiled = {}
+				compiled['header'] = {}
+
+				# Removes the latest version from the header because it is insignificant.
+				file_data['header'].each do |key, value|
+					compiled['header']["#{key}"] = value unless key == "latest"
+				end
 
 				if history
-					puts tmp
-					return tmp
+					compiled['body'] = file_data['body']
 				else
-					return tmp
+					body_list = []
+					file_data['body'].each do |key, value|
+						body_list << key
+					end
+
+					compiled['body'] = {}
+
+					# Now sort the list of body versions
+					body_list.heapsort!
+					body_list.each do |version|
+						file_data['body']["#{version}"].each do |key, value|
+							compiled['body']["#{key}"] = value
+						end
+					end
 				end
+				
+				# Then return that value
+				return compiled
 			end
 		end
 
@@ -327,15 +350,8 @@ module Reedb
 					elsif key == "tags"
 
 					end
-
 				end
-
-
-				# @headers[df.name].each do |key, value|
-				# 	if key == "url"
-				# 		value.each { |url| @urls[url] = [] unless @urls[url] ; @urls[url] <<  }
-				# 	end
-				# end
+				df = nil
 			end
 		end
 

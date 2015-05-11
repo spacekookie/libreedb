@@ -46,10 +46,13 @@ module Reedb
 			new_reason = "user request" if reason == "user"
 			new_reason = "system request" if reason == "root"
 
-			DaemonLogger.write("[TERMINATION] Scheduling termination because of #{new_reason}...")
-			counter = 0
-			@@active_vaults.each { |k, v| v.close; counter += 1 }
-			DaemonLogger.write("[TERMINATION] Closed #{counter} vaults. Done!")
+			DaemonLogger.write("[TERMINATION]: Scheduling termination because of #{new_reason}.")
+
+			# TODO: Close the debounce thread here.
+
+			# Closing open vaults here
+			counter = 0 ; @@active_vaults.each { |k, v| v.close; counter += 1 }
+			DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
 		end
 
 		def init(options)
@@ -87,10 +90,6 @@ module Reedb
 				log_path = File.expand_path('~/.config/reedb/logs/')
 				@@config_path = File.join("#{master_path}", "master.cfg")
 
-				FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
-				FileUtils::chmod_R(0744, "#{log_path}")
-				FileUtils::chmod_R(0744, "#{master_path}")
-
 			elsif @@archos == :osx
 				master_path = File.expand_path('~/Library/Application\ Support/reedb/')
 				log_path = File.expand_path('~/Library/Application\ Support/reedb/logs/')
@@ -98,6 +97,12 @@ module Reedb
 			else
 				# Windows crap
 			end
+
+			# Changing file permissions. Does this do ANYTHING on windows?
+			FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
+			FileUtils::chmod_R(0744, "#{log_path}")
+			FileUtils::chmod_R(0744, "#{master_path}")
+			
 			Reedb::DaemonLogger.setup("#{log_path}")
 			Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
 			cache_config
@@ -115,8 +120,6 @@ module Reedb
 		def available_vaults
 			available = {}
 
-
-
 			@@config[:vaults].each do |uuid, value|
 				# puts @@config[:vaults]["#{uuid}"]
 				available["#{uuid}"] = {}
@@ -133,10 +136,10 @@ module Reedb
 		# Also adds that token to the @@tokens list
 		#
 		# Params: 	
-		# 					'name' of the vault
-		# 					'path' of the vault
-		# 					user 'passphrase'
-		# 					'encryption' method (:aes, :twofish, :auto)
+		# 				'name' of the vault
+		# 				'path' of the vault
+		# 				user 'passphrase'
+		# 				'encryption' method (:aes, :twofish, :auto)
 		#
 		# => Base64 encoded token | nil if errors occured.
 		#
@@ -206,8 +209,8 @@ module Reedb
 		# or generate a new token for application interaction.
 		# On a new install usually called just before requesting a token
 		# 
-		# Params: 	'name' of the vault
-		# 					'path' on the systen
+		# Params: 		'name' of the vault
+		# 				'path' on the systen
 		#
 		def scope_vault(name, path)
 			# Checks if that specific vault was already scoped
@@ -256,8 +259,8 @@ module Reedb
 		# Only used if @@no_token == false. Unlocks a vault as well
 		# with the user passphrase
 		#
-		# Params: 	'name' of the vault
-		# 					'passphrase' to unlock
+		# Params: 		'name' of the vault
+		# 				'passphrase' to unlock
 		#
 		# => Returns token for vault
 		#
@@ -297,7 +300,7 @@ module Reedb
 		# Only used if @@no_token == false. Unlocks a vault as well
 		# with the user passphrase
 		#
-		# Params:   'uuid' of the vault
+		# Params: 		'uuid' of the vault
 		#       		'search' search queury as described in the wiki
 		#
 		# => Returns list of headers present in the vault
@@ -317,11 +320,21 @@ module Reedb
 		# Params:   'uuid' of the vault
 		#       		'file_name' file identifier to access
 		#
-		# => Returns contents of a file either as it's current
-		#   version or it's edit history
+		# => Returns contents (including headers) of a file either
+		#   as it's current version or it's edit history.
 		#
 		def access_file(uuid, token, file_name, history = false)
-			@@active_vaults["#{uuid}"].read_file(file_name, false)
+			return nil unless @@active_vaults["#{uuid}"]
+			return nil unless @@tokens[token].include?(uuid)
+
+			file = nil
+			begin
+				file = @@active_vaults["#{uuid}"].read_file(file_name, history)
+			rescue FileNotFoundError => e
+				puts e.message
+				return VAULT_FILE_NOT_FOUND_ERROR
+			end
+			return file
 		end
 
 		# Request token for a vault permanently.
@@ -512,18 +525,15 @@ name = "default"
 path = "/home/spacekookie/Desktop"
 
 Reedb::init({:os=>:linux, :pw_length=>12})
-# Reedb::scope_vault(name, path)
+Reedb::scope_vault(name, path)
 
 # puts Reedb::available_vaults
 # Reedb::create_vault(name, path, user_pw)
 
 available = Reedb::available_vaults
-puts "Available vaults: #{available}\n"
+# puts "Available vaults: #{available}\n"
 
-target = nil
-available.each do |uuid, meta|
-	(target = uuid) if meta[:name] == "default"
-end 
+target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default" }
 
 #puts "Target: #{target}"
 
@@ -531,34 +541,37 @@ my_token = Reedb::request_token(target, user_pw)
 # puts my_token
 # puts "My token: #{my_token}\n\n"
 
-# data = {
-# 	'header' => {
-# 		'urls' => 'www.lonelyrobot.io',
-# 		'tags' => ['website', 'awsome']
-# 	},
-# 	'body' => {
-# 		'username' => 'spacekookie',
-# 		'password' => 'reedb_is_awesome'
-# 	}
-# }
+data1 = {
+	'header' => {
+		'urls' => 'www.lonelyrobot.io',
+		'tags' => ['website', 'awsome']
+	},
+	'body' => {
+		'username' => 'spacekookie',
+		'password' => 'reedb_is_awesome'
+	}
+}
 
-# data = {
-# 	'header' => {
-# 		'urls' => 'pornhub.com',
-# 		'tags' => 'website'
-# 	},
-# }
+data2 = {
+	'body' => {
+		'note1' => 'This is a very special note',
+		'banking' => '5522442112'
+	}
+}
 
-data = {
- 	'body' => {
- 		'password' => 'new_password',
- 		'note' => 'awesome stuff'
- 	},
- }
+data3 = {
+	'body' => {
+		'password' => 'Mega_awesome_better_password',
+		'phone number' => '017670422074'
+	}
+}
 
-Reedb::insert(target, my_token, "Lonely Robot", data)
 
-puts Reedb::access_file(target, my_token, "Lonely Robot", false)
+# Reedb::insert(target, my_token, "Lonely Robot", data1)
+# Reedb::insert(target, my_token, "Lonely Robot", data2)
+# Reedb::insert(target, my_token, "Lonely Robot", data3)
+
+puts Reedb::access_file(target, my_token, "Lonely Robot", true)
 
 #headers = Reedb::access_headers(target, my_token)
 #puts "Vault headers: #{headers}\n\n"

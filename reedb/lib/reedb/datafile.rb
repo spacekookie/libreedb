@@ -185,11 +185,8 @@ module Reedb
 			time_dif = curr_time - then_time
 
 			unless @dataset['body'][@version] == {}
-				unless time_dif < 10000
+				unless time_dif < 7500
 					@version.update
-				else
-					# Does this really need an output??
-					# puts "Not incrementing version because write cycle too short."
 				end
 			end
 
