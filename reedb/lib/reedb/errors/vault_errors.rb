@@ -33,3 +33,7 @@ end
 
 class FileBusyError < VaultError
 end
+
+class MalformedSearchError < VaultError
+end
+

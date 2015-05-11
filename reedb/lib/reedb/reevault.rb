@@ -295,9 +295,42 @@ module Reedb
 		# 	'generic_field' => '__generic_information__'
 		# }
 		#
+		# 'tags=search engines, internet#urls=www.poodle.com'
+		#
 		def list_headers search
-			cache_headers
-			return @headers
+			query = {}
+			cache_headers # => This fills @headers and @hfields
+
+			return @headers unless search
+
+			begin
+				splat = search.split('#')
+				splat.each do |target|
+					slice = target.split('=')
+					query["#{slice[0]}"] = slice[1..-1]
+				end
+				# puts query
+			rescue
+				raise MalformedSearchError.new, "Malformed search data"
+			end
+
+			log_query = {}
+			candidates = []
+
+			query.each do |cat, data|
+				data.each do |val|
+					log_query["#{cat}"] = @hgroups["#{cat}"]["#{val}"] if @hgroups["#{cat}"].include?(val)
+					log_query["#{cat}"].each { |c| candidates << c unless candidates.include?(c)  }
+				end
+			end
+			return_buffer = candidates
+			candidates.each do |can|
+				log_query.each do |cat, data|
+					return_buffer.delete(can) unless log_query["#{cat}"].include?(can)
+				end
+			end
+
+			return return_buffer
 		end
 
 		# Dump headers and files from memory in times of
@@ -334,7 +367,6 @@ module Reedb
 		def cache_headers
 			@headers = {}
 
-
 			VaultLogger.write("Starting a cache cycle.", 'debug')
 
 			Dir.glob("#{@path}/data/*.ree") do |file|
@@ -355,31 +387,25 @@ module Reedb
 				
 				# Now work with the header set to determine sub-groups
 				tmp_head.each do |category, data|
+
+					# This will loop through all the category groups in the
+					# header that have been registered
 					if @header_set.include?(category)
-						# This will loop through all the category groups in the
-						# header that have been registered
 
 						# Creates a new sub-hash for data
 						@hgroups["#{category}"] = {} unless @hgroups["#{category}"]
 
-						# Create a list to represent files that match the information
-						@hgroups["#{category}"]["#{data}"] = [] unless @hgroups["#{category}"]["#{data}"]
-
-						# Now go through the data per data type and sort it into
-						# the apropriate category section.
-						#
-						if @header_set["#{category}"] == 'single'
-							@hgroups["#{category}"]["#{data}"] << data
-
-						# If inserting into a header list
-						elsif @header_set["#{category}"] == 'list'
-							data.each do |value|
-								@hgroups["#{category}"]["#{data}"] << value
+						if @header_set["#{category}"] == 'list'
+							data.each do |target|
+								@hgroups["#{category}"]["#{target}"] = [] unless @hgroups["#{category}"]["#{target}"]
+								@hgroups["#{category}"]["#{target}"] << tmp_name unless @hgroups["#{category}"]["#{target}"].include?(tmp_name)
 							end
-						# If inserting into a header tree
-						elsif @header_set["#{category}"] == 'tree'
-							@hgroups["#{category}"]["#{data}"] << data
+
+						elsif @header_set["#{category}"] == 'single'
+							@hgroups["#{category}"] = "#{data}"
 						end
+
+						#TODO: Implement dictionary head later
 					end
 				end
 			end

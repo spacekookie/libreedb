@@ -531,10 +531,10 @@ target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "
 
 my_token = Reedb::request_token(target, user_pw)
 
-search_qeuery = ""
+search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
 
 headers = Reedb::access_headers(target, my_token, search_qeuery)
-puts headers
+print "#{headers}\n"
 
 # Reedb::insert(target, my_token, "Lonely Robot", data1)
 # Reedb::insert(target, my_token, "Lonely Robot", data2)
