@@ -309,7 +309,7 @@ module Reedb
 		def access_headers(uuid, token, search = nil)
 			return nil unless @@active_vaults["#{uuid}"]
 			return nil unless @@tokens[token].include?(uuid)
-			@@active_vaults["#{uuid}"].list_headers(search)
+			return @@active_vaults["#{uuid}"].list_headers(search)
 		end
 
 
@@ -326,15 +326,7 @@ module Reedb
 		def access_file(uuid, token, file_name, history = false)
 			return nil unless @@active_vaults["#{uuid}"]
 			return nil unless @@tokens[token].include?(uuid)
-
-			file = nil
-			begin
-				file = @@active_vaults["#{uuid}"].read_file(file_name, history)
-			rescue FileNotFoundError => e
-				puts e.message
-				return VAULT_FILE_NOT_FOUND_ERROR
-			end
-			return file
+			return @@active_vaults["#{uuid}"].read_file(file_name, history)
 		end
 
 		# Request token for a vault permanently.
@@ -538,143 +530,20 @@ target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "
 #puts "Target: #{target}"
 
 my_token = Reedb::request_token(target, user_pw)
-# puts my_token
-# puts "My token: #{my_token}\n\n"
 
-data1 = {
-	'header' => {
-		'urls' => 'www.lonelyrobot.io',
-		'tags' => ['website', 'awsome']
-	},
-	'body' => {
-		'username' => 'spacekookie',
-		'password' => 'reedb_is_awesome'
-	}
-}
+search_qeuery = ""
 
-data2 = {
-	'body' => {
-		'note1' => 'This is a very special note',
-		'banking' => '5522442112'
-	}
-}
-
-data3 = {
-	'body' => {
-		'password' => 'Mega_awesome_better_password',
-		'phone number' => '017670422074'
-	}
-}
-
+headers = Reedb::access_headers(target, my_token, search_qeuery)
+puts headers
 
 # Reedb::insert(target, my_token, "Lonely Robot", data1)
 # Reedb::insert(target, my_token, "Lonely Robot", data2)
 # Reedb::insert(target, my_token, "Lonely Robot", data3)
 
-puts Reedb::access_file(target, my_token, "Lonely Robot", true)
+# puts Reedb::access_file(target, my_token, "Lonely Robot", true)
 
 #headers = Reedb::access_headers(target, my_token)
 #puts "Vault headers: #{headers}\n\n"
 
 Reedb::close_vault(target, my_token)
 Reedb::terminate("user")
-# data = {
-# 	'header'=>{
-# 		'url'=>'www.facebook.com',
-# 		'category'=>'Web Login'
-# 		},
-# 	'body'=>{
-# 		'password'=>'mega_secure_password',
-# 		'username'=>'spacekookie'
-# 	}
-# }
-
-# Reedb::ReeVault.new(name, path, :aes).load(user_pw).insert("Lonely Robot", data)
-
-##
-#####
-##########
-
-# available.each do |key, value|
-# 	Reedb::unscope_vault("#{key}") if value[:name] == "default2"
-# 	#  if value[:name] == 'default2'
-# end
-# puts Reedb::available_vaults
-
-# token = Reedb::create_vault(name, path, user_pw)
-# puts Reedb::available_vaults
-# token = Reedb::request_token(name, user_pw)
-
-# puts token
-
-=begin
-
-Reedb.init(:unix, 12) # => defines OS and minimal password length on vault
-path = File.expand_path('~/Desktop/reedb')
-
-# Default encryption is set to 'aes'
-begin
-	Reedb.vault('default', "#{path}", :aes).load(user_pw)
-rescue VaultDoesNotExistError, VaultExistsAtLocationError => e
-	puts e.message
-	puts "If you think this is a bug, please report it <3"
-	# exit
-end
-
-data = {
-	'header'=>{
-		'url'=>'www.facebook.com',
-		'category'=>'Web Login'
-		},
-	'body'=>{
-		'password'=>'mega_secure_password',
-		'username'=>'spacekookie'
-	}
-}
-
-data2 = {
-	'body'=>{
-		'password'=>'less_secure',
-	}
-}=end
-
-
-Reedb.active_vaults['default'].insert('facebook', data)
-
-=begin
-begin
-	puts Reedb.active_vaults['default'].read_file('Peter pan')
-rescue
-	puts "This error was handled: could not read!"
-end=end
-
-
-=begin
-
-begin
-	Reedb.active_vaults['default'].remove_file('Peter pan')
-rescue
-	puts "This error was handled: could not remove!"
-end
-=end
-
-
-
-# beg=begin
-
-# in
-# 	Reedb.vault(name='default', "#{path}", :aes).secure_config(true).create(user_pw)
-
-# 	sample_data = {}
-# 	sample_data['header'] = {}
-# 	sample_data['header']['name'] = "Sample"
-# 	sample_data['header']['category'] = "Unsorted"
-# 	sample_data['body'] = {}
-# 	sample_data['body']['username'] = "spacekookie"
-# 	sample_data['body']['password'] = 'the_flying_unicorn_shits_rainbows'
-
-# 	Reedb.active_vaults['default'].insert('Sample', sample_data)
-
-# rescue
-# 	puts "Error occured opening your vault. Does it exist?"
-# end

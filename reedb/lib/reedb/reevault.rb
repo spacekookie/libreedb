@@ -59,15 +59,17 @@ module Reedb
 			
 			# Header maps
 			@headers = {}
-			@tags = {}
-			@urls = {}
+			@hgroups = {}
 
 			# Fileset
 			@locked = false
 			@locks = []
 
 			# Defines the default (and boring vanilla) header set
-			@header_set = {'urls'=>'list', 'tags'=>'list'}
+			@header_set = {
+				'urls'=>'list',
+				'tags'=>'list'
+			}
 
 			construct_path("#{name}", "#{path}")
 			init_encryption(encprytion) # => Throws exceptions!
@@ -83,6 +85,7 @@ module Reedb
 		# Fields can be added to a vault header BUT NOT REMOVED AGAIN!
 		# So be careful what you put in your header.
 		# (aka upgrade yes, downgrade noooo)
+		#
 		# Unused fields can remain blank but need to stay in a vaults header list
 		# for backwards compatiblity
 		#
@@ -138,6 +141,8 @@ module Reedb
 					FileUtils::mkdir(File.expand_path("#{@path}/logs")) # => Logs dir
 
 					FileUtils::chmod_R(0744, "#{@path}")
+
+				# This is used for windows because windows fucking sucks!
 				else
 					FileUtils::mkdir_p(File.expand_path("#{@path}/data")) # => Data dir
 					FileUtils::mkdir(File.expand_path("#{@path}/shasums")) # => Checksum dir
@@ -196,7 +201,7 @@ module Reedb
 		end
 
 		# Read a single file from the vault in secure mode
-		# Returns the entire file in hashes (so includes all sub-versions)
+		# Returns the entire file or only it's current set in hashes.
 		#
 		def read_file(name, history = false)
 
@@ -328,8 +333,8 @@ module Reedb
 		# 
 		def cache_headers
 			@headers = {}
-			@tags = {}
-			@urls = {}
+
+
 			VaultLogger.write("Starting a cache cycle.", 'debug')
 
 			Dir.glob("#{@path}/data/*.ree") do |file|
@@ -339,19 +344,44 @@ module Reedb
 
 				data = JSON.parse(decrypted)
 				df = DataFile.new(nil, self, data)
-				@headers[df.name] = df.cache(:header)
+
+				tmp_head = df.cache(:header)
+				tmp_name = df.name
+
+				# Blank the df variable just in case.
+				df = 0x111111111111111
 				
-				# Sort values into @tags and @urls here!
+				@headers[tmp_name] = tmp_head 
+				
+				# Now work with the header set to determine sub-groups
+				tmp_head.each do |category, data|
+					if @header_set.include?(category)
+						# This will loop through all the category groups in the
+						# header that have been registered
 
-				@headers[df.name].each do |key, value|
-					if key == "urls"
-						@urls[value] = [] unless @urls[value]
-						@urls[value] << @headers[df.name]['name']
-					elsif key == "tags"
+						# Creates a new sub-hash for data
+						@hgroups["#{category}"] = {} unless @hgroups["#{category}"]
 
+						# Create a list to represent files that match the information
+						@hgroups["#{category}"]["#{data}"] = [] unless @hgroups["#{category}"]["#{data}"]
+
+						# Now go through the data per data type and sort it into
+						# the apropriate category section.
+						#
+						if @header_set["#{category}"] == 'single'
+							@hgroups["#{category}"]["#{data}"] << data
+
+						# If inserting into a header list
+						elsif @header_set["#{category}"] == 'list'
+							data.each do |value|
+								@hgroups["#{category}"]["#{data}"] << value
+							end
+						# If inserting into a header tree
+						elsif @header_set["#{category}"] == 'tree'
+							@hgroups["#{category}"]["#{data}"] << data
+						end
 					end
 				end
-				df = nil
 			end
 		end
 
