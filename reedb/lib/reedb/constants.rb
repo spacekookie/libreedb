@@ -11,9 +11,9 @@ module Reedb
 	VERSION = "0.9.9"
 	NET_PORT = 55736
 	TOKEN_BYTE_SIZE = 16 # in bytes
-	MASTER_PATH = "&&HOME&&" # Placeholder
+	DEF_MASTER_PATH = "__sysmas__" # Placeholder
 	FILE_CACHE_TIME = 2500 # Time in ms
- 	KEY_CACHE_TIME = (30 * 60) * 1000 # (30 minutes in ms)
+ 	KEY_CACHE_TIME = (15 * 60) * 1000 # (30 minutes in ms)
 
 
 
