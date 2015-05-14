@@ -1,16 +1,16 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('./lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'reedb/constants'
+require_relative 'lib/reedb/constants'
 
 Gem::Specification.new do |spec|
   spec.name          = "reedb"
   spec.version       = Reedb::VERSION
-  spec.authors       = ["Random Robot Softworks"]
+  spec.authors       = ["Lonely Robot"]
   spec.email         = ["katharina.sabel@2rsoftworks.de"]
-  spec.summary       = %q{Ruby file-based database using encryption from it's core. Used to power reepass}
-  spec.description   = %q{Ruby database. Uses json files for data storage. Uses aes and twofish for encryption. Sha256 and Tiger2/192 for hashing and integrety checking. Encprytion from the core.}
-  spec.homepage      = ""
+  spec.summary       = %q{Ruby storage containers/ database that uses completely encrpypted files for maximum security.}
+  spec.description   = %q{Ruby storage containers/ database. Uses Rinjdael, Twofish, ... to keep your data safe. Made for native and local application development. Spawns a system daemon that manages vaults that applications can talk to.}
+  spec.homepage      = "https://github.com/tr-lonelyrobot/reedb/wiki"
   spec.license       = "LGPL v3.0"
 
   spec.files         = `git ls-files -z`.split("\x0")

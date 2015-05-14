@@ -168,6 +168,7 @@ module Reedb
 				@config['creation_user'] = "#{Etc.getlogin}"
 				@config['updating_user'] = "#{Etc.getlogin}"
 				@config['header_set'] = "#{@header_set}"
+				@config['creation_version'] = "#{Reedb::VERSION}"
 				save_config
 				
 				# Now writing encrypted key to file with ASCII armour
@@ -191,7 +192,7 @@ module Reedb
 				@config = YAML.load_file("#{@path}/config")
 			end
 
-			# @header_set = @config['header_set']
+			
 
 			return nil unless unlock_vault("#{password}")
 			VaultLogger.write("Finished loading vault", 'debug')
@@ -267,6 +268,7 @@ module Reedb
 			@config['updating_user'] = "#{Etc.getlogin}"
 			@config['updating_machine'] = "#{Socket.gethostname}"
 			@config['last_updated'] = "#{Utilities.get_time}"
+			@config['last_version'] = "#{Reedb::VERSION}"
 			save_config
 
 			# Sync and close the file.

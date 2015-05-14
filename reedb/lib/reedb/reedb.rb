@@ -19,6 +19,22 @@ require_relative 'reevault'
 require 'securerandom'
 
 module Reedb
+	class << self
+		# Returns the platform/ architecture of the daemon and vault handler
+
+		def archos() (return @@archos) end
+
+		# Returns whether or not this is a daemon
+		def daemon?() (return @@daemon) end
+
+		# Returns the minimum passphrase length is
+		def passlength() (return @@pw_length) end
+
+		# Returns whether verbose mode is enabled
+		def verbose?() (return @@verbose) end			
+	end
+
+
 	def self.included(api)
 		class << api
 
@@ -43,21 +59,6 @@ module Reedb
 
 			# Stores the master configuration
 			@@config = nil
-			
-
-
-			# Returns the platform/ architecture of the daemon and vault handler
-			def archos() (return @@archos) end
-
-			# Returns whether or not this is a daemon
-			def daemon?() (return @@daemon) end
-
-			# Returns the minimum passphrase length is
-			def passlength() (return @@pw_length) end
-
-			# Returns whether verbose mode is enabled
-			def verbose?() (return @@verbose) end			
-
 
 			# PRIVATE FUNCTIONS BELOW
 			private
@@ -199,7 +200,7 @@ module Reedb
 				@@verbose = if options.include?(:verbose) then options[:verbose] else false end
 				@@no_token = if options.include?(:no_token) then options[:no_token] else false end
 
-				unless @@no_token
+				if @@no_token
 					puts "NO_TOKEN mode has not been implemented yet! Please just use token authentication mode."
 					@@no_token = false
 				end
@@ -247,6 +248,7 @@ module Reedb
 				FileUtils::chmod_R(0744, "#{master_path}")
 				
 				Reedb::DaemonLogger.setup("#{log_path}")
+				@@started = true
 				Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
 
 				# Now cache the config
@@ -271,6 +273,7 @@ module Reedb
 
 				# TODO: Close the debounce thread here.
 
+				@@started = false
 				# Closing open vaults here
 				counter = 0 ; @@active_vaults.each { |k, v| v.close; counter += 1 }
 				DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
@@ -571,60 +574,51 @@ module Reedb
 				write_config
 			end
 		end
-
-		module Daemon
-			include Reedb
-
-			class << self
-				# Request token for a vault permanently.
-				# Only used if @@no_token == false. Unlocks a vault as well
-				# with the user passphrase
-				#
-				# Params: 		'name' of the vault
-				# 				'passphrase' to unlock
-				#
-				# => Returns token for vault
-				#
-				def request_token(uuid, passphrase, parmanent = false)
-
-					# If the vault is not currently open
-					unless @@active_vaults.include?(uuid)
-						unless @@config[:vaults][uuid]
-							DaemonLogger.write("The requested vault is unknown to this system. Aborting operation!", 'error')
-							return nil
-						end
-
-						# Continue
-						name = @@config[:vaults][uuid][:meta].name
-						path = @@config[:vaults][uuid][:meta].path
-
-						@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load(passphrase)
-					end
-
-					token = generate_token(uuid, path)
-					return token
-				end
-
-				# This function should be used by recurring applications that already own
-				# an authentication token for a vault.
-				#
-				def access_with_token(uuid, token, passphrase)
-
-				end
-
-				# Call this function to free a token and remove it from the access
-				# tree. This means that the vault it used to access are not removed or
-				# unloaded for other applications to use. But the token can no longer
-				# be used for file access.
-				#
-				def free_token(token)
-
-				end
-
-			end
-		end
 	end
-end
+
+	module Daemon
+		include Reedb
+
+		class << self
+			# Request token for a vault permanently.
+			# Only used if @@no_token == false. Unlocks a vault as well
+			# with the user passphrase
+			#
+			# Params: 		'name' of the vault
+			# 				'passphrase' to unlock
+			#
+			# => Returns token for vault
+			#
+			def request_token(uuid, passphrase, parmanent = false)
+				# If the vault is not currently open
+				unless @@active_vaults.include?(uuid)
+					unless @@config[:vaults][uuid]
+						DaemonLogger.write("The requested vault is unknown to this system. Aborting operation!", 'error')
+						return nil
+					end
+					# Continue
+					name = @@config[:vaults][uuid][:meta].name
+					path = @@config[:vaults][uuid][:meta].path
+					@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load(passphrase)
+				end
+				token = generate_token(uuid, path)
+				return token
+			end
+			# This function should be used by recurring applications that already own
+			# an authentication token for a vault.
+			#
+			def access_with_token(uuid, token, passphrase)
+			end
+			# Call this function to free a token and remove it from the access
+			# tree. This means that the vault it used to access are not removed or
+			# unloaded for other applications to use. But the token can no longer
+			# be used for file access.
+			#
+			def free_token(token)
+			end
+		end #self class end
+	end # module Daemon end
+end # Module Reedb end
 
 # Main Reedb module that handles the operation of vaults.
 # This can be called from a gem dependency from another ruby app
@@ -645,7 +639,7 @@ module Reedb
 end
 
 user_pw = "1234567890123"
-name = "default"
+name = "default2"
 path = "/home/spacekookie/Desktop"
 
 Reedb::Core::init({:os=>:linux, :pw_length=>12})
@@ -653,31 +647,31 @@ Reedb::Core::init({:os=>:linux, :pw_length=>12})
 
 # Reedb::scope_vault(name, path)
 
-# # puts Reedb::available_vaults
-# # Reedb::create_vault(name, path, user_pw)
+# puts Reedb::Vault::available_vaults
+Reedb::Vault::create_vault(name, path, user_pw)
 
-# available = Reedb::available_vaults
-# # puts "Available vaults: #{available}\n"
+#available = Reedb::Vault::available_vaults
+# puts "Available vaults: #{available}\n"
 
-# target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default" }
+#target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default2" }
 
-# #puts "Target: #{target}"
+# # #puts "Target: #{target}"
 
-# my_token = Reedb::request_token(target, user_pw)
+#my_token = Reedb::Daemon::request_token(target, user_pw)
 
-# search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
+# # search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
 
-# headers = Reedb::access_headers(target, my_token, search_qeuery)
-# print "#{headers}\n"
+# # headers = Reedb::access_headers(target, my_token, search_qeuery)
+# # print "#{headers}\n"
 
-# Reedb::insert(target, my_token, "Lonely Robot", data1)
-# Reedb::insert(target, my_token, "Lonely Robot", data2)
-# Reedb::insert(target, my_token, "Lonely Robot", data3)
+# # Reedb::insert(target, my_token, "Lonely Robot", data1)
+# # Reedb::insert(target, my_token, "Lonely Robot", data2)
+# # Reedb::insert(target, my_token, "Lonely Robot", data3)
 
-# puts Reedb::access_file(target, my_token, "Lonely Robot", true)
+# puts Reedb::Vault::access_file(target, my_token, "Lonely Robot", true)
 
 #headers = Reedb::access_headers(target, my_token)
 #puts "Vault headers: #{headers}\n\n"
 
 # Reedb::close_vault(target, my_token)
-# Reedb::terminate("user")
+Reedb::Core::terminate("aliens")

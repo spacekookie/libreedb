@@ -7,8 +7,13 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
+# A bunch of constants
 module Reedb
-	VERSION = "0.9.9"
+
+	# The version of reedb. This is actually written into vaults to identify
+	# breaking changes and using an older sub-set of the API to interact with
+	# legacy vaults.
+	VERSION = "0.9.9-RC1"
 	NET_PORT = 55736
 	TOKEN_BYTE_SIZE = 16 # in bytes
 	DEF_MASTER_PATH = "__sysmas__" # Placeholder
