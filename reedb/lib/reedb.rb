@@ -630,7 +630,7 @@ Reedb::Core::init({:os=>:linux, :pw_length=>12})
 # Reedb::scope_vault(name, path)
 
 # puts Reedb::Vault::available_vaults
-Reedb::Vault::create_vault(name, path, user_pw)
+# Reedb::Vault::create_vault(name, path, user_pw)
 
 # available = Reedb::Vault::available_vaults
 # puts "Available vaults: #{available}\n"
@@ -656,4 +656,4 @@ Reedb::Vault::create_vault(name, path, user_pw)
 #puts "Vault headers: #{headers}\n\n"
 
 # Reedb::Vault::close_vault(target, my_token)
-Reedb::Core::terminate("aliens")
+# Reedb::Core::terminate("aliens")

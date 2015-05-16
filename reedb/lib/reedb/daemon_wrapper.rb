@@ -18,7 +18,7 @@ require 'sinatra'
 require 'rack'
 
 # Reedb requirements
-require_relative 'reedb'
+require_relative '../reedb'
 
 # HTTP handler class that registers the functions
 # for the vault interface
