@@ -8,12 +8,12 @@
 # ====================================================
 
 # Internal requirements
-require_relative 'utils/meta_vault'
-require_relative 'utils/utilities'
-require_relative 'utils/logger'
-require_relative 'utils/uuids'
-require_relative 'constants'
-require_relative 'reevault'
+require_relative 'reedb/utils/meta_vault'
+require_relative 'reedb/utils/utilities'
+require_relative 'reedb/utils/logger'
+require_relative 'reedb/utils/uuids'
+require_relative 'reedb/constants'
+require_relative 'reedb/reevault'
 
 # System requirements
 require 'securerandom'
@@ -620,24 +620,6 @@ module Reedb
 	end # module Daemon end
 end # Module Reedb end
 
-# Main Reedb module that handles the operation of vaults.
-# This can be called from a gem dependency from another ruby app
-# or used with the reedb daemon.
-#
-module Reedb
-	class << self
-
-		######################################################
-		#
-		#
-		# PRIVATE FUNCTIONS BELOW
-		#
-		#
-		######################################################
-
-	end
-end
-
 user_pw = "1234567890123"
 name = "default2"
 path = "/home/spacekookie/Desktop"
@@ -650,28 +632,28 @@ Reedb::Core::init({:os=>:linux, :pw_length=>12})
 # puts Reedb::Vault::available_vaults
 Reedb::Vault::create_vault(name, path, user_pw)
 
-#available = Reedb::Vault::available_vaults
+# available = Reedb::Vault::available_vaults
 # puts "Available vaults: #{available}\n"
 
-#target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default2" }
+# target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default2" }
 
-# # #puts "Target: #{target}"
+# puts "Target: #{target}"
 
-#my_token = Reedb::Daemon::request_token(target, user_pw)
+# my_token = Reedb::Daemon::request_token(target, user_pw)
 
-# # search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
+# search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
 
-# # headers = Reedb::access_headers(target, my_token, search_qeuery)
-# # print "#{headers}\n"
+# headers = Reedb::access_headers(target, my_token, search_qeuery)
+# print "#{headers}\n"
 
-# # Reedb::insert(target, my_token, "Lonely Robot", data1)
-# # Reedb::insert(target, my_token, "Lonely Robot", data2)
-# # Reedb::insert(target, my_token, "Lonely Robot", data3)
+# Reedb::Vault::insert(target, my_token, "Lonely Robot", data1)
+# Reedb::Vault::insert(target, my_token, "Lonely Robot", data2)
+# Reedb::Vault::insert(target, my_token, "Lonely Robot", data3)
 
 # puts Reedb::Vault::access_file(target, my_token, "Lonely Robot", true)
 
-#headers = Reedb::access_headers(target, my_token)
+#headers = Reedb::Vault::access_headers(target, my_token)
 #puts "Vault headers: #{headers}\n\n"
 
-# Reedb::close_vault(target, my_token)
+# Reedb::Vault::close_vault(target, my_token)
 Reedb::Core::terminate("aliens")
