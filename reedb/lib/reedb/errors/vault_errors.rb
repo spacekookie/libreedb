@@ -37,3 +37,11 @@ end
 class MalformedSearchError < VaultError
 end
 
+
+
+# Some errors about scoping vaults
+class VaultAlreadyScopedError < VaultError
+end
+
+class VaultNotScopedError < VaultError
+end

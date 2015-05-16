@@ -381,12 +381,8 @@ module Reedb
 				end
 
 				# Create actual Vault object
-				begin
-					tmp_vault = ReeVault.new("#{name}", "#{path}", encryption).create("#{passphrase}")
-				rescue VaultExistsAtLocationError => e
-					DaemonLogger.write("Tried to write over vault '#{name}' at '#{path}'. Action aborted.", 'warn')
-					return nil
-				end
+				# This throws errors!
+				tmp_vault = ReeVault.new("#{name}", "#{path}", encryption).create("#{passphrase}")
 
 				# Creates a metavault with name, path, size and uuid to be tracked on the system
 				# metavault = MetaVault.new("#{name}", "#{path}", 0, "#{uuid}")
@@ -459,6 +455,7 @@ module Reedb
 				@@config[:vaults].each do |key, value|
 					if value[:meta].name == "#{name}" && value[:meta].path == "#{path}"
 						DaemonLogger.write("Vault already scoped at #{path}", 'info')
+						raise VaultAlreadyScopedError.new, "Vault #{name} already scoped!"
 						return false
 					end
 				end
@@ -478,6 +475,7 @@ module Reedb
 					return true
 				else
 					DaemonLogger.write("Tried to scope empty target at #{path}", 'warn')
+					raise VaultDoesNotExistError.new, "Tried to scope empty target at #{path}"
 					return false
 				end
 			end
@@ -488,7 +486,10 @@ module Reedb
 			# Returns nil if no such vault was scoped before.
 			#
 			def unscope_vault(uuid)
-				return nil unless @@config[:vaults]["#{uuid}"]
+				unless @@config[:vaults]["#{uuid}"]
+					raise VaultNotScopedError.new, "Vault #{name} not scoped!"
+				end
+
 				path = @@config[:vaults]["#{uuid}"][:path]
 				DaemonLogger.write("Unscoping vault #{uuid} at #{path}")
 				@@active_vaults["#{uuid}"].close if @@active_vaults["#{uuid}"]
@@ -620,11 +621,19 @@ module Reedb
 	end # module Daemon end
 end # Module Reedb end
 
-user_pw = "1234567890123"
-name = "default2"
-path = "/home/spacekookie/Desktop"
+#user_pw = "1234567890123"
+#name = "default2"
+#path = "/home/spacekookie/Desktop"
 
-Reedb::Core::init({:os=>:linux, :pw_length=>12})
+
+
+# name = "mega2"
+# path = "/home/spacekookie"
+# passphrase = "omg_awesome_sauce"
+
+# Reedb::Core::init({:os=>:linux, :pw_length=>12})
+# token = Reedb::Vault::create_vault(name, path, passphrase, :auto)
+# puts token
 # puts Reedb::generate_token("something", "blob")
 
 # Reedb::scope_vault(name, path)

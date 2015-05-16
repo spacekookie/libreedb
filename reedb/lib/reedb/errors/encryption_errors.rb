@@ -18,3 +18,9 @@ end
 
 class InsecureUserPasswordError < EncryptionError
 end
+
+class EncryptionFailedError < EncryptionError
+end
+
+class DecryptionFailedError < EncryptionError
+end

@@ -130,7 +130,7 @@ module Reedb
 			needs_creation = true
 
 			if self.includes?('config')
-				raise VaultExistsAtLocationError.new, "Vault already exists at location #{@path}.\nLoading existing vault instead...\n"
+				raise VaultExistsAtLocationError.new, "Vault already exists at location #{@path}. Aborting operation..."
 				
 				# => This rules out lots of code to be run
 				needs_creation = false
@@ -493,14 +493,10 @@ module Reedb
 		end
 
 		def password? password
-			begin
-				raise MissingUserPasswordError.new, "Encryption error: Missing user password!" if password == nil
+			raise MissingUserPasswordError.new, "Encryption error: Missing user password!" if password == nil
 
-				raise InsecureUserPasswordError.new, "Encryption error: Password too short!" if password.length < Reedb::passlength
-			rescue EncryptionError => e
-			 	puts e.message
-			 	return false
-			end
+			raise InsecureUserPasswordError.new, "Encryption error: Password too short! See: https://xkcd.com/936/" if password.length < Reedb::passlength
+
 			return true
 		end
 

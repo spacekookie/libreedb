@@ -18,74 +18,167 @@ require 'sinatra'
 require 'rack'
 
 # Reedb requirements
-require_relative '../reedb'
+require 'reedb'
 
 # HTTP handler class that registers the functions
 # for the vault interface
 #
 class ReedbHandler < Sinatra::Base
 
+	# 	funct 	url 										descr
 	#
-	# funct 		url 									descr
-	#
-	#CHECK#  GET 			/vaults 									List of all vaults
-	#  GET 			/vaults/*vault-id*							Vault with ID
+	# 	 GET 	/vaults 									List of all vaults
+	# 	 PUT 	/vaults 									Create a new vault.
+	# 	 PUT 	/vaults/scope 								Scope a vault that already exists
 
-	#  GET 			/vaults/*vault-id*/files/*file-id*/body		Returns body of a file
-	#  GET 			/vaults/*vault-id*/files/*file-id*/history	Returns history of a file (???)
+	# 	 POST 	/vaults/*vault-id*/request_token			Auth for vault with ID
+# [AUTH] POST 	/vaults/*vault-id*/headers					Return vault headers
+# [AUTH] POST 	/vaults/*vault-id*/close					Close vault with ID
 
-	#  PUT 			/vaults/*vault-id*/files/					Create file
-	#  POST 		/vaults/*vault-id*/files/*file-id*			Update file contents
+# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*			Returns body of a file
+# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*/history	Returns history of a file (???)
 
-	#  PUT 			/vaults										Create new vault
-# DELETE 		/vaults/*vault-id*							Deletes a vault
-	#
+# [AUTH] PUT 	/vaults/*vault-id*/files					Create file
+# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*			Update file contents
+# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*/remove	Removes a file
 
 	configure :production, :development do
 		enable :logging
 	end
 
-	# Require authentication to access basic  vault functionality.
+	def build_response(status_code, message, payload = nil)
+		status status_code # Set http status code
+		content_type 'application/json'
+		response = { 'success' => (status_code >= 400 ? false : true),
+					 'message' => "#{message}",
+					 'payload' => "#{payload}" }
+		return response.to_json
+	end
+
+	# Returns a list of vaults scoped on the system
 	get '/vaults' do
-		return Reedb::available_vaults.to_json
+		return Reedb::Vault::available_vaults.to_json
 	end
 
-	put '/new_vault' do
-		# title = params['title']
-		return "#{params}"
-		#name = params['name']
-		#path = params['path']
-		#passprase = params['passphrase']
-		#encryption = params['encryption']
-		return "Hello World"
-		#return "#{name}, #{path}, #{passphrase}, #{encryption}"
-		# Reedb::create_vault(name, path, passphrase, encryption = :auto)
+	# Create a new vault on the system
+	put '/vaults' do
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+	   		return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		name = data["name"] if data["name"]
+		path = data["path"] if data["path"]
+		passphrase = data["passphrase"] if data["passphrase"]
+		encryption = :auto # TODO: Handle this better!
+
+		# This gets fired if not all neccesary information was provided.
+		unless name && path && passphrase
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		# Now deal with the actual stuff
+		token = nil
+
+		# Catches ALL possible errors that can occur during this operation!
+		begin
+			token = Reedb::Vault::create_vault(name, path, passphrase, encryption)
+		rescue InsecureUserPasswordError => e
+			return build_response(400, e.message)
+
+		rescue VaultExistsAtLocationError => e
+			return build_response(409, e.message)
+
+		rescue VaultWritePermissionsError,
+			   VaultMissingConfigurationError,
+			   VaultLoggerError,
+			   BadCacheError,
+			   EncryptionFailedError,
+			   DecryptionFailedError => e
+
+			# Bundled error return
+			return build_response(500, e.message)
+		end
+
+		return build_response(201, "Vault was successfully crated at location", token)
 	end
 
-	get '/*/request_token' do
-		vault = params['splat'][0]
+	# Scope a new vault on the system.
+	put '/vaults/scope' do
+		# If request was garbage
+		unless request.content_type == 'application/json'
+	   		return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		name = data["name"] if data["name"]
+		path = data["path"] if data["path"]
+
+		unless name && path
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		Reedb::Vault::scope_vault(name, path)
 	end
 
-	get '/*/headers' do
-		vault = params['splat'][0]
+	put '/vaults/unscope' do
+		# READ FROM CONFIG HERE!
+	end 
+
+	#  Request a token for a vault
+	post '/vaults/*/request_token' do
+
 	end
 
-	get '/*/*/body' do
-		vault = params['splat'][0]
-		file = params['splat'][1]
+	# [AUTH] Request headers for a vault with token/ id
+	post '/vaults/*/headers' do
+
 	end
 
-	get '/*/*/history' do
-		vault = params['splat'][0]
-		file = params['splat'][1]
+	# [AUTH] Close vault with id + token
+	post '/vaults/*/close' do
+
 	end
 
-	post '/insert' do
-		# vault = params['splat'][0]
-		# file = params['splat'][1]
-		data = params['data']
-		puts data
-		return "SOMETHING AWESOME: #{data}"
+	# [AUTH] Return body of a file
+	post '/vaults/*/files/*' do
+
+	end
+
+	# [AUTH] Return history of a file
+	post '/vaults/*/files/*/history' do
+
+	end
+
+	# [AUTH] Creates a new file with data
+	put '/vaults/*/files' do
+
+	end
+
+	# [AUTH] Update file contents
+	post '/vaults/*/files/*' do
+
+	end
+
+	# [AUTH] Removes a file
+	post '/vaults/*/files/*/remove' do
+
 	end
 end
 
@@ -97,7 +190,7 @@ options[:verbose] = false
 options[:daemon] = true
 options[:port] = Reedb::NET_PORT
 options[:os] = Reedb::Utilities::parse_os
-options[:path] = Reedb::MASTER_PATH
+options[:path] = Reedb::DEF_MASTER_PATH
 
 #create parsers
 opts = OptionParser.new
@@ -109,7 +202,7 @@ opts.on('-a', '--app-path STRING') { |o| options[:path] = o }
 opts.parse! unless ARGV == []
 
 # This creates the Reedb module and binds it to a variable to be interacted with in the future
-Reedb::init({:os => options[:os], :pw_length => options[:pw_length], 
+Reedb::Core::init({:os => options[:os], :pw_length => options[:pw_length], 
 	:daemon => options[:daemon], :verbose => options[:verbose], :path => options[:path]})
 # Next up we start the HTTP server and that's that. We're up and running :)
 Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => options[:port], :BindAddress => "localhost"})

@@ -50,6 +50,7 @@ module Reedb
 				return AES.encrypt(data, @key) unless @key.nil?
 			rescue Exception => e
 				puts e.message
+				raise EncryptionFailedError.new, "An error was encountered while encrypting data"
 			end
 		end
 
@@ -62,25 +63,26 @@ module Reedb
 				return AES.decrypt(data, @key) unless @key.nil?
 			rescue Exception => e
 				puts e.message
+				raise DecryptionFailedError.new, "An error was encountered while decrypting data"
 			end
 		end
 
 		# Starts the shift of the main password and creates a new key (cipher) to encrypt with the new pw
 		#
-		def init_shift(fresh)
+		def init_shift
 			@tmp_key = AES.key
 		end
 
 		# Change the encryption cipher for a file in the vault.
 		#
-		def shift_cipher(file, fresh)
+		def shift_cipher(file)
 			temp = AES.decrypt(file, @key) unless @key.nil?
 			return AES.encrypt(temp, @tmp_key)
 		end
 
 		# Returns new encrypted key
 		#
-		def finalise_shift
+		def finalise_shift(fresh)
 			@key = @tmp_key # => Finishing the cipher shift
 			key_encrypted = AES.encrypt(@tmp_key, fresh)
 			remove_instance_variable(:@tmp_key)	# => Removing insecure imprint

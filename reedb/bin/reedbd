@@ -9,14 +9,15 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
+
 # Very simple wrapper script to start the Reedb daemon.
+require 'reedb/constants'
 require 'daemons'
-require 'reedb'
 
-NAME = 'reedb'
 
-if __FILE__ == $PROGRAM_NAME
+NAME = 'reedbd'
 
+if File.basename(__FILE__) == NAME
 	if ARGV.include? '--version'
 		puts Reedb::VERSION
 		exit
@@ -54,9 +55,9 @@ if __FILE__ == $PROGRAM_NAME
 	}
 
 	spec = Gem::Specification.find_by_name("reedb")
-	puts "HA: #{spec}"
-	(puts "Error: reedb not installed!" ; return -1) unless spec
+	(puts "Error: reedb not installed!" ; exit) unless spec
 	path = (spec.gem_dir) + "/lib/reedb"
 
+	require 'reedb'
 	Daemons.run(File.join(path, 'daemon_wrapper.rb'), options)
 end
