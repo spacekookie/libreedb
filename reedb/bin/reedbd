@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # ====================================================
 # Copyright 2015 Lonely Robot (see @author)
@@ -54,7 +54,8 @@ if __FILE__ == $PROGRAM_NAME
 	}
 
 	spec = Gem::Specification.find_by_name("reedb")
-	(puts "Error: reedb not installed!" ; return nil) unless spec
+	puts "HA: #{spec}"
+	(puts "Error: reedb not installed!" ; return -1) unless spec
 	path = (spec.gem_dir) + "/lib/reedb"
 
 	Daemons.run(File.join(path, 'daemon_wrapper.rb'), options)
