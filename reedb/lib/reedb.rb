@@ -488,6 +488,7 @@ module Reedb
 			def unscope_vault(uuid)
 				unless @@config[:vaults]["#{uuid}"]
 					raise VaultNotScopedError.new, "Vault #{name} not scoped!"
+					return nilp
 				end
 
 				path = @@config[:vaults]["#{uuid}"][:path]
@@ -595,7 +596,7 @@ module Reedb
 				unless @@active_vaults.include?(uuid)
 					unless @@config[:vaults][uuid]
 						DaemonLogger.write("The requested vault is unknown to this system. Aborting operation!", 'error')
-						return nil
+						raise VaultNotScopedError.new, "Requested vault #{uuid} is unknown to reedb. Has it been scoped before?"
 					end
 					# Continue
 					name = @@config[:vaults][uuid][:meta].name

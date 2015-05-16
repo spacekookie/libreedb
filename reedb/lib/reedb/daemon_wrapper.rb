@@ -116,7 +116,7 @@ class ReedbHandler < Sinatra::Base
 	put '/vaults/scope' do
 		# If request was garbage
 		unless request.content_type == 'application/json'
-	   		return build_response(400, 'Data was malformed. Expects JSON!')
+			return build_response(400, 'Data was malformed. Expects JSON!')
 		end
 
 		# Check if the JSON data
@@ -134,16 +134,117 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
-		Reedb::Vault::scope_vault(name, path)
+		begin
+			Reedb::Vault::scope_vault(name, path)
+		rescue VaultAlreadyScopedError, VaultDoesNotExistError => e
+			return build_response(400, e.message)
+		end
+
+		# If everything went well
+		return build_response(200, "Vault successfully scoped. It is now available to load.")
 	end
 
 	put '/vaults/unscope' do
-		# READ FROM CONFIG HERE!
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		name = data["name"] if data["name"]
+		path = data["path"] if data["path"]
+
+		unless name && path
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		begin
+			Reedb::Vault::scope_vault(name, path)
+		rescue VaultNotScopedError => e
+			return build_response(400, e.message)
+		end
+
+		# If everything went well
+		return build_response(200, "Vault successfully unscoped and will not show up in vault lists anymore.")
 	end 
 
 	#  Request a token for a vault
 	post '/vaults/*/request_token' do
+		vault_uuid = params[:splat].first
 
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		passphrase = data["passphrase"] if data["passphrase"]
+		permanent = false # TODO: Implement this!
+
+		unless passphrase && permanent
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		token = nil
+		begin
+			token = Reedb::Daemon::request_token(vault_uuid, passphrase)
+		rescue VaultNotScopedError => e
+			return build_response(404, e.message)
+		end
+		return build_response(200, "Access successfully granted for vault", token)
+	end
+
+	post '/vaults/*/free_token' do
+		vault_uuid = params[:splat].first
+
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+
+		unless token
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		begin
+			Reedb::Daemon::free_token(token)
+		rescue
+			return build_response(400, 'Token unknown to Reedb. Can not free it!')
+		end
+
+		return build_response(200, "Token successfully freed")
 	end
 
 	# [AUTH] Request headers for a vault with token/ id
