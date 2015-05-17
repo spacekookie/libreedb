@@ -57,7 +57,8 @@ class ReedbHandler < Sinatra::Base
 
 	# Returns a list of vaults scoped on the system
 	get '/vaults' do
-		return Reedb::Vault::available_vaults.to_json
+		payload = Reedb::Vault::available_vaults
+		return build_response(200, "Currently scoped vaults", payload)
 	end
 
 	# Create a new vault on the system
@@ -82,7 +83,7 @@ class ReedbHandler < Sinatra::Base
 		encryption = :auto # TODO: Handle this better!
 
 		# This gets fired if not all neccesary information was provided.
-		unless name && path && passphrase
+		if name == nil && path == nil && passphrase == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
@@ -130,7 +131,7 @@ class ReedbHandler < Sinatra::Base
 		name = data["name"] if data["name"]
 		path = data["path"] if data["path"]
 
-		unless name && path
+		if name == nil && path == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
@@ -161,7 +162,7 @@ class ReedbHandler < Sinatra::Base
 		name = data["name"] if data["name"]
 		path = data["path"] if data["path"]
 
-		unless name && path
+		if name == nil && path == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
@@ -179,7 +180,9 @@ class ReedbHandler < Sinatra::Base
 	post '/vaults/*/request_token' do
 		vault_uuid = params[:splat][0]
 
-		unless vault 
+		puts vault_uuid
+
+		if vault_uuid == nil
 			return build_response(400, 'Missing vault access id.')
 		end
 
@@ -199,15 +202,18 @@ class ReedbHandler < Sinatra::Base
 		passphrase = data["passphrase"] if data["passphrase"]
 		permanent = false # TODO: Implement this!
 
-		unless passphrase && permanent
+		if passphrase == nil && permanent == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
 		token = nil
 		begin
 			token = Reedb::Daemon::request_token(vault_uuid, passphrase)
-		rescue VaultNotScopedError => e
+		rescue VaultNotScopedError, VaultDoesNotExistError => e
 			return build_response(404, e.message)
+
+		rescue WrongUserPasswordError => e
+			return build_response(401, e.message)			
 		end
 		return build_response(200, "Access successfully granted for vault", token)
 	end
@@ -215,7 +221,7 @@ class ReedbHandler < Sinatra::Base
 	post '/vaults/*/free_token' do
 		vault_uuid = params[:splat][0]
 
-		unless vault 
+		unless vault_uuid 
 			return build_response(400, 'Missing vault access id.')
 		end
 
@@ -234,7 +240,7 @@ class ReedbHandler < Sinatra::Base
 
 		token = data["token"] if data["token"]
 
-		unless token
+		if token == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
@@ -251,7 +257,7 @@ class ReedbHandler < Sinatra::Base
 	post '/vaults/*/close' do
 		vault_uuid = params[:splat][0]
 
-		unless vault 
+		unless vault_uuid 
 			return build_response(400, 'Missing vault access id.')
 		end
 
@@ -285,7 +291,7 @@ class ReedbHandler < Sinatra::Base
 	post '/vaults/*/headers' do
 		vault_uuid = params[:splat][0]
 
-		unless vault 
+		if vault_uuid == nil 
 			return build_response(400, 'Missing vault access id.')
 		end
 
@@ -305,18 +311,27 @@ class ReedbHandler < Sinatra::Base
 		token = data["token"] if data["token"]
 		search = data["search"] if data["search"]
 
-		unless token
+		if token == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
 		headers = nil
 		begin
 			headers = Reedb::Vault::access_headers(vault_uuid, token, search)
+		
+		rescue VaultNotAvailableError => e
+			return build_response(404, e.message)
+
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+
 		rescue Exception => e
 			return build_response(500, "An errror occured. #{e.message}")
 		end
 
-		return build_response(401, "Permission denied OR unknown vault!") unless headers 
 		return build_response(200, "", headers)
 	end
 
@@ -325,7 +340,7 @@ class ReedbHandler < Sinatra::Base
 		vault_uuid = params[:splat][0]
 		file_id = params[:splat][1]
 
-		unless vault 
+		unless vault_uuid 
 			return build_response(400, 'Missing vault access id.')
 		end
 
@@ -362,7 +377,7 @@ class ReedbHandler < Sinatra::Base
 		vault_uuid = params[:splat][0]
 		file_id = params[:splat][1]
 
-		unless vault 
+		unless vault_uuid 
 			return build_response(400, 'Missing vault access id.')
 		end
 
@@ -399,7 +414,7 @@ class ReedbHandler < Sinatra::Base
 	put '/vaults/*/files' do
 		vault_uuid = params[:splat][0]
 
-		unless vault 
+		unless vault_uuid 
 			return build_response(400, 'Missing vault access id.')
 		end
 

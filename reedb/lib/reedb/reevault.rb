@@ -514,14 +514,16 @@ module Reedb
 		# Enables the cryptographic module to decrypt and encrypt files.
 		#
 		def unlock_vault pw
-			@encrypted_key = read_secure_info('cey') unless @encrypted_key
-			@crypt.start_encryption(pw, @encrypted_key)
-			remove_instance_variable(:@encrypted_key) if @encrypted_key
-			return true if @crypt.init
+			begin
+				@encrypted_key = read_secure_info('cey') unless @encrypted_key
+				@crypt.start_encryption(pw, @encrypted_key)
+				remove_instance_variable(:@encrypted_key) if @encrypted_key
+			rescue #TODO: Check exception type here.
+				raise WrongUserPasswordError.new, "Incorrect user passphrase. Could not unlock!"
+			end
 
-			# If encryption init failed...
-			puts "Wrong user password!"
-			return false
+			# Return values for the rest of the file.
+			return @crypt.init
 		end
 
 		# This method checks what encryption to use by enums.

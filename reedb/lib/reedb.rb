@@ -8,12 +8,16 @@
 # ====================================================
 
 # Internal requirements
+require_relative 'reedb/errors/daemon_errors'
+
 require_relative 'reedb/utils/meta_vault'
 require_relative 'reedb/utils/utilities'
 require_relative 'reedb/utils/logger'
 require_relative 'reedb/utils/uuids'
+
 require_relative 'reedb/constants'
 require_relative 'reedb/reevault'
+
 
 # System requirements
 require 'securerandom'
@@ -364,6 +368,9 @@ module Reedb
 			# user side.
 			# Also adds that token to the @@tokens list
 			#
+			# THROWS A LOT OF EXCEPTIONS!
+			#
+			#
 			# Params: 	
 			# 				'name' of the vault
 			# 				'path' of the vault
@@ -411,7 +418,7 @@ module Reedb
 			# returns a confirmation that vault access was granted.
 			#
 			def access_vault(uuid, passphrase)
-				puts "This has not been implemented yet! Use token authentication via the DAEMON module."
+				raise FunctionNotImplementedError.new, "This has not been implemented yet! Use token authentication via the DAEMON module."
 				return false
 			end
 
@@ -439,7 +446,7 @@ module Reedb
 				return false if @@active_vaults[uuid].locked?
 	 
 				# Mark a vault for removal and only actually
-				puts "THIS HAS NOT BEEN IMPLEMENTED YET! DON'T DO THIS!!11ELEVEN!!!!"
+				raise FunctionNotImplementedError.new, "This has not been implemented yet! Don't do this."
 				return false
 			end
 
@@ -509,8 +516,13 @@ module Reedb
 			#   according to the search queury
 			#
 			def access_headers(uuid, token, search = nil)
-				return nil unless @@active_vaults["#{uuid}"]
-				return nil unless @@tokens[token].include?(uuid)
+				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
+
+				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+
+				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
+
+
 				return @@active_vaults["#{uuid}"].list_headers(search)
 			end
 
@@ -526,8 +538,11 @@ module Reedb
 			#   as it's current version or it's edit history.
 			#
 			def access_file(uuid, token, file_name, history = false)
-				return nil unless @@active_vaults["#{uuid}"]
-				return nil unless @@tokens[token].include?(uuid)
+				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
+
+				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+
+				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
 				return @@active_vaults["#{uuid}"].read_file(file_name, history)
 			end
 
@@ -542,9 +557,11 @@ module Reedb
 			#   version or it's edit history
 			#
 			def insert(uuid, token, file_name, data)
-				return Reedb::RETURN_UNKNOWN_TOKEN_ERROR unless @@tokens[token]
-				return Reedb::RETURN_UNAUTHORISED_TOKEN_ERROR unless @@tokens[token].include?(uuid)
-				return Reedb::RETURN_INACTIVE_VAULT_ERROR unless @@active_vaults["#{uuid}"]
+				raise VaultNotAvailableError.new, "The vault you wish to insert data to is not currently active on this system." unless @@active_vaults["#{uuid}"]
+
+				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+
+				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 
@@ -554,8 +571,11 @@ module Reedb
 			# Ends the exchange with a vault. Removes token from active vault record
 			#
 			def close_vault(uuid, token)
-				return nil unless @@tokens[token]
-				return nil unless @@tokens[token].include?(uuid)
+				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
+
+				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+
+				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Closing vault with #{uuid}.", "debug")
 

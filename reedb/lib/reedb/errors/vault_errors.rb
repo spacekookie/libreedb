@@ -25,6 +25,7 @@ end
 class VaultLoggerError < VaultError
 end
 
+# This has been depreciated.
 class BadCacheError < VaultError
 end
 
@@ -35,13 +36,4 @@ class FileBusyError < VaultError
 end
 
 class MalformedSearchError < VaultError
-end
-
-
-
-# Some errors about scoping vaults
-class VaultAlreadyScopedError < VaultError
-end
-
-class VaultNotScopedError < VaultError
 end

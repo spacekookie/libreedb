@@ -16,6 +16,9 @@ end
 class MissingUserPasswordError < EncryptionError
 end
 
+class WrongUserPasswordError < EncryptionError
+end
+
 class InsecureUserPasswordError < EncryptionError
 end
 
