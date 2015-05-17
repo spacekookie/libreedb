@@ -8,5 +8,5 @@ The following people worked on Reedb and made it possible that the API exists to
 ```
 Katharina (spacekookie) Sabel <sabel.katharina@gmail.com>
 
-Ricardo (XenGi) Band <email@ricardo.bandway>
+Ricardo (XenGi) Band <email@ricardo.band>
 ```
