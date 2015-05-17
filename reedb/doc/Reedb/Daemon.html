@@ -1,0 +1,469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Reedb::Daemon
+  
+    &mdash; Documentation by YARD 0.8.7.6
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!Reedb/Daemon.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (D)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Reedb.html" title="Reedb (module)">Reedb</a></span></span>
+     &raquo; 
+    <span class="title">Daemon</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Reedb::Daemon
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+      <dt class="r1">Includes:</dt>
+      <dd class="r1"><span class='object_link'><a href="../Reedb.html" title="Reedb (module)">Reedb</a></span></dd>
+      
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/reedb.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>module vault end</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  <h2>Constant Summary</h2>
+  
+
+
+
+  <h2>Constant Summary</h2>
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="../Reedb.html" title="Reedb (module)">Reedb</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Reedb.html#DAEMON_INACTIVE_VAULT_ERROR-constant" title="Reedb::DAEMON_INACTIVE_VAULT_ERROR (constant)">DAEMON_INACTIVE_VAULT_ERROR</a></span>, <span class='object_link'><a href="../Reedb.html#DAEMON_UNAUTHORISED_TOKEN_ERROR-constant" title="Reedb::DAEMON_UNAUTHORISED_TOKEN_ERROR (constant)">DAEMON_UNAUTHORISED_TOKEN_ERROR</a></span>, <span class='object_link'><a href="../Reedb.html#DAEMON_UNKNOWN_TOKEN_ERROR-constant" title="Reedb::DAEMON_UNKNOWN_TOKEN_ERROR (constant)">DAEMON_UNKNOWN_TOKEN_ERROR</a></span>, <span class='object_link'><a href="../Reedb.html#DEF_MASTER_PATH-constant" title="Reedb::DEF_MASTER_PATH (constant)">DEF_MASTER_PATH</a></span>, <span class='object_link'><a href="../Reedb.html#FILE_CACHE_TIME-constant" title="Reedb::FILE_CACHE_TIME (constant)">FILE_CACHE_TIME</a></span>, <span class='object_link'><a href="../Reedb.html#FILE_MALFORMED_DATA_ERROR-constant" title="Reedb::FILE_MALFORMED_DATA_ERROR (constant)">FILE_MALFORMED_DATA_ERROR</a></span>, <span class='object_link'><a href="../Reedb.html#KEY_CACHE_TIME-constant" title="Reedb::KEY_CACHE_TIME (constant)">KEY_CACHE_TIME</a></span>, <span class='object_link'><a href="../Reedb.html#NET_PORT-constant" title="Reedb::NET_PORT (constant)">NET_PORT</a></span>, <span class='object_link'><a href="../Reedb.html#TOKEN_BYTE_SIZE-constant" title="Reedb::TOKEN_BYTE_SIZE (constant)">TOKEN_BYTE_SIZE</a></span>, <span class='object_link'><a href="../Reedb.html#VAULT_FILE_NOT_FOUND_ERROR-constant" title="Reedb::VAULT_FILE_NOT_FOUND_ERROR (constant)">VAULT_FILE_NOT_FOUND_ERROR</a></span>, <span class='object_link'><a href="../Reedb.html#VERSION-constant" title="Reedb::VERSION (constant)">VERSION</a></span></p>
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#access_with_token-class_method" title="access_with_token (class method)">+ (Object) <strong>access_with_token</strong>(uuid, token, passphrase) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>This function should be used by recurring applications that already own an
+authentication token for a vault.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#free_token-class_method" title="free_token (class method)">+ (Object) <strong>free_token</strong>(token) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Call this function to free a token and remove it from the access tree.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#request_token-class_method" title="request_token (class method)">+ (Object) <strong>request_token</strong>(uuid, passphrase, parmanent = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Request token for a vault permanently.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Reedb.html" title="Reedb (module)">Reedb</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Reedb.html#archos-class_method" title="Reedb.archos (method)">archos</a></span>, <span class='object_link'><a href="../Reedb.html#daemon%3F-class_method" title="Reedb.daemon? (method)">daemon?</a></span>, <span class='object_link'><a href="../Reedb.html#included-class_method" title="Reedb.included (method)">included</a></span>, <span class='object_link'><a href="../Reedb.html#passlength-class_method" title="Reedb.passlength (method)">passlength</a></span>, <span class='object_link'><a href="../Reedb.html#verbose%3F-class_method" title="Reedb.verbose? (method)">verbose?</a></span></p>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="access_with_token-class_method">
+  
+    + (<tt>Object</tt>) <strong>access_with_token</strong>(uuid, token, passphrase) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>This function should be used by recurring applications that already own an
+authentication token for a vault.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+705
+706
+707</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 705</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_access_with_token'>access_with_token</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_token'>token</span><span class='comma'>,</span> <span class='id identifier rubyid_passphrase'>passphrase</span><span class='rparen'>)</span>
+	<span class='id identifier rubyid_token'>token</span><span class='period'>.</span><span class='id identifier rubyid_delete!'>delete!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="free_token-class_method">
+  
+    + (<tt>Object</tt>) <strong>free_token</strong>(token) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Call this function to free a token and remove it from the access tree. This
+means that the vault it used to access are not removed or unloaded for
+other applications to use. But the token can no longer be used for file
+access.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Token to be freed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../UnknownTokenError.html" title="UnknownTokenError (class)">UnknownTokenError</a></span>.new</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 716</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_free_token'>free_token</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+	<span class='id identifier rubyid_token'>token</span><span class='period'>.</span><span class='id identifier rubyid_delete!'>delete!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+	<span class='comment'># Throw a warning if the token isn&#39;t valid in the first place.
+</span>	<span class='id identifier rubyid_raise'>raise</span> <span class='const'>UnknownTokenError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The token you provided is unknown to this system</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='cvar'>@@tokens</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+
+	<span class='cvar'>@@tokens</span><span class='lbracket'>[</span><span class='id identifier rubyid_token'>token</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_uuid'>uuid</span><span class='op'>|</span>
+		<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+	<span class='kw'>end</span>
+
+	<span class='id identifier rubyid_write_config'>write_config</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="request_token-class_method">
+  
+    + (<tt>Object</tt>) <strong>request_token</strong>(uuid, passphrase, parmanent = false) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Request token for a vault permanently. Only used if @@no_token == false.
+Unlocks a vault as well with the user passphrase</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Name of the vault</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>passphrase</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Passphrase of the vault.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 686</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_request_token'>request_token</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_passphrase'>passphrase</span><span class='comma'>,</span> <span class='id identifier rubyid_parmanent'>parmanent</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+	<span class='comment'># If the vault is not currently open
+</span>	<span class='kw'>unless</span> <span class='cvar'>@@active_vaults</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+		<span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rbracket'>]</span>
+			<span class='const'>DaemonLogger</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The requested vault is unknown to this system. Aborting operation!</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+			<span class='id identifier rubyid_raise'>raise</span> <span class='const'>VaultNotScopedError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Requested vault </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_content'> is unknown to reedb. Has it been scoped before?</span><span class='tstring_end'>&quot;</span></span>
+		<span class='kw'>end</span>
+		<span class='comment'># Continue
+</span>		<span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+		<span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span>
+		<span class='cvar'>@@active_vaults</span><span class='lbracket'>[</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>ReeVault</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:auto</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_passphrase'>passphrase</span><span class='rparen'>)</span>
+	<span class='kw'>end</span>
+	<span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='id identifier rubyid_generate_token'>generate_token</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+	<span class='kw'>return</span> <span class='id identifier rubyid_token'>token</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun May 17 23:17:07 2015 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.1.5).
+</div>
+
+  </body>
+</html>

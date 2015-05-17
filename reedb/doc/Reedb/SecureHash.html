@@ -1,0 +1,548 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Reedb::SecureHash
+  
+    &mdash; Documentation by YARD 0.8.7.6
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!Reedb/SecureHash.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Reedb.html" title="Reedb (module)">Reedb</a></span></span>
+     &raquo; 
+    <span class="title">SecureHash</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Reedb::SecureHash
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Reedb::SecureHash</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/reedb/security/secure_hash.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="PBKDF2_ITERATIONS-constant" class="">PBKDF2_ITERATIONS =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Constants for the hashing process. Can be changed without breaking existing
+hashes!</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>10000</span></pre></dd>
+      
+        <dt id="SALT_BYTE_SIZE-constant" class="">SALT_BYTE_SIZE =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>32</span></pre></dd>
+      
+        <dt id="HASH_BYTE_SIZE-constant" class="">HASH_BYTE_SIZE =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>24</span></pre></dd>
+      
+        <dt id="HASH_SECTIONS-constant" class="">HASH_SECTIONS =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>3</span></pre></dd>
+      
+        <dt id="SECTION_DELIMITER-constant" class="">SECTION_DELIMITER =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>::</span><span class='tstring_end'>&#39;</span></span></pre></dd>
+      
+        <dt id="ITERATIONS_INDEX-constant" class="">ITERATIONS_INDEX =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>0</span></pre></dd>
+      
+        <dt id="SALT_INDEX-constant" class="">SALT_INDEX =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>1</span></pre></dd>
+      
+        <dt id="HASH_INDEX-constant" class="">HASH_INDEX =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>2</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#assert-class_method" title="assert (class method)">+ (Object) <strong>assert</strong>(truth, msg) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#runSelfTests-class_method" title="runSelfTests (class method)">+ (Object) <strong>runSelfTests</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Run tests to ensure the module is functioning properly.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#secure_hash-class_method" title="secure_hash (class method)">+ (Object) <strong>secure_hash</strong>(password) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#validate_pw-class_method" title="validate_pw (class method)">+ (Object) <strong>validate_pw</strong>(password, correctHash) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Checks if a password is correct given a hash of the correct one.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="assert-class_method">
+  
+    + (<tt>Object</tt>) <strong>assert</strong>(truth, msg) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+122
+123
+124
+125
+126
+127
+128
+129</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb/security/secure_hash.rb', line 122</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_assert'>assert</span><span class='lparen'>(</span> <span class='id identifier rubyid_truth'>truth</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span> <span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_truth'>truth</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PASS [</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_msg'>msg</span><span class='embexpr_end'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FAIL [</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_msg'>msg</span><span class='embexpr_end'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span>
+    <span class='cvar'>@@allPass</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="runSelfTests-class_method">
+  
+    + (<tt>Object</tt>) <strong>runSelfTests</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Run tests to ensure the module is functioning properly. Returns true if all
+tests succeed, false if not.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb/security/secure_hash.rb', line 94</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_runSelfTests'>runSelfTests</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample hashes:</span><span class='tstring_end'>&quot;</span></span>
+  <span class='int'>3</span><span class='period'>.</span><span class='id identifier rubyid_times'>times</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_secure_hash'>secure_hash</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>password</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\nRunning self tests...</span><span class='tstring_end'>&quot;</span></span>
+  <span class='cvar'>@@allPass</span> <span class='op'>=</span> <span class='kw'>true</span>
+
+  <span class='id identifier rubyid_correctPassword'>correctPassword</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>aaaaaaaaaa</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_wrongPassword'>wrongPassword</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>aaaaaaaaab</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='id identifier rubyid_secure_hash'>secure_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_correctPassword'>correctPassword</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_assert'>assert</span><span class='lparen'>(</span> <span class='id identifier rubyid_validate_pw'>validate_pw</span><span class='lparen'>(</span> <span class='id identifier rubyid_correctPassword'>correctPassword</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span> <span class='rparen'>)</span> <span class='op'>==</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>correct password</span><span class='tstring_end'>&quot;</span></span> <span class='rparen'>)</span>
+  <span class='id identifier rubyid_assert'>assert</span><span class='lparen'>(</span> <span class='id identifier rubyid_validate_pw'>validate_pw</span><span class='lparen'>(</span> <span class='id identifier rubyid_wrongPassword'>wrongPassword</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span> <span class='rparen'>)</span> <span class='op'>==</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wrong password</span><span class='tstring_end'>&quot;</span></span> <span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_h1'>h1</span> <span class='op'>=</span> <span class='id identifier rubyid_hash'>hash</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span> <span class='const'>SECTION_DELIMITER</span> <span class='rparen'>)</span>
+  <span class='id identifier rubyid_h2'>h2</span> <span class='op'>=</span> <span class='id identifier rubyid_secure_hash'>secure_hash</span><span class='lparen'>(</span> <span class='id identifier rubyid_correctPassword'>correctPassword</span> <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span> <span class='const'>SECTION_DELIMITER</span> <span class='rparen'>)</span>
+  <span class='id identifier rubyid_assert'>assert</span><span class='lparen'>(</span> <span class='id identifier rubyid_h1'>h1</span><span class='lbracket'>[</span><span class='const'>HASH_INDEX</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='id identifier rubyid_h2'>h2</span><span class='lbracket'>[</span><span class='const'>HASH_INDEX</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>different hashes</span><span class='tstring_end'>&quot;</span></span> <span class='rparen'>)</span>
+  <span class='id identifier rubyid_assert'>assert</span><span class='lparen'>(</span> <span class='id identifier rubyid_h1'>h1</span><span class='lbracket'>[</span><span class='const'>SALT_INDEX</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='id identifier rubyid_h2'>h2</span><span class='lbracket'>[</span><span class='const'>SALT_INDEX</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>different salt</span><span class='tstring_end'>&quot;</span></span> <span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='cvar'>@@allPass</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*** ALL TESTS PASS ***</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*** FAILURES ***</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>return</span> <span class='cvar'>@@allPass</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="secure_hash-class_method">
+  
+    + (<tt>Object</tt>) <strong>secure_hash</strong>(password) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb/security/secure_hash.rb', line 53</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_secure_hash'>secure_hash</span> <span class='id identifier rubyid_password'>password</span>
+  <span class='id identifier rubyid_salt'>salt</span> <span class='op'>=</span> <span class='const'>SecureRandom</span><span class='period'>.</span><span class='id identifier rubyid_base64'>base64</span><span class='lparen'>(</span><span class='const'>SALT_BYTE_SIZE</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_sha256'>sha256</span> <span class='op'>=</span> <span class='const'>OpenSSL</span><span class='op'>::</span><span class='const'>Digest</span><span class='op'>::</span><span class='const'>SHA256</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_len'>len</span> <span class='op'>=</span> <span class='id identifier rubyid_sha256'>sha256</span><span class='period'>.</span><span class='id identifier rubyid_digest_length'>digest_length</span>
+  <span class='id identifier rubyid_pbkdf2'>pbkdf2</span> <span class='op'>=</span> <span class='const'>OpenSSL</span><span class='op'>::</span><span class='const'>PKCS5</span><span class='period'>.</span><span class='id identifier rubyid_pbkdf2_hmac'>pbkdf2_hmac</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_password'>password</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_salt'>salt</span><span class='comma'>,</span>
+    <span class='const'>PBKDF2_ITERATIONS</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_len'>len</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_sha256'>sha256</span>
+  <span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='const'>PBKDF2_ITERATIONS</span><span class='comma'>,</span> <span class='id identifier rubyid_salt'>salt</span><span class='comma'>,</span> <span class='const'>Base64</span><span class='period'>.</span><span class='id identifier rubyid_encode64'>encode64</span><span class='lparen'>(</span> <span class='id identifier rubyid_pbkdf2'>pbkdf2</span> <span class='rparen'>)</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span> <span class='const'>SECTION_DELIMITER</span> <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="validate_pw-class_method">
+  
+    + (<tt>Object</tt>) <strong>validate_pw</strong>(password, correctHash) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Checks if a password is correct given a hash of the correct one.
+correctHash must be a hash string generated with createHash.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb/security/secure_hash.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_validate_pw'>validate_pw</span><span class='lparen'>(</span><span class='id identifier rubyid_password'>password</span><span class='comma'>,</span> <span class='id identifier rubyid_correctHash'>correctHash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_correctHash'>correctHash</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='const'>SECTION_DELIMITER</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_params'>params</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>!=</span> <span class='const'>HASH_SECTIONS</span>
+
+  <span class='id identifier rubyid_salt'>salt</span> <span class='op'>=</span> <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='const'>SALT_INDEX</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'>HASH_INDEX</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_sha256'>sha256</span> <span class='op'>=</span> <span class='const'>OpenSSL</span><span class='op'>::</span><span class='const'>Digest</span><span class='op'>::</span><span class='const'>SHA256</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_len'>len</span> <span class='op'>=</span> <span class='id identifier rubyid_sha256'>sha256</span><span class='period'>.</span><span class='id identifier rubyid_digest_length'>digest_length</span>
+
+  <span class='id identifier rubyid_confirmed'>confirmed</span> <span class='op'>=</span> <span class='const'>Base64</span><span class='period'>.</span><span class='id identifier rubyid_decode64'>decode64</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='const'>HASH_INDEX</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_test_hash'>test_hash</span> <span class='op'>=</span> <span class='const'>OpenSSL</span><span class='op'>::</span><span class='const'>PKCS5</span><span class='period'>.</span><span class='id identifier rubyid_pbkdf2_hmac'>pbkdf2_hmac</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_password'>password</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_salt'>salt</span><span class='comma'>,</span>
+    <span class='const'>PBKDF2_ITERATIONS</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_len'>len</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_sha256'>sha256</span>
+  <span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='id identifier rubyid_confirmed'>confirmed</span> <span class='op'>==</span> <span class='id identifier rubyid_test_hash'>test_hash</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun May 17 23:17:15 2015 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.1.5).
+</div>
+
+  </body>
+</html>

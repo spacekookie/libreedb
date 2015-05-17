@@ -1,0 +1,933 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: Reedb
+  
+    &mdash; Documentation by YARD 0.8.7.6
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!Reedb.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index (R)</a> &raquo;
+    
+    
+    <span class="title">Reedb</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: Reedb
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+    <dt class="r1">Included in:</dt>
+    <dd class="r1"><span class='object_link'><a href="Reedb/Config/Master.html" title="Reedb::Config::Master (module)">Config::Master</a></span>, <span class='object_link'><a href="Reedb/Config/Vault.html" title="Reedb::Config::Vault (module)">Config::Vault</a></span>, <span class='object_link'><a href="Reedb/Core.html" title="Reedb::Core (module)">Core</a></span>, <span class='object_link'><a href="Reedb/Daemon.html" title="Reedb::Daemon (module)">Daemon</a></span>, <span class='object_link'><a href="Reedb/Vault.html" title="Reedb::Vault (module)">Vault</a></span></dd>
+    
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/reedb/config.rb<span class="defines">,<br />
+  lib/reedb.rb,<br /> lib/reedb/reevault.rb,<br /> lib/reedb/datafile.rb,<br /> lib/reedb/constants.rb,<br /> lib/reedb/utils/logger.rb,<br /> lib/reedb/security/aes.rb,<br /> lib/reedb/utils/version.rb,<br /> lib/reedb/utils/utilities.rb,<br /> lib/reedb/utils/meta_vault.rb,<br /> lib/reedb/security/twofish.rb,<br /> lib/reedb/security/multifish.rb,<br /> lib/reedb/security/encryption.rb,<br /> lib/reedb/security/secure_hash.rb</span>
+</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Salted password hashing with SHA2. Authors: @RedragonX (dicesoft.net),
+havoc AT defuse.ca</p>
+
+<pre class="code ruby"><code class="ruby">@SpaceKookie, spacekookie AT c-base.org</code></pre>
+
+<p>www: <a
+href="http://crackstation.net/hashing-security.htm">crackstation.net/hashing-security.htm</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Reedb/Config.html" title="Reedb::Config (module)">Config</a></span>, <span class='object_link'><a href="Reedb/Core.html" title="Reedb::Core (module)">Core</a></span>, <span class='object_link'><a href="Reedb/Daemon.html" title="Reedb::Daemon (module)">Daemon</a></span>, <span class='object_link'><a href="Reedb/Vault.html" title="Reedb::Vault (module)">Vault</a></span>
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Reedb/DaemonLogger.html" title="Reedb::DaemonLogger (class)">DaemonLogger</a></span>, <span class='object_link'><a href="Reedb/DataFile.html" title="Reedb::DataFile (class)">DataFile</a></span>, <span class='object_link'><a href="Reedb/Fish.html" title="Reedb::Fish (class)">Fish</a></span>, <span class='object_link'><a href="Reedb/MCypher.html" title="Reedb::MCypher (class)">MCypher</a></span>, <span class='object_link'><a href="Reedb/MLE.html" title="Reedb::MLE (class)">MLE</a></span>, <span class='object_link'><a href="Reedb/MetaVault.html" title="Reedb::MetaVault (class)">MetaVault</a></span>, <span class='object_link'><a href="Reedb/RAES.html" title="Reedb::RAES (class)">RAES</a></span>, <span class='object_link'><a href="Reedb/ReeVault.html" title="Reedb::ReeVault (class)">ReeVault</a></span>, <span class='object_link'><a href="Reedb/SecureHash.html" title="Reedb::SecureHash (class)">SecureHash</a></span>, <span class='object_link'><a href="Reedb/SecurityUtils.html" title="Reedb::SecurityUtils (class)">SecurityUtils</a></span>, <span class='object_link'><a href="Reedb/Timestamp.html" title="Reedb::Timestamp (class)">Timestamp</a></span>, <span class='object_link'><a href="Reedb/Utilities.html" title="Reedb::Utilities (class)">Utilities</a></span>, <span class='object_link'><a href="Reedb/VaultConfig.html" title="Reedb::VaultConfig (class)">VaultConfig</a></span>, <span class='object_link'><a href="Reedb/VaultLogger.html" title="Reedb::VaultLogger (class)">VaultLogger</a></span>, <span class='object_link'><a href="Reedb/Version1.html" title="Reedb::Version1 (class)">Version1</a></span>, <span class='object_link'><a href="Reedb/Version_spec.html" title="Reedb::Version_spec (class)">Version_spec</a></span>
+    
+  
+</p>
+
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="VERSION-constant" class="">VERSION =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>The version of reedb. This is actually written into vaults to identify
+breaking changes and using an older sub-set of the API to interact with
+legacy vaults.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.10.rc2</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="NET_PORT-constant" class="">NET_PORT =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>55736</span></pre></dd>
+      
+        <dt id="TOKEN_BYTE_SIZE-constant" class="">TOKEN_BYTE_SIZE =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>in bytes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>16</span></pre></dd>
+      
+        <dt id="DEF_MASTER_PATH-constant" class="">DEF_MASTER_PATH =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Placeholder</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>__sysmas__</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="FILE_CACHE_TIME-constant" class="">FILE_CACHE_TIME =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Time in ms</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>2500</span></pre></dd>
+      
+        <dt id="KEY_CACHE_TIME-constant" class="">KEY_CACHE_TIME =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>(30 minutes in ms)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='int'>15</span> <span class='op'>*</span> <span class='int'>60</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='int'>1000</span></pre></dd>
+      
+        <dt id="FILE_MALFORMED_DATA_ERROR-constant" class="">FILE_MALFORMED_DATA_ERROR =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>THIS SECTION WILL BE RESERVED FOR ERROR CODES AS RETURN VALUES</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>0x11</span></pre></dd>
+      
+        <dt id="VAULT_FILE_NOT_FOUND_ERROR-constant" class="">VAULT_FILE_NOT_FOUND_ERROR =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>VAULT ERROR CODES</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>0x12</span></pre></dd>
+      
+        <dt id="DAEMON_UNKNOWN_TOKEN_ERROR-constant" class="">DAEMON_UNKNOWN_TOKEN_ERROR =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>RETURN ERROR CODES</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>0x31</span></pre></dd>
+      
+        <dt id="DAEMON_UNAUTHORISED_TOKEN_ERROR-constant" class="">DAEMON_UNAUTHORISED_TOKEN_ERROR =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>0x32</span></pre></dd>
+      
+        <dt id="DAEMON_INACTIVE_VAULT_ERROR-constant" class="">DAEMON_INACTIVE_VAULT_ERROR =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>0x33</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#archos-class_method" title="archos (class method)">+ (Object) <strong>archos</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the platform/ architecture of the daemon and vault handler.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#daemon%3F-class_method" title="daemon? (class method)">+ (Boolean) <strong>daemon?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not this is a daemon.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#included-class_method" title="included (class method)">+ (Object) <strong>included</strong>(api) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#passlength-class_method" title="passlength (class method)">+ (Object) <strong>passlength</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the minimum passphrase length is.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#verbose%3F-class_method" title="verbose? (class method)">+ (Boolean) <strong>verbose?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether verbose mode is enabled.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="archos-class_method">
+  
+    + (<tt>Object</tt>) <strong>archos</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the platform/ architecture of the daemon and vault handler</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 29</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_archos'>archos</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='lparen'>(</span><span class='kw'>return</span> <span class='cvar'>@@archos</span><span class='rparen'>)</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="daemon?-class_method">
+  
+    + (<tt>Boolean</tt>) <strong>daemon?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not this is a daemon</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_daemon?'>daemon?</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='lparen'>(</span><span class='kw'>return</span> <span class='cvar'>@@daemon</span><span class='rparen'>)</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="included-class_method">
+  
+    + (<tt>Object</tt>) <strong>included</strong>(api) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 42</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_included'>included</span><span class='lparen'>(</span><span class='id identifier rubyid_api'>api</span><span class='rparen'>)</span>
+	<span class='kw'>class</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_api'>api</span>
+
+		<span class='cvar'>@@counter</span> <span class='op'>=</span> <span class='int'>0</span>
+		<span class='cvar'>@@started</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+		<span class='comment'># Some more runtime variables
+</span>		<span class='cvar'>@@path</span> <span class='op'>=</span> <span class='const'>Reedb</span><span class='op'>::</span><span class='const'>DEF_MASTER_PATH</span>
+		<span class='cvar'>@@config_path</span> <span class='op'>=</span> <span class='const'>Reedb</span><span class='op'>::</span><span class='const'>DEF_MASTER_PATH</span>
+		<span class='cvar'>@@no_token</span> <span class='op'>=</span> <span class='kw'>false</span>
+		<span class='cvar'>@@verbose</span> <span class='op'>=</span> <span class='kw'>false</span>
+		<span class='cvar'>@@pw_length</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span>
+		<span class='cvar'>@@cleanup</span> <span class='op'>=</span> <span class='kw'>true</span>
+		<span class='cvar'>@@daemon</span> <span class='op'>=</span> <span class='kw'>true</span>
+		<span class='cvar'>@@archos</span> <span class='op'>=</span> <span class='kw'>nil</span>
+		
+		<span class='comment'># Stores the active vaults
+</span>		<span class='cvar'>@@active_vaults</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+		<span class='comment'># Stores the active tokens
+</span>		<span class='cvar'>@@tokens</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+		<span class='comment'># Stores the master configuration
+</span>		<span class='cvar'>@@config</span> <span class='op'>=</span> <span class='kw'>nil</span>
+
+		<span class='comment'># PRIVATE FUNCTIONS BELOW
+</span>		<span class='id identifier rubyid_private'>private</span>
+
+		<span class='comment'># Generates an authentication token for vault access.
+</span>		<span class='comment'># The function also adds the token, bound to the vault name, to the
+</span>		<span class='comment'># @@tokens set.
+</span>		<span class='comment'>#
+</span>		<span class='comment'># Params: 	&#39;name&#39; of the vault
+</span>		<span class='comment'># 					&#39;path&#39; of the vault
+</span>		<span class='comment'>#
+</span>		<span class='comment'># =&gt; Base64 encoded token
+</span>		<span class='comment'>#
+</span>		<span class='kw'>def</span> <span class='id identifier rubyid_generate_token'>generate_token</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+			<span class='comment'># Concatinates the token together and base64 encodes it
+</span>			<span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='const'>Base64</span><span class='period'>.</span><span class='id identifier rubyid_encode64'>encode64</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='const'>SecureRandom</span><span class='period'>.</span><span class='id identifier rubyid_base64'>base64</span><span class='lparen'>(</span><span class='const'>Reedb</span><span class='op'>::</span><span class='const'>TOKEN_BYTE_SIZE</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>--</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_content'>--</span><span class='embexpr_beg'>#{</span><span class='const'>SecureRandom</span><span class='period'>.</span><span class='id identifier rubyid_base64'>base64</span><span class='lparen'>(</span><span class='const'>Reedb</span><span class='op'>::</span><span class='const'>TOKEN_BYTE_SIZE</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>--</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_content'>--</span><span class='embexpr_beg'>#{</span><span class='const'>SecureRandom</span><span class='period'>.</span><span class='id identifier rubyid_base64'>base64</span><span class='lparen'>(</span><span class='const'>Reedb</span><span class='op'>::</span><span class='const'>TOKEN_BYTE_SIZE</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+			<span class='id identifier rubyid_token'>token</span><span class='period'>.</span><span class='id identifier rubyid_delete!'>delete!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+			<span class='cvar'>@@tokens</span><span class='lbracket'>[</span><span class='id identifier rubyid_token'>token</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='cvar'>@@tokens</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+			<span class='cvar'>@@tokens</span><span class='lbracket'>[</span><span class='id identifier rubyid_token'>token</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_uuid'>uuid</span>
+			<span class='id identifier rubyid_update_tracked_vault'>update_tracked_vault</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+			<span class='kw'>return</span> <span class='id identifier rubyid_token'>token</span>
+		<span class='kw'>end</span>
+
+		<span class='comment'># Writes a vault into a tracking file for the user
+</span>		<span class='comment'># That means that the vault will be tracked next time
+</span>		<span class='comment'># Reedb starts
+</span>		<span class='comment'>#
+</span>		<span class='comment'># Params: 	name =&gt; Public vault name
+</span>		<span class='comment'># 					path =&gt; Location on the system
+</span>		<span class='comment'># 					tokens =&gt; Authentication token for applications
+</span>		<span class='comment'>#
+</span>		<span class='kw'>def</span> <span class='id identifier rubyid_track_vault'>track_vault</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+
+			<span class='comment'># Adds actual size as soon as the vault gets unlocked by an application
+</span>			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>MetaVault</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+			<span class='id identifier rubyid_write_config'>write_config</span>
+		<span class='kw'>end</span>
+
+		<span class='kw'>def</span> <span class='id identifier rubyid_untrack_vault'>untrack_vault</span> <span class='id identifier rubyid_uuid'>uuid</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+		<span class='kw'>end</span>
+
+		<span class='kw'>def</span> <span class='id identifier rubyid_update_tracked_vault'>update_tracked_vault</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+			<span class='id identifier rubyid_token'>token</span><span class='period'>.</span><span class='id identifier rubyid_delete!'>delete!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+			<span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span> <span class='kw'>if</span> <span class='id identifier rubyid_name'>name</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_path'>path</span> <span class='kw'>if</span> <span class='id identifier rubyid_path'>path</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>=</span> <span class='id identifier rubyid_size'>size</span> <span class='kw'>if</span> <span class='id identifier rubyid_size'>size</span>
+
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_token'>token</span> <span class='kw'>if</span> <span class='id identifier rubyid_token'>token</span>
+
+			<span class='id identifier rubyid_write_config'>write_config</span>
+		<span class='kw'>end</span>
+
+		<span class='comment'># Removes a token from a vault config thus removing any access that token had.
+</span>		<span class='comment'>#
+</span>		<span class='kw'>def</span> <span class='id identifier rubyid_remove_token'>remove_token</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+			<span class='id identifier rubyid_token'>token</span><span class='period'>.</span><span class='id identifier rubyid_delete!'>delete!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+			<span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+			<span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+			
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:tokens</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+			<span class='id identifier rubyid_write_config'>write_config</span>
+		<span class='kw'>end</span>
+
+		<span class='comment'># Caches the config file to @@config
+</span>		<span class='comment'>#
+</span>		<span class='comment'>#
+</span>		<span class='kw'>def</span> <span class='id identifier rubyid_cache_config'>cache_config</span>
+			<span class='comment'># Now read vault information and put it into @@active_vaults field
+</span>			<span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='cvar'>@@config_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+				<span class='id identifier rubyid_read_config'>read_config</span>
+			<span class='kw'>else</span>
+				<span class='comment'># Creates some dummy info
+</span>				<span class='cvar'>@@config</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+				<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:global</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+				<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:global</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:logs</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='symbol'>:default</span>
+				<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+				<span class='comment'># Writes the config to file with Base64 encoding
+</span>				<span class='id identifier rubyid_write_config'>write_config</span>
+				<span class='const'>FileUtils</span><span class='op'>::</span><span class='id identifier rubyid_chmod_R'>chmod_R</span><span class='lparen'>(</span><span class='int'>0744</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='cvar'>@@config_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+			<span class='kw'>end</span>
+
+			<span class='id identifier rubyid_check_vault_integreties'>check_vault_integreties</span> <span class='kw'>if</span> <span class='cvar'>@@cleanup</span>
+
+			<span class='comment'># At this point @@config has been loaded
+</span>			<span class='id identifier rubyid_vault_count'>vault_count</span> <span class='op'>=</span> <span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+			<span class='const'>DaemonLogger</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Found </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_vault_count'>vault_count</span><span class='embexpr_end'>}</span><span class='tstring_content'> vault(s) on the system.</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>debug</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+		<span class='kw'>end</span>
+
+		<span class='comment'># Check vault integreties here!
+</span>		<span class='comment'># Will try every vault in the config and remove the ones that are no longer 
+</span>		<span class='comment'># available to avoid errors and access corruptions
+</span>		<span class='comment'>#
+</span>		<span class='kw'>def</span> <span class='id identifier rubyid_check_vault_integreties'>check_vault_integreties</span>
+			<span class='comment'># Vaults that will be marked for removal
+</span>			<span class='id identifier rubyid_marked'>marked</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+			<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_uuid'>uuid</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='op'>|</span>
+				<span class='kw'>unless</span> <span class='const'>ReeVault</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='symbol'>:meta</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='symbol'>:auto</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_try?'>try?</span>
+					<span class='id identifier rubyid_marked'>marked</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_uuid'>uuid</span>
+				<span class='kw'>end</span>
+			<span class='kw'>end</span>
+
+			<span class='id identifier rubyid_marked'>marked</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_uuid'>uuid</span><span class='op'>|</span>
+				<span class='comment'># puts &quot;Removing: #{uuid}&quot;
+</span>				<span class='const'>DaemonLogger</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Removing corrupted vault </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_uuid'>uuid</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>warn</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+				<span class='cvar'>@@config</span><span class='lbracket'>[</span><span class='symbol'>:vaults</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_uuid'>uuid</span><span class='rparen'>)</span>
+			<span class='kw'>end</span>
+			<span class='id identifier rubyid_write_config'>write_config</span>
+		<span class='kw'>end</span>
+
+		<span class='kw'>def</span> <span class='id identifier rubyid_write_config'>write_config</span>
+			<span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='const'>Marshal</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='lparen'>(</span><span class='cvar'>@@config</span><span class='rparen'>)</span>
+			<span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='cvar'>@@config_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>wb+</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_file'>file</span><span class='op'>|</span> <span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+			<span class='id identifier rubyid_read_config'>read_config</span>
+		<span class='kw'>end</span>
+
+		<span class='kw'>def</span> <span class='id identifier rubyid_read_config'>read_config</span>
+			<span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='cvar'>@@config_path</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='rparen'>)</span>
+			<span class='cvar'>@@config</span> <span class='op'>=</span> <span class='const'>Marshal</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+		<span class='kw'>end</span>
+	<span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="passlength-class_method">
+  
+    + (<tt>Object</tt>) <strong>passlength</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the minimum passphrase length is</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_passlength'>passlength</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='lparen'>(</span><span class='kw'>return</span> <span class='cvar'>@@pw_length</span><span class='rparen'>)</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="verbose?-class_method">
+  
+    + (<tt>Boolean</tt>) <strong>verbose?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether verbose mode is enabled</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/reedb.rb', line 38</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_verbose?'>verbose?</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='lparen'>(</span><span class='kw'>return</span> <span class='cvar'>@@verbose</span><span class='rparen'>)</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun May 17 23:17:05 2015 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.1.5).
+</div>
+
+  </body>
+</html>

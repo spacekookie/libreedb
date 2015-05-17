@@ -200,6 +200,15 @@ module Reedb
 
 		class << self
 
+			# Initialise Reedb with a set of parameters passed into this method.
+			# Please check the wiki to find out what option parameters are
+			# available to use here.
+			#
+			# @param options [Hash] Parameters to run Reedb by sorted in a
+			# 							hash datastructure.
+			#
+			# @return nil
+			#
 			def init(options)
 				@@daemon = if options.include?(:daemon) then options[:daemon] else true end
 				@@archos = options[:os]
@@ -265,7 +274,15 @@ module Reedb
 				# debounce_handler
 			end
 
-
+			# Terminate Reedb with a reason. After calling this function the
+			# core functionality (and depending interfaces on the stack)
+			# is no longer available.
+			#
+			# @param reason [String] Reason why Reedb is being terminated to
+			# 							be written into central logs.
+			#
+			# @return nil
+			#
 			def terminate(reason = nil)
 				puts "Must start process first" unless @@started
 
@@ -286,17 +303,13 @@ module Reedb
 				DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
 			end
 		end
-	end
+	end # module core end.
 
 	# Config submodule of the Interface stack
 	module Config
 		module Master
 			include Reedb
 			class << self
-
-				def dump_config
-					return @@config
-				end
 
 				# Set a global timeout time to all vaults. Determine when a vault will
 				# be unloaded or the daemon will lock itself.
@@ -324,8 +337,8 @@ module Reedb
 				def clean_config
 
 				end
-			end
-		end
+			end # self class end
+		end # module Config::Master end
 
 		module Vault
 			include Reedb
@@ -341,9 +354,9 @@ module Reedb
 
 				def read_config
 				end
-			end
-		end
-	end
+			end # self class end
+		end # module Config::Vault end
+	end # module config end
 
 	# Vault submodule of the Interface stack
 	module Vault
@@ -355,7 +368,8 @@ module Reedb
 			# Vaults are ordered in a dictionary under their UUID that's used by the
 			# Reedb daemon.
 			#
-			# => A compiled JSON of vaults with uuid, name, path and size
+			#
+			# @return available_vaults [Hash]
 			#
 			def available_vaults
 				available = {}
@@ -370,21 +384,20 @@ module Reedb
 				return available
 			end
 
-			# Creates a new vault on the current system. Returns nil if vault already existed at
-			# location. Returns a token if the creation and authentication was successful on the
-			# user side.
-			# Also adds that token to the @@tokens list
+			# Creates a new vault on the current system. Returns nil if vault 
+			# already existed at location. Returns a token if the creation
+			# and authentication was successful on the user side.
 			#
-			# THROWS A LOT OF EXCEPTIONS!
+			# Also adds that token to the @@tokens list.
 			#
+			# ! THROWS A LOT OF EXCEPTIONS !
 			#
-			# Params: 	
-			# 				'name' of the vault
-			# 				'path' of the vault
-			# 				user 'passphrase'
-			# 				'encryption' method (:aes, :twofish, :auto)
+			# @param name [String] Name of the vault
+			# @param path [String] Path of the vault
+			# @param passphrase [String] User passphrase for decryption
+			# @param encryption [enum] Encryption method (:aes, :twofish, :auto)
 			#
-			# => Base64 encoded token | nil if errors occured.
+			# @return token [Base64 String]
 			#
 			def create_vault(name, path, passphrase, encryption = :auto)
 				# Creates new UUIDs until one is found that doesn't already exist in the scope
@@ -416,10 +429,9 @@ module Reedb
 				return nil
 			end
 
-
-			# ONLY PERMITTED WHEN IN NO_TOKEN MODE! WILL BE DISABLED AUTOMATICALLY WHEN
-			# USING THE HTTP MODULE!
+			# !!! NOT IMPLEMENTED YET !!!
 			#
+			# ONLY PERMITTED WHEN IN NO_TOKEN MODE!
 			# Loads a vault with a UUID and passphrase into the current vault set.
 			# Ignores the token set (as not applicable when in token mode) and simply
 			# returns a confirmation that vault access was granted.
@@ -429,18 +441,16 @@ module Reedb
 				return false
 			end
 
-
 			# Removes a vault from the file system. This requires special privileges 
 			# to do via this interface to prevent deleting vaults without the users 
 			# permission. Will also fire a user interrupt to alert them of this 
 			# behaviour depending on platform.
 			#
-			# Params:   
-			#       		'uuid' of the vault
-			#       		'passphrase' of the vault
-			#       		'token' of an application that needs to be authorised
+			# @param uuid [String] UUID of a vault (as an ID)
+			# @param passphrase [String] User passphrase for decryption
+			# @param token [String] Authentication token for validation
 			#
-			# => Returns boolean describing success
+			# @return success [Boolean]
 			#
 			def remove_vault(uuid, passphrase, token)
 				token.delete!("\n")
@@ -458,12 +468,14 @@ module Reedb
 				return false
 			end
 
-			# Adds a new vault to the tracking scope of this Reedb daemon. Does not grant access
-			# or generate a new token for application interaction.
+			# Adds a new vault to the tracking scope of this Reedb daemon. 
+			# Does not grant access or generate a new token for application interaction.
 			# On a new install usually called just before requesting a token
-			# 
-			# Params: 		'name' of the vault
-			# 				'path' on the systen
+			#
+			# @param name [String] Name of the vault
+			# @param path [String] Path of the vault
+			#
+			# @return success [Boolean]
 			#
 			def scope_vault(name, path)
 				# Checks if that specific vault was already scoped
@@ -495,10 +507,13 @@ module Reedb
 				end
 			end
 
+
 			# Removes a vault from the application scope with a uuid.
 			# Closes the vault from the active vault set.
 			#
-			# Returns nil if no such vault was scoped before.
+			# @param uuid [String] UUID of a vault (as an ID)
+			#
+			# @return success [Boolean]
 			#
 			def unscope_vault(uuid)
 				unless @@config[:vaults]["#{uuid}"]
@@ -513,15 +528,15 @@ module Reedb
 				cache_config
 			end
 
-			# Request token for a vault permanently.
-			# Only used if @@no_token == false. Unlocks a vault as well
-			# with the user passphrase
+			# List headers from a vault with a search qeury (nil by default).
+			# Can only be used with a token on vaults that authentication has
+			# been successful before.
 			#
-			# Params: 		'uuid' of the vault
-			#       		'search' search queury as described in the wiki
+			# @param uuid [String] UUID of a vault (as an ID)
+			# @param token [String] Authentication token for access
+			# @param search [String] Search qeury as described in the wiki
 			#
-			# => Returns list of headers present in the vault
-			#   according to the search queury
+			# @return headers [List]
 			#
 			def access_headers(uuid, token, search = nil)
 				token.delete!("\n")
@@ -535,16 +550,18 @@ module Reedb
 				return @@active_vaults["#{uuid}"].list_headers(search)
 			end
 
-
-			# Request token for a vault permanently.
-			# Only used if @@no_token == false. Unlocks a vault as well
-			# with the user passphrase
+			# Access file contents with a file ID in a vault that a token has already
+			# been authenticated on.
 			#
-			# Params:   'uuid' of the vault
-			#       		'file_name' file identifier to access
+			# Depending on the history flag (false by default) the history or only
+			# current dataset will be returned.
 			#
-			# => Returns contents (including headers) of a file either
-			#   as it's current version or it's edit history.
+			# @param uuid [String] UUID of a vault (as an ID)
+			# @param token [String] Authentication token for access
+			# @param file_name [String] File identifier
+			# @param history [Boolean] history idenfitier
+			#
+			# @return file [Hash]
 			#
 			def access_file(uuid, token, file_name, history = false)
 				token.delete!("\n")
@@ -556,15 +573,23 @@ module Reedb
 				return @@active_vaults["#{uuid}"].read_file(file_name, history)
 			end
 
-			# Request token for a vault permanently.
-			# Only used if @@no_token == false. Unlocks a vault as well
-			# with the user passphrase
+
+			# Access file contents with a file ID in a vault that a token has already
+			# been authenticated on.
 			#
-			# Params:   'uuid' of the vault
-			#       		'file_name' file identifier to access
+			# Inserts data into a vault. Depending on parameters and runtime settings
+			# this function has different effects. It can be used to create a new file
+			# if it doesn't already exists.
+			# 
+			# Please refer to the wiki for details on how to use this function as it
+			# (! MAY !) have unwanted side-effects if it is used wrong!
 			#
-			# => Returns contents of a file either as it's current
-			#   version or it's edit history
+			# @param uuid [String] UUID of a vault (as an ID)
+			# @param token [String] Authentication token for access
+			# @param file_name [String] File identifier
+			# @param data [Hash] Data that should be written to the vault.
+			#
+			# @return file [Hash]
 			#
 			def insert(uuid, token, file_name, data)
 				token.delete!("\n")
@@ -577,17 +602,18 @@ module Reedb
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 
 				@@active_vaults["#{uuid}"].update(file_name, data)
+				return nil
 			end
 
-			# Request token for a vault permanently.
-			# Only used if @@no_token == false. Unlocks a vault as well
-			# with the user passphrase
+			# Removes a file from a vault that a token was authorised to
+			# access. File is identified via an ID handle. This operation
+			# is dangerous as it can NOT be reverted!
 			#
-			# Params:   'uuid' of the vault
-			#       		'file_name' file identifier to access
+			# @param uuid [String] UUID of a vault (as an ID)
+			# @param token [String] Authentication token for access
+			# @param file_name [String] File identifier
 			#
-			# => Returns contents of a file either as it's current
-			#   version or it's edit history
+			# @return nil
 			#
 			def remove(uuid, token, file_name)
 				token.delete!("\n")
@@ -600,10 +626,19 @@ module Reedb
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 
 				@@active_vaults["#{uuid}"].remove_file(file_name)
+				return nil
 			end
 
 
-			# Ends the exchange with a vault. Removes token from active vault record
+			# Closes a vault to end the file transaction between you and the vault.
+			# The encryption key will be unloaded and scrubbed from memory which means
+			# you will have to unlock a vault again 
+			# (which usually means more user interaction).
+			#
+			# @param uuid [String] UUID of a vault (as an ID)
+			# @param token [String] Authentication token for access
+			#
+			# @return nil
 			#
 			def close_vault(uuid, token)
 				token.delete!("\n")
@@ -631,21 +666,22 @@ module Reedb
 				@@config[:vaults]["#{uuid}"][:tokens].delete(token)
 				write_config
 			end
-		end
-	end
+		end # self class end
+	end # module vault end
 
 	module Daemon
 		include Reedb
 
 		class << self
+
 			# Request token for a vault permanently.
 			# Only used if @@no_token == false. Unlocks a vault as well
 			# with the user passphrase
 			#
-			# Params: 		'name' of the vault
-			# 				'passphrase' to unlock
+			# @param name [String] Name of the vault
+			# @param passphrase [String] Passphrase of the vault.
 			#
-			# => Returns token for vault
+			# @return token [Base64 String]
 			#
 			def request_token(uuid, passphrase, parmanent = false)
 				# If the vault is not currently open
@@ -669,10 +705,13 @@ module Reedb
 			def access_with_token(uuid, token, passphrase)
 				token.delete!("\n")
 			end
+
 			# Call this function to free a token and remove it from the access
 			# tree. This means that the vault it used to access are not removed or
 			# unloaded for other applications to use. But the token can no longer
 			# be used for file access.
+			#
+			# @param token [String] Token to be freed
 			#
 			def free_token(token)
 				token.delete!("\n")
@@ -686,54 +725,6 @@ module Reedb
 
 				write_config
 			end
-		end #self class end
+		end # self class end
 	end # module Daemon end
 end # Module Reedb end
-
-passphrase = "1234567890123"
-name = "default"
-path = "/home/spacekookie/Desktop"
-
-
-
-# name = "mega2"
-# path = "/home/spacekookie"
-# passphrase = "omg_awesome_sauce"
-
-# Reedb::Core::init({:os=>:linux, :pw_length=>12})
-#token = Reedb::Vault::create_vault(name, path, passphrase, :auto)
-#puts token
-# puts Reedb::generate_token("something", "blob")
-
-# Reedb::Vault::scope_vault(name, path)
-
-# puts Reedb::Vault::available_vaults
-# Reedb::Vault::create_vault(name, path, user_pw)
-
-# available = Reedb::Vault::available_vaults
-# # puts "Available vaults: #{available}\n"
-
-# puts Reedb::Config::Master::dump_config
-# puts ""
-# target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default" }
-
-# puts "Target: #{target}"
-
-# my_token = Reedb::Daemon::request_token(target, passphrase)
-# puts "#{my_token}\n"
-# search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
-
-# headers = Reedb::Vault::access_headers(target, my_token, nil)
-# print "#{headers}\n"
-
-# Reedb::Vault::insert(target, my_token, "Lonely Robot", data1)
-# Reedb::Vault::insert(target, my_token, "Lonely Robot", data2)
-# Reedb::Vault::insert(target, my_token, "Lonely Robot", data3)
-
-# puts Reedb::Vault::access_file(target, my_token, "Lonely Robot", true)
-
-#headers = Reedb::Vault::access_headers(target, my_token)
-#puts "Vault headers: #{headers}\n\n"
-
-# Reedb::Vault::close_vault(target, my_token)
-# Reedb::Core::terminate("aliens")
