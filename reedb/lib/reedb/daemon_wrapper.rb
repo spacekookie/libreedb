@@ -177,7 +177,7 @@ class ReedbHandler < Sinatra::Base
 
 	#  Request a token for a vault
 	post '/vaults/*/request_token' do
-		vault_uuid = params[:splat].first
+		vault_uuid = params[:splat][0]
 
 		unless vault 
 			return build_response(400, 'Missing vault access id.')
@@ -213,7 +213,7 @@ class ReedbHandler < Sinatra::Base
 	end
 
 	post '/vaults/*/free_token' do
-		vault_uuid = params[:splat].first
+		vault_uuid = params[:splat][0]
 
 		unless vault 
 			return build_response(400, 'Missing vault access id.')
@@ -247,28 +247,189 @@ class ReedbHandler < Sinatra::Base
 		return build_response(200, "Token successfully freed")
 	end
 
-	# [AUTH] Request headers for a vault with token/ id
-	post '/vaults/*/headers' do
+	# [AUTH] Close vault with id + token
+	post '/vaults/*/close' do
+		vault_uuid = params[:splat][0]
+
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+		
+		unless token
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		response = Reedb::Vault::close_vault(vault_uuid, token)
+
+		return build_response(401, "Permission denied OR unknown vault!") unless response 
+		return build_response(200, "Vault #{vault_uuid} successfully closed.")
 
 	end
 
-	# [AUTH] Close vault with id + token
-	post '/vaults/*/close' do
+	# [AUTH] Request headers for a vault with token/ id
+	post '/vaults/*/headers' do
+		vault_uuid = params[:splat][0]
 
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+		search = data["search"] if data["search"]
+
+		unless token
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		headers = nil
+		begin
+			headers = Reedb::Vault::access_headers(vault_uuid, token, search)
+		rescue Exception => e
+			return build_response(500, "An errror occured. #{e.message}")
+		end
+
+		return build_response(401, "Permission denied OR unknown vault!") unless headers 
+		return build_response(200, "", headers)
 	end
 
 	# [AUTH] Return body of a file
 	post '/vaults/*/files/*' do
+		vault_uuid = params[:splat][0]
+		file_id = params[:splat][1]
 
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+
+		unless token
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		file = nil
+		begin
+			file = Reedb::Vault::access_file(vault_uuid, file_id, token, false)
+		rescue FileNotFoundError => e
+			return build_response(404, e.message)
+		end
+		return build_response(200, "File read without version history", file)
 	end
 
 	# [AUTH] Return history of a file
 	post '/vaults/*/files/*/history' do
+		vault_uuid = params[:splat][0]
+		file_id = params[:splat][1]
+
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+
+		unless token
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		file = nil
+		begin
+			file = Reedb::Vault::access_file(vault_uuid, file_id, token, true)
+		rescue FileNotFoundError => e
+			return build_response(404, e.message)
+		end
+		return build_response(200, "File read including version history", file)
 
 	end
 
 	# [AUTH] Creates a new file with data
 	put '/vaults/*/files' do
+		vault_uuid = params[:splat][0]
+
+		unless vault 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+		name = data["name"] if data["name"]
+		file_data = data["data"] if data["data"]
+
+		unless token && name && file_data
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		response = nil
+		begin
+			response = Reedb::Vault::insert(vault_uuid, token, name, file_data)
+		rescue
+
+		end
 
 	end
 
