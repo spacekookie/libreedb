@@ -215,6 +215,7 @@ class ReedbHandler < Sinatra::Base
 		rescue WrongUserPasswordError => e
 			return build_response(401, e.message)			
 		end
+
 		return build_response(200, "Access successfully granted for vault", token)
 	end
 
@@ -280,9 +281,22 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
-		response = Reedb::Vault::close_vault(vault_uuid, token)
+		begin
+			Reedb::Vault::close_vault(vault_uuid, token)
+		
+		rescue VaultNotAvailableError => e
+			return build_response(404, e.message)
 
-		return build_response(401, "Permission denied OR unknown vault!") unless response 
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+
+		rescue Exception => e
+			return build_response(500, "An errror occured. #{e.message}")
+		end
+
 		return build_response(200, "Vault #{vault_uuid} successfully closed.")
 
 	end
@@ -332,7 +346,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(500, "An errror occured. #{e.message}")
 		end
 
-		return build_response(200, "", headers)
+		return build_response(200, "Headers for vault #{vault_uuid}", headers)
 	end
 
 	# [AUTH] Return body of a file
@@ -407,7 +421,10 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')	
 		end
 
-		token = data["token"] if data["token"]
+		token = data["token"].delete!("\n") if data["token"]
+
+		puts "#{token}\n"
+		puts "#{Reedb::Config::Master::dump_config}\n"
 
 		unless token
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
@@ -418,9 +435,18 @@ class ReedbHandler < Sinatra::Base
 			file = Reedb::Vault::access_file(vault_uuid, file_id, token, true)
 		rescue FileNotFoundError => e
 			return build_response(404, e.message)
-		end
-		return build_response(200, "File read including version history", file)
 
+		rescue VaultNotAvailableError => e
+			return build_response(404, e.message)
+
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+
+		end
+		return build_response(200, "File read with version history", file)
 	end
 
 	# [AUTH] Creates a new file with data
@@ -452,23 +478,116 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
 		end
 
+		headers = Reedb::Vault::access_headers(vault_uuid, token, nil)
+		unless headers.include?(name)
+			return build_response(400, "File already exists. Use update POST instead.")
+		end
+
 		response = nil
 		begin
 			response = Reedb::Vault::insert(vault_uuid, token, name, file_data)
-		rescue
-
+		rescue VaultNotAvailableError => e
+			return build_response(404, e.message)
+			
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+			
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+			
+		rescue FileBusyError => e
+			return build_response(418, "Dont take this error code too seriously: #{e.message}")
 		end
 
+		return build_response(200, "File successfully created!")
 	end
 
 	# [AUTH] Update file contents
 	post '/vaults/*/files/*' do
+		vault_uuid = params[:splat][0]
+		file_name = params[:splat][1]
 
+		unless vault_uuid 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+		file_data = data["data"] if data["data"]
+
+		unless token && file_data
+			return build_response(400, 'Required data fields are missing from JSON data body!')	
+		end
+
+		begin
+			Reedb::Vault::insert(vault_uuid, token, file_name, file_data)
+
+		rescue VaultNotAvailableError => e
+			return build_response(404, e.message)
+			
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+			
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+			
+		rescue FileBusyError => e
+			return build_response(418, "Dont take this error code too seriously: #{e.message}")
+		end
+
+		return build_response(200, "File successfully updated!")
 	end
 
 	# [AUTH] Removes a file
 	post '/vaults/*/files/*/remove' do
+		vault_uuid = params[:splat][0]
+		file_name = params[:splat][1]
 
+		unless vault_uuid 
+			return build_response(400, 'Missing vault access id.')
+		end
+
+		# If request was garbage
+		unless request.content_type == 'application/json'
+			return build_response(400, 'Data was malformed. Expects JSON!')
+		end
+
+		# Check if the JSON data
+		data = nil
+		begin
+			data = JSON.parse(request.body.read)
+		rescue
+			return build_response(400, 'JSON data was malformed!')	
+		end
+
+		token = data["token"] if data["token"]
+
+		begin
+			Reedb::Vault::remove(vault_uuid, token, file_name)
+			
+		rescue FileNotFoundError, VaultNotAvailableError => e
+			return build_response(404, e.message)
+
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+		end
+
+		return build_response(200, "File successfully deleted.")
 	end
 end
 

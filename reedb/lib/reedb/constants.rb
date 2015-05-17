@@ -13,7 +13,7 @@ module Reedb
 	# The version of reedb. This is actually written into vaults to identify
 	# breaking changes and using an older sub-set of the API to interact with
 	# legacy vaults.
-	VERSION = "0.9.9-RC1"
+	VERSION = "0.10-RC1"
 	NET_PORT = 55736
 	TOKEN_BYTE_SIZE = 16 # in bytes
 	DEF_MASTER_PATH = "__sysmas__" # Placeholder

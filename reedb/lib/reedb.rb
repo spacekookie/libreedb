@@ -579,6 +579,30 @@ module Reedb
 				@@active_vaults["#{uuid}"].update(file_name, data)
 			end
 
+			# Request token for a vault permanently.
+			# Only used if @@no_token == false. Unlocks a vault as well
+			# with the user passphrase
+			#
+			# Params:   'uuid' of the vault
+			#       		'file_name' file identifier to access
+			#
+			# => Returns contents of a file either as it's current
+			#   version or it's edit history
+			#
+			def remove(uuid, token, file_name)
+				token.delete!("\n")
+				raise VaultNotAvailableError.new, "The vault you wish to insert data to is not currently active on this system." unless @@active_vaults["#{uuid}"]
+
+				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+
+				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
+
+				DaemonLogger.write("Writing data to #{uuid}", 'debug')
+
+				@@active_vaults["#{uuid}"].remove_file(file_name)
+			end
+
+
 			# Ends the exchange with a vault. Removes token from active vault record
 			#
 			def close_vault(uuid, token)
@@ -676,7 +700,7 @@ path = "/home/spacekookie/Desktop"
 # path = "/home/spacekookie"
 # passphrase = "omg_awesome_sauce"
 
-Reedb::Core::init({:os=>:linux, :pw_length=>12})
+# Reedb::Core::init({:os=>:linux, :pw_length=>12})
 #token = Reedb::Vault::create_vault(name, path, passphrase, :auto)
 #puts token
 # puts Reedb::generate_token("something", "blob")
@@ -686,23 +710,18 @@ Reedb::Core::init({:os=>:linux, :pw_length=>12})
 # puts Reedb::Vault::available_vaults
 # Reedb::Vault::create_vault(name, path, user_pw)
 
-available = Reedb::Vault::available_vaults
-# puts "Available vaults: #{available}\n"
+# available = Reedb::Vault::available_vaults
+# # puts "Available vaults: #{available}\n"
 
-puts Reedb::Config::Master::dump_config
-puts ""
-target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default" }
+# puts Reedb::Config::Master::dump_config
+# puts ""
+# target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default" }
 
 # puts "Target: #{target}"
 
-my_token = Reedb::Daemon::request_token(target, passphrase)
+# my_token = Reedb::Daemon::request_token(target, passphrase)
 # puts "#{my_token}\n"
 # search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
-puts Reedb::Config::Master::dump_config
-puts ""
-Reedb::Daemon::free_token(my_token)
-puts ""
-puts Reedb::Config::Master::dump_config
 
 # headers = Reedb::Vault::access_headers(target, my_token, nil)
 # print "#{headers}\n"
