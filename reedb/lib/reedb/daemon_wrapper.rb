@@ -50,8 +50,8 @@ class ReedbHandler < Sinatra::Base
 		status status_code # Set http status code
 		content_type 'application/json'
 		response = { 'success' => (status_code >= 400 ? false : true),
-					 'message' => "#{message}",
-					 'payload' => "#{payload}" }
+					 'message' => message,
+					 'payload' => payload }
 		return response.to_json
 	end
 
@@ -357,7 +357,10 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')	
 		end
 
-		token = data["token"] if data["token"]
+		token = data["token"].delete!("\n") if data["token"]
+
+		puts "#{token}\n"
+		puts "#{Reedb::Config::Master::dump_config}\n"
 
 		unless token
 			return build_response(400, 'Required data fields are missing from JSON data body!')	
@@ -368,6 +371,16 @@ class ReedbHandler < Sinatra::Base
 			file = Reedb::Vault::access_file(vault_uuid, file_id, token, false)
 		rescue FileNotFoundError => e
 			return build_response(404, e.message)
+
+		rescue VaultNotAvailableError => e
+			return build_response(404, e.message)
+
+		rescue UnknownTokenError => e
+			return build_response(401, e.message)
+
+		rescue UnautherisedTokenError => e
+			return build_response(403, e.message)
+
 		end
 		return build_response(200, "File read without version history", file)
 	end

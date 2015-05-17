@@ -79,6 +79,7 @@ module Reedb
 			def generate_token(uuid, path)
 				# Concatinates the token together and base64 encodes it
 				token = Base64.encode64("#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{uuid}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{path}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}")
+				token.delete!("\n")
 				@@tokens[token] = [] unless @@tokens.include?(token)
 				@@tokens[token] << uuid
 				update_tracked_vault("#{uuid}", nil, nil, nil, token)
@@ -109,6 +110,7 @@ module Reedb
 			end
 
 			def update_tracked_vault(uuid, name, path, size, token)
+				token.delete!("\n")
 				return nil unless @@config[:vaults].include?(uuid)
 
 				@@config[:vaults]["#{uuid}"][:meta].name = name if name
@@ -124,6 +126,7 @@ module Reedb
 			# Removes a token from a vault config thus removing any access that token had.
 			#
 			def remove_token(uuid, token)
+				token.delete!("\n")
 				return nil unless @@config[:vaults].include?(uuid)
 				return nil unless @@config[:vaults]["#{uuid}"][:tokens].include?(token)
 				
@@ -291,6 +294,10 @@ module Reedb
 			include Reedb
 			class << self
 
+				def dump_config
+					return @@config
+				end
+
 				# Set a global timeout time to all vaults. Determine when a vault will
 				# be unloaded or the daemon will lock itself.
 				# Time provided in seconds
@@ -401,7 +408,7 @@ module Reedb
 				unless @@no_token
 					token = generate_token(uuid, path)
 					track_vault(name, path, 0, uuid)
-					return token
+					return token.delete!("\n")
 				end
 
 				# In case token authentication was disabled
@@ -436,6 +443,7 @@ module Reedb
 			# => Returns boolean describing success
 			#
 			def remove_vault(uuid, passphrase, token)
+				token.delete!("\n")
 				# Returns false if that token isn't authorised
 				return false unless @@tokens[token].include?(uuid)
 
@@ -516,6 +524,7 @@ module Reedb
 			#   according to the search queury
 			#
 			def access_headers(uuid, token, search = nil)
+				token.delete!("\n")
 				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
 				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
@@ -538,6 +547,7 @@ module Reedb
 			#   as it's current version or it's edit history.
 			#
 			def access_file(uuid, token, file_name, history = false)
+				token.delete!("\n")
 				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
 				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
@@ -557,6 +567,7 @@ module Reedb
 			#   version or it's edit history
 			#
 			def insert(uuid, token, file_name, data)
+				token.delete!("\n")
 				raise VaultNotAvailableError.new, "The vault you wish to insert data to is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
 				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
@@ -571,6 +582,7 @@ module Reedb
 			# Ends the exchange with a vault. Removes token from active vault record
 			#
 			def close_vault(uuid, token)
+				token.delete!("\n")
 				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
 				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
@@ -626,10 +638,12 @@ module Reedb
 				token = generate_token(uuid, path)
 				return token
 			end
+
 			# This function should be used by recurring applications that already own
 			# an authentication token for a vault.
 			#
 			def access_with_token(uuid, token, passphrase)
+				token.delete!("\n")
 			end
 			# Call this function to free a token and remove it from the access
 			# tree. This means that the vault it used to access are not removed or
@@ -637,14 +651,24 @@ module Reedb
 			# be used for file access.
 			#
 			def free_token(token)
+				token.delete!("\n")
+
+				# Throw a warning if the token isn't valid in the first place.
+				raise UnknownTokenError.new, "The token you provided is unknown to this system" unless @@tokens.include?(token)
+
+				@@tokens[token].each do |uuid|
+					@@config[:vaults]["#{uuid}"][:tokens].delete(token)
+				end
+
+				write_config
 			end
 		end #self class end
 	end # module Daemon end
 end # Module Reedb end
 
-#user_pw = "1234567890123"
-#name = "default2"
-#path = "/home/spacekookie/Desktop"
+passphrase = "1234567890123"
+name = "default"
+path = "/home/spacekookie/Desktop"
 
 
 
@@ -652,28 +676,35 @@ end # Module Reedb end
 # path = "/home/spacekookie"
 # passphrase = "omg_awesome_sauce"
 
-# Reedb::Core::init({:os=>:linux, :pw_length=>12})
-# token = Reedb::Vault::create_vault(name, path, passphrase, :auto)
-# puts token
+Reedb::Core::init({:os=>:linux, :pw_length=>12})
+#token = Reedb::Vault::create_vault(name, path, passphrase, :auto)
+#puts token
 # puts Reedb::generate_token("something", "blob")
 
-# Reedb::scope_vault(name, path)
+# Reedb::Vault::scope_vault(name, path)
 
 # puts Reedb::Vault::available_vaults
 # Reedb::Vault::create_vault(name, path, user_pw)
 
-# available = Reedb::Vault::available_vaults
+available = Reedb::Vault::available_vaults
 # puts "Available vaults: #{available}\n"
 
-# target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default2" }
+puts Reedb::Config::Master::dump_config
+puts ""
+target = nil ; available.each { |uuid, meta| (target = uuid) if meta[:name] == "default" }
 
 # puts "Target: #{target}"
 
-# my_token = Reedb::Daemon::request_token(target, user_pw)
-
+my_token = Reedb::Daemon::request_token(target, passphrase)
+# puts "#{my_token}\n"
 # search_qeuery = "tags=awsome#urls=www.lonelyrobot.io"
+puts Reedb::Config::Master::dump_config
+puts ""
+Reedb::Daemon::free_token(my_token)
+puts ""
+puts Reedb::Config::Master::dump_config
 
-# headers = Reedb::access_headers(target, my_token, search_qeuery)
+# headers = Reedb::Vault::access_headers(target, my_token, nil)
 # print "#{headers}\n"
 
 # Reedb::Vault::insert(target, my_token, "Lonely Robot", data1)
