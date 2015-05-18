@@ -2,13 +2,3 @@ source 'https://rubygems.org'
 
 # Specify your gem's dependencies in reedb.gemspec
 gemspec
-
-# Security!
-gem 'aes', '>=0.5.0'
-gem 'twofish', '>=1.0.5'
-gem 'digest-tiger', '~> 1.0.2'
-
-# Other stuff that's important
-gem 'json', '~> 1.8.2'
-gem 'daemons', '~> 1.2.2'
-gem 'sinatra', '~> 1.4.6'
