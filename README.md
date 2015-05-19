@@ -6,7 +6,7 @@ Spicy and secure Ruby file-based database.
 ReeDB is a system daemon that brings its own libraries and manages databases (Reevaults) fast and securely.
 Made for native app development, to protect sensitive information that are worth protecting with AES and Twofish.
 
-Proudly powering [Reepass] (and others).
+Proudly powering [Reepass] - (and others).
 
 
 Installation
