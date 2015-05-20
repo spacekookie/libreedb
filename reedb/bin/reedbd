@@ -9,7 +9,6 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
-
 # Very simple wrapper script to start the Reedb daemon.
 require 'reedb/constants'
 
