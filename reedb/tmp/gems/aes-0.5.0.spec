@@ -1,25 +1,24 @@
-# Generated from rack-protection-1.5.3.gem by gem2rpm -*- rpm-spec -*-
-%global gem_name rack-protection
+# Generated from aes-0.5.0.gem by gem2rpm -*- rpm-spec -*-
+%global gem_name aes
 
 Name: rubygem-%{gem_name}
-Version: 1.5.3
+Version: 0.5.0
 Release: 1%{?dist}
-Summary: You should use protection!
+Summary: An AES encrypt/decrypt gem built ontop of OpenSSL.
 Group: Development/Languages
 License: MIT
-URL: http://github.com/rkh/rack-protection
+URL: http://github.com/chicks/aes
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
-# BuildRequires: rubygem(rack-test)
-# BuildRequires: rubygem(rspec) => 2.0
-# BuildRequires: rubygem(rspec) < 3
+# BuildRequires: rubygem(shoulda)
+# BuildRequires: rubygem(jeweler)
+# BuildRequires: rubygem(simplecov)
 BuildArch: noarch
 
 %description
-You should use protection!
-
+An AES encrypt/decrypt gem built ontop of OpenSSL.  Not as quick as FastAES, but it doesn't require building native extensions and supports Base64 encoded input and output.
 
 %package doc
 Summary: Documentation for %{name}
@@ -61,18 +60,21 @@ popd
 
 %files
 %dir %{gem_instdir}
-%{gem_instdir}/License
+%license %{gem_instdir}/LICENSE.txt
+%{gem_instdir}/VERSION
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
 
 %files doc
 %doc %{gem_docdir}
-%doc %{gem_instdir}/README.md
+%doc %{gem_instdir}/.document
+%{gem_instdir}/Gemfile
+%doc %{gem_instdir}/README.rdoc
 %{gem_instdir}/Rakefile
-%{gem_instdir}/rack-protection.gemspec
-%{gem_instdir}/spec
+%{gem_instdir}/aes.gemspec
+%{gem_instdir}/test
 
 %changelog
-* Thu May 21 2015 Katharina Sabel - 1.5.3-1
+* Thu May 21 2015 Katharina 'spacekookie' Sabel <sabel.katharina@gmail.com> - 0.5.0-1
 - Initial package

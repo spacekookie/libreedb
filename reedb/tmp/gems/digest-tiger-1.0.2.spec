@@ -81,5 +81,5 @@ popd
 %{gem_instdir}/test
 
 %changelog
-* Thu May 21 2015 Katharina Sabel - 1.0.2-1
+* Thu May 21 2015 Katharina 'spacekookie' Sabel <sabel.katharina@gmail.com> - 1.0.2-1
 - Initial package

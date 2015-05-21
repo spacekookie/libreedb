@@ -10,11 +10,11 @@ Gem::Specification.new do |spec|
 	spec.authors       = ["Katharina Sabel"]
 	spec.email         = ["sabel.katharina@gmail.com"]
 
-	spec.summary       = %q{Ruby storage containers/ database that uses completely encrpypted files for maximum security.}
+	spec.summary       = %q{Ruby database that uses completely encrpypted files for maximum security}
 
-	spec.description   = %q{Ruby storage containers/ database. Uses Rinjdael, Twofish, ... to keep your data safe. Made for native and local application development. Spawns a system daemon that manages vaults that applications can talk to. Check out the wiki on Github to find out about how to use this API.}
+	spec.description   = %q{Ruby storage containers/ database. Uses Rinjdael, Twofish, ... to keep your data safe. Made for native and local application development. Spawns a system daemon that manages vaults that applications can talk to or provides a powerful interface to interact with vaults from within other ruby applications. Check the wiki for details}
 	
-	spec.homepage      = "https://github.com/tr-lonelyrobot/reedb/wiki"
+	spec.homepage      = "https://github.com/tr-lonelyrobot/reedb/"
 	spec.license       = "LGPL v3.0"
 
 	spec.files         = `git ls-files -z`.split("\x0")

@@ -1,13 +1,13 @@
-# Generated from daemons-1.2.2.gem by gem2rpm -*- rpm-spec -*-
-%global gem_name daemons
+# Generated from twofish-1.0.5.gem by gem2rpm -*- rpm-spec -*-
+%global gem_name twofish
 
 Name: rubygem-%{gem_name}
-Version: 1.2.2
+Version: 1.0.5
 Release: 1%{?dist}
-Summary: A toolkit to create and control daemons in different ways
+Summary: Twofish symmetric cipher in pure Ruby
 Group: Development/Languages
-License: MIT
-URL: https://github.com/thuehlinger/daemons
+License: BSD
+URL: http://mcarpenter.org/projects/twofish
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -15,14 +15,8 @@ BuildRequires: ruby
 BuildArch: noarch
 
 %description
-Daemons provides an easy way to wrap existing ruby scripts (for example a
-self-written server)  to be run as a daemon and to be controlled by simple
-start/stop/restart commands.
-You can also call blocks as daemons and control them from the parent or just
-daemonize the current process.
-Besides this basic functionality, daemons offers many advanced features like
-exception backtracing and logging (in case your ruby script crashes) and
-monitoring and automatic restarting of your processes if they crash.
+Twofish symmetric cipher in pure Ruby with ECB and CBC cipher modes derived
+from an original Perl implementation by Guido Flohr.
 
 
 %package doc
@@ -72,10 +66,10 @@ popd
 
 %files doc
 %doc %{gem_docdir}
-%doc %{gem_instdir}/README.md
-%doc %{gem_instdir}/Releases
-%{gem_instdir}/examples
+%doc %{gem_instdir}/README.rdoc
+%{gem_instdir}/Rakefile
+%{gem_instdir}/test
 
 %changelog
-* Thu May 21 2015 Katharina Sabel - 1.2.2-1
+* Thu May 21 2015 Katharina 'spacekookie' Sabel <sabel.katharina@gmail.com> - 1.0.5-1
 - Initial package

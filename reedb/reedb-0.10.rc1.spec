@@ -1,22 +1,24 @@
-# Generated from tilt-2.0.1.gem by gem2rpm -*- rpm-spec -*-
-%global gem_name tilt
+# Generated from reedb-0.10.rc2.gem by gem2rpm -*- rpm-spec -*-
+%global gem_name reedb
 
 Name: rubygem-%{gem_name}
-Version: 2.0.1
+Version: 0.10.rc1
 Release: 1%{?dist}
-Summary: Generic interface to multiple Ruby template engines
+Summary: Ruby storage containers/ database that uses completely encrpypted files for maximum security
 Group: Development/Languages
-License: MIT
-URL: http://github.com/rtomayko/tilt/
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+License: LGPL v3.0
+URL: https://github.com/tr-lonelyrobot/reedb/wiki
+Source0: %{gem_name}-%{version}.gem
 BuildRequires: ruby(release)
-BuildRequires: rubygems-devel
-BuildRequires: ruby
+BuildRequires: rubygems-devel => 1.3.1
+BuildRequires: ruby => 2.1
 BuildArch: noarch
 
 %description
-Generic interface to multiple Ruby template engines.
-
+Ruby storage containers/ database. Uses Rinjdael, Twofish, ... to keep your
+data safe. Made for native and local application development. Spawns a system
+daemon that manages vaults that applications can talk to. Check out the wiki
+on Github to find out about how to use this API
 
 %package doc
 Summary: Documentation for %{name}
@@ -47,7 +49,6 @@ mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
-
 mkdir -p %{buildroot}%{_bindir}
 cp -pa .%{_bindir}/* \
         %{buildroot}%{_bindir}/
@@ -62,24 +63,24 @@ popd
 
 %files
 %dir %{gem_instdir}
-%{_bindir}/tilt
-%license %{gem_instdir}/COPYING
-%{gem_instdir}/HACKING
+%{_bindir}/reedbd
+%{gem_instdir}/.ruby-gemset
+%{gem_instdir}/.ruby-version
 %{gem_instdir}/bin
 %{gem_libdir}
+%{gem_instdir}/rubygem-reedb-0.10.2-1.noarch.rpm
+%{gem_instdir}/tmp
 %exclude %{gem_cache}
 %{gem_spec}
 
 %files doc
 %doc %{gem_docdir}
-%doc %{gem_instdir}/CHANGELOG.md
 %{gem_instdir}/Gemfile
-%doc %{gem_instdir}/README.md
+%{gem_instdir}/Gemfile.lock
 %{gem_instdir}/Rakefile
-%doc %{gem_instdir}/docs
-%{gem_instdir}/test
-%{gem_instdir}/tilt.gemspec
+%{gem_instdir}/reedb.gemspec
+%{gem_instdir}/tests
 
 %changelog
-* Thu May 21 2015 Katharina Sabel - 2.0.1-1
-- Initial package
+* Thu May 21 2015 Katharina Sabel <sabel.katharina@gmail.com> - 0.10.rc2-1
+- Initial package creation
