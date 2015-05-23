@@ -9,12 +9,14 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
-# Very simple wrapper script to start the Reedb daemon.
+# Only loads the constants section to read the version.
 require 'reedb/constants'
 
-NAME = 'reedbd'
+W_NAME = 'reedbd'
+C_NAME = 'reedb'
 
-if File.basename(__FILE__) == NAME
+# Very simple wrapper script to start the Reedb daemon.
+if File.basename(__FILE__) == W_NAME
 	if ARGV.include? '--version'
 		puts Reedb::VERSION
 		exit
@@ -22,23 +24,23 @@ if File.basename(__FILE__) == NAME
 
 	if ARGV == []
 		puts "[ERROR]: Invalid application arguments!"
-		puts "Usage: reedb [daemon options] -- [reedb options]
+		puts "Usage: reedb (daemon options) [-- reedb options]
 
   Available [reedb options]:
      -l, --pw-length INTEGER     Define minimal passphrase length (Default: 12)
-     -p, --port INTEGER          Change the listener port. May break your setup!
-     -a, --app-path STRING      Change the path for the reedb config files/ logs. (default in ~)
+     -p, --port INTEGER          Change the listener port. May break your setup! (default: #{Reedb::NET_PORT})
+     -a, --app-path STRING      Change the path for the reedb config files/ logs. (default: ~)
      -v, --verbose               Enable verbose logging about the Reedb daemon.
      -d, --no-daemon             Don't run Reedb as a background daemon. Log to STOUT instead of log file.
 
   Available [daemon options]:
-     start                       Start an instance of the #{NAME} daemon
-     stop                        Stop all instances of the #{NAME} daemon
-     restart                     Stop all and restart a new instance of #{NAME} afterwards
-     status                      Show status (PID) of #{NAME} daemon instance
+     start                       Start an instance of the #{C_NAME} daemon
+     stop                        Stop all instances of the #{C_NAME} daemon
+     restart                     Stop all and restart a new instance of #{C_NAME} afterwards
+     status                      Show status (PID) of #{C_NAME} daemon instance
 
   Common options:
-         --version               Show #{NAME} version"
+         --version               Show #{C_NAME} version"
 
 		# Then exits the application
 		exit
@@ -46,16 +48,17 @@ if File.basename(__FILE__) == NAME
 
 	options = {
 		:app_name   => "reedb",
-		:backtrace  => true,
-		# :monitor    => true,
-		# :ontop      => true
+		:backtrace  => true
 	}
 
 	spec = Gem::Specification.find_by_name("reedb")
 	(puts "Error: reedb not installed!" ; exit) unless spec
-	path = (spec.gem_dir) + "/lib/reedb"
+	g_path = (spec.gem_dir) + "/lib/reedb"
 
+	# NOW load the required modules to run. 
 	require 'daemons'
 	require 'reedb'
-	Daemons.run(File.join(path, 'daemon_wrapper.rb'), options)
+
+	# Then actually start the wrapper.
+	Daemons.run(File.join(g_path, 'daemon_wrapper.rb'), options)
 end

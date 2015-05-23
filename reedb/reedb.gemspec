@@ -5,7 +5,7 @@ require_relative 'lib/reedb/constants'
 
 Gem::Specification.new do |spec|
 	spec.name          = "reedb"
-	spec.version       = "0.10.rc1"
+	spec.version       = Reedb::VERSION
 
 	spec.authors       = ["Katharina Sabel"]
 	spec.email         = ["sabel.katharina@gmail.com"]

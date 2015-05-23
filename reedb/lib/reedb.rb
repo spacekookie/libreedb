@@ -46,14 +46,15 @@ module Reedb
 			@@started = false
 
 			# Some more runtime variables
-			@@path = Reedb::DEF_MASTER_PATH
-			@@config_path = Reedb::DEF_MASTER_PATH
+			@@path = Reedb::DEFAULT_PATH
+			@@config_path = Reedb::DEFAULT_PATH
 			@@no_token = false
 			@@verbose = false
 			@@pw_length = -1
 			@@cleanup = true
 			@@daemon = true
 			@@archos = nil
+			@@lock_file = nil
 			
 			# Stores the active vaults
 			@@active_vaults = {}
@@ -210,6 +211,12 @@ module Reedb
 			# @return nil
 			#
 			def init(options)
+				unless options.include?(:os) && options.include?(:pw_length)
+					puts "Missing :os (:linux|:osx) and/or :pw_length fields from options!"
+					return nil
+				end
+
+
 				@@daemon = if options.include?(:daemon) then options[:daemon] else true end
 				@@archos = options[:os]
 				@@pw_length = options[:pw_length]
@@ -221,7 +228,8 @@ module Reedb
 					@@no_token = false
 				end
 				
-				@@path = if options.include?(:path) then options[:path] else "&&HOME&&" end
+				# Now @@path is either a path OR a placeholder.
+				@@path = if options.include?(:path) then options[:path] else Reedb::DEFAULT_PATH end
 
 				# Enable cleanup mode
 				# This means that the config will be cleaned and unused tokens removed
@@ -241,29 +249,56 @@ module Reedb
 				#
 				@@tokens = {} unless @@no_token
 
-				if @@archos == :linux
-					master_path = File.expand_path('~/.config/reedb/')
+				# This is called when the default path applies
+				if @@path == Reedb::DEFAULT_PATH
 
-					# Puts the folder in /etc if running as root
-					master_path = "/etc/reedb" if Utilities::parse_user == 'root'
+					# For good operating systems.
+					if @@archos == :linux
+						master_path = File.expand_path('~/.config/reedb/')
+						master_path = "/etc/reedb" if Utilities::parse_user == 'root'
 
-					log_path = File.expand_path('~/.config/reedb/logs/')
-					@@config_path = File.join("#{master_path}", "master.cfg")
+						log_path = File.expand_path('~/.config/reedb/logs/')
 
-				elsif @@archos == :osx
-					master_path = File.expand_path('~/Library/Application\ Support/reedb/')
-					log_path = File.expand_path('~/Library/Application\ Support/reedb/logs/')
-					@@config_path = File.join("#{master_path}", "master.cfg")
+					# For OSX
+					elsif @@archos == :osx
+						master_path = File.expand_path('~/Library/Application\ Support/reedb/')
+						master_path = "/Library/Application\ Support/reedb" if Utilities::parse_user == 'root'
+
+						log_path = File.expand_path('~/Library/Application\ Support/reedb/logs/')
+				
+					elsif @@archos == :win
+						# Windows crap
+					else
+						puts "Da fuq?"
+					end
+
+					# Sets up the config path
 				else
-					# Windows crap
+					master_path = @@path
+					log_path = File.join("#{master_path}", "logs")
 				end
+				@@config_path = File.join("#{master_path}", "master.cfg")
+				@@lock_file = File.join("#{master_path}", "lock")
 
-				# Changing file permissions. Does this do ANYTHING on windows?
-				FileUtils::mkdir_p("#{log_path}") # 744 (owned by $USER)
+				# Now go create directories if they need to be created.
+				FileUtils::mkdir_p("#{log_path}") unless FileUtils.is_dir("#{log_path}")
 				FileUtils::chmod_R(0744, "#{log_path}")
 				FileUtils::chmod_R(0744, "#{master_path}")
+
+				# Now that pathing has been established, check if there is a lock file.
+				if File.exist?(@@lock_file)
+					puts "[FATAL ERROR] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!"
+					exit 1
+				end
 				
+
+				# Create a lock file
+				File.open(@@lock_file, 'w+') { |f| f.write("Hier koennte Ihre Werbung stehen.") }
+
+				# Start up the logging service.
 				Reedb::DaemonLogger.setup("#{log_path}")
+
+				# Now go and declare this daemon started and log it.
 				@@started = true
 				Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
 
@@ -297,9 +332,10 @@ module Reedb
 
 				# TODO: Close the debounce thread here.
 
-				@@started = false
 				# Closing open vaults here
 				counter = 0 ; @@active_vaults.each { |k, v| v.close; counter += 1 }
+				@@started = false
+				File.delete(@@lock_file)
 				DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
 			end
 		end
@@ -329,6 +365,18 @@ module Reedb
 				# so be careful with this!
 				# 
 				def passphrase_length length
+				end
+
+				# Because Reedb can be operated out of different paths at runtime
+				# (or initiation) this function in the Config::Master interface 
+				# returns the path that this Reedb instance is keeping it's config.
+				#
+				# Because of this, external applications can write their configs into
+				# $(OPERAND_PATH)/apps if they do not bring their own configs directory.
+				#
+				# @return op_path
+				#
+				def get_operation_path
 				end
 
 				# Cleans the config file of broken vaults and config items. This is
