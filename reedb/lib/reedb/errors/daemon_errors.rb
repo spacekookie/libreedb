@@ -12,15 +12,18 @@
 class DaemonError < StandardError
 end
 
+# These are scoping errors
 class VaultAlreadyScopedError < DaemonError
 end
 
 class VaultNotScopedError < DaemonError
 end
 
+# Not knowing a vault
 class VaultNotAvailableError < DaemonError
 end
 
+# Token errors
 class UnknownTokenError < DaemonError
 end
 
@@ -28,7 +31,4 @@ class UnautherisedTokenError < DaemonError
 end
 
 class MissingTokenError < DaemonError
-end
-
-class FunctionNotImplementedError < DaemonError
 end

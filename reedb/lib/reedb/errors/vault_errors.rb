@@ -19,14 +19,8 @@ end
 class VaultWritePermissionsError < VaultError
 end
 
+# I/O error or fucked?
 class VaultMissingConfigurationError < VaultError
-end
-
-class VaultLoggerError < VaultError
-end
-
-# This has been depreciated.
-class BadCacheError < VaultError
 end
 
 class FileNotFoundError < VaultError
@@ -36,4 +30,12 @@ class FileBusyError < VaultError
 end
 
 class MalformedSearchError < VaultError
+end
+
+# This one is VERY hypothetical
+class VaultLoggerError < VaultError
+end
+
+# This has been depreciated.
+class BadCacheError < VaultError
 end

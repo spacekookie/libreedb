@@ -9,6 +9,7 @@
 
 # Internal requirements
 require_relative 'reedb/errors/daemon_errors'
+require_relative 'reedb/errors/reedb_errors'
 
 require_relative 'reedb/utils/meta_vault'
 require_relative 'reedb/utils/utilities'
@@ -267,9 +268,12 @@ module Reedb
 						log_path = File.expand_path('~/Library/Application\ Support/reedb/logs/')
 				
 					elsif @@archos == :win
+						puts "This is currently not supported :( Sorry."
 						# Windows crap
+					elsif @@archos == :other
+						raise UnknownOSError.new, "Operating system was not specified, yet an override path was not specified either. Can not continue without more information!"
 					else
-						puts "Da fuq?"
+						raise UnknownOSError.new, "Could not recognise specified OS. What are you running? Why don't you go here: getfedora.org :)"
 					end
 
 					# Sets up the config path
@@ -776,3 +780,12 @@ module Reedb
 		end # self class end
 	end # module Daemon end
 end # Module Reedb end
+
+# These options should be set when using Reedb as a normal dependency
+# options = {
+# 	:daemon => false, # !!! IMPORTANT !!!
+# 	:archos => :something, # Pick whichever one applies (:linux, :osx, :win, :other)
+# 	:pw_length => 16, # Is mandatory anyways
+# 	:no_token => true, # Important!
+# 	:path => "/some/path/here" # !!! IMPORTANT !!!
+# }
