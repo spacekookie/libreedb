@@ -35,21 +35,21 @@ class UUID
 	private_class_method :new
 
 	class << self
-		def mask19 v, str # :nodoc
-			nstr = str.bytes.to_a
+		def mask19(v, str) # :nodoc
+			new_string = str.bytes.to_a
 			version = [0, 16, 32, 48, 64, 80][v]
-			nstr[6] &= 0b00001111
-			nstr[6] |= version
-#			nstr[7] &= 0b00001111
-#			nstr[7] |= 0b01010000
-			nstr[8] &= 0b00111111
-			nstr[8] |= 0b10000000
+			new_string[6] &= 0b00001111
+			new_string[6] |= version
+#			new_string[7] &= 0b00001111
+#			new_string[7] |= 0b01010000
+			new_string[8] &= 0b00111111
+			new_string[8] |= 0b10000000
 			str = ''
-			nstr.each { |s| str << s.chr }
+			new_string.each { |s| str << s.chr }
 			str
 		end
 
-		def mask18 v, str # :nodoc
+		def mask18(v, str) # :nodoc
 			version = [0, 16, 32, 48, 64, 80][v]
 			str[6] &= 0b00001111
 			str[6] |= version
@@ -60,8 +60,8 @@ class UUID
 			str
 		end
 
-		def mask v, str
-			if RUBY_VERSION >= "1.9.0"
+		def mask(v, str)
+			if RUBY_VERSION >= '1.9.0'
 				return mask19 v, str
 			else
 				return mask18 v, str
@@ -71,7 +71,7 @@ class UUID
 
 		# UUID generation using SHA1. Recommended over create_md5.
 		# Namespace object is another UUID, some of them are pre-defined below.
-		def create_sha1 str, namespace
+		def create_sha1(str, namespace)
 			sha1 = Digest::SHA1.new
 			sha1.update namespace.raw_bytes
 			sha1.update str
@@ -84,7 +84,7 @@ class UUID
 		alias :create_v5 :create_sha1
 
 		# UUID generation using MD5 (for backward compat.)
-		def create_md5 str, namespace
+		def create_md5(str, namespace)
 			md5 = Digest::MD5.new
 			md5.update namespace.raw_bytes
 			md5.update str
@@ -134,7 +134,7 @@ class UUID
 		# invokation. If you want to speed  this up, try remounting tmpdir with a
 		# memory based filesystem  (such as tmpfs).  STILL slow?  then no way but
 		# rewrite it with c :)
-		def create clock=nil, time=nil, mac_addr=nil
+		def create(clock=nil, time=nil, mac_addr=nil)
 			c = t = m = nil
 			Dir.chdir Dir.tmpdir do
 				unless FileTest.exist? STATE_FILE then
@@ -144,17 +144,17 @@ class UUID
 					# see Section 4.5 of RFC4122 for details.
 					sha1 = Digest::SHA1.new
 					256.times do
-						r = [rand(0x100000000)].pack "N"
+						r = [rand(0x100000000)].pack 'N'
 						sha1.update r
 					end
 					str = sha1.digest
 					r = rand 14 # 20-6
 					node = str[r, 6] || str
-					if RUBY_VERSION >= "1.9.0"
-						nnode = node.bytes.to_a
-						nnode[0] |= 0x01
+					if RUBY_VERSION >= '1.9.0'
+						n_node = node.bytes.to_a
+						n_node[0] |= 0x01
 						node = ''
-						nnode.each { |s| node << s.chr }
+						n_node.each { |s| node << s.chr }
 					else
 						node[0] |= 0x01 # multicast bit
 					end
@@ -162,7 +162,7 @@ class UUID
 					open STATE_FILE, 'w' do |fp|
 						fp.flock IO::LOCK_EX
 						write_state fp, k, node
-						fp.chmod 0o777 # must be world writable
+						fp.chmod(777) # must be world writable
 					end
 				end
 				open STATE_FILE, 'r+' do |fp|
@@ -197,7 +197,7 @@ class UUID
 
 		# A  simple GUID  parser:  just ignores  unknown  characters and  convert
 		# hexadecimal dump into 16-octet object.
-		def parse obj
+		def parse(obj)
 			str = obj.to_s.sub %r/\Aurn:uuid:/, ''
 			str.gsub! %r/[^0-9A-Fa-f]/, ''
 			raw = str[0..31].lines.to_a.pack 'H*'
@@ -208,8 +208,8 @@ class UUID
 
 		# The 'primitive constructor' of this class
 		# Note UUID.pack(uuid.unpack) == uuid
-		def pack tl, tm, th, ch, cl, n
-			raw = [tl, tm, th, ch, cl, n].pack "NnnCCa6"
+		def pack(tl, tm, th, ch, cl, n)
+			raw = [tl, tm, th, ch, cl, n].pack 'NnnCCa6'
 			ret = new raw
 			ret.freeze
 			ret
@@ -219,7 +219,7 @@ class UUID
 	# The 'primitive deconstructor', or the dual to pack.
 	# Note UUID.pack(uuid.unpack) == uuid
 	def unpack
-		raw_bytes.unpack "NnnCCa6"
+		raw_bytes.unpack 'NnnCCa6'
 	end
 
 	# Generate the string representation (a.k.a GUID) of this UUID
@@ -227,20 +227,20 @@ class UUID
 		a = unpack
 		tmp = a[-1].unpack 'C*'
 		a[-1] = sprintf '%02x%02x%02x%02x%02x%02x', *tmp
-		"%08x-%04x-%04x-%02x%02x-%s" % a
+		return ('%08x-%04x-%04x-%02x%02x-%s' % a)
 	end
 	alias guid to_s
 
-	# Convert into a RFC4122-comforming URN representation
+	# Convert into a RFC4122-conforming URN representation
 	def to_uri
-		"urn:uuid:" + self.to_s
+		return ('urn:uuid:' + self.to_s)
 	end
 	alias urn to_uri
 
 	# Convert into 128-bit unsigned integer
 	# Typically a Bignum instance, but can be a Fixnum.
 	def to_int
-		tmp = self.raw_bytes.unpack "C*"
+		tmp = self.raw_bytes.unpack 'C*'
 		tmp.inject do |r, i|
 			r * 256 | i
 		end
@@ -257,119 +257,24 @@ class UUID
 	end
 
 	# Two  UUIDs  are  said  to  be  equal if  and  only  if  their  (byte-order
-	# canonicalized) integer representations are equivallent.  Refer RFC4122 for
+	# canonicalized) integer representations are equivalent.  Refer RFC4122 for
 	# details.
-	def == other
+	def == (other)
 		to_i == other.to_i
 	end
 
 	include Comparable
 	# UUIDs are comparable (don't know what benefits are there, though).
-	def <=> other
+	def <=> (other)
 		to_s <=> other.to_s
 	end
 
 	# Pre-defined UUID Namespaces described in RFC4122 Appendix C.
-	NameSpace_DNS = parse "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-	NameSpace_URL = parse "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
-	NameSpace_OID = parse "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
-	NameSpace_X500 = parse "6ba7b814-9dad-11d1-80b4-00c04fd430c8"
+	NameSpace_DNS = parse '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+	NameSpace_URL = parse '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+	NameSpace_OID = parse '6ba7b812-9dad-11d1-80b4-00c04fd430c8'
+	NameSpace_X500 = parse '6ba7b814-9dad-11d1-80b4-00c04fd430c8'
 
 	# The Nil UUID in RFC4122 Section 4.1.7
-	Nil = parse "00000000-0000-0000-0000-000000000000"
-end
-
-__END__
-
-if __FILE__ == $0 then
-	require 'test/unit'
-
-	class TC_UUID < Test::Unit::TestCase
-		def test_v1
-			u1 = UUID.create
-			u2 = UUID.create
-			assert_not_equal u1, u2
-		end
-
-		def test_v1_repeatability
-			u1 = UUID.create 1, 2, "345678"
-			u2 = UUID.create 1, 2, "345678"
-			assert_equal u1, u2
-		end
-
-		def test_v3
-			u1 = UUID.create_md5 "foo", UUID::NameSpace_DNS
-			u2 = UUID.create_md5 "foo", UUID::NameSpace_DNS
-			u3 = UUID.create_md5 "foo", UUID::NameSpace_URL
-			assert_equal u1, u2
-			assert_not_equal u1, u3
-		end
-
-		def test_v5
-			u1 = UUID.create_sha1 "foo", UUID::NameSpace_DNS
-			u2 = UUID.create_sha1 "foo", UUID::NameSpace_DNS
-			u3 = UUID.create_sha1 "foo", UUID::NameSpace_URL
-			assert_equal u1, u2
-			assert_not_equal u1, u3
-		end
-
-		def test_v4
-			# This test  is not  perfect, because the  random nature of  version 4
-			# UUID  it is  not always  true that  the three  objects  below really
-			# differ.  But  in real  life it's  enough to say  we're OK  when this
-			# passes.
-			u1 = UUID.create_random
-			u2 = UUID.create_random
-			u3 = UUID.create_random
-			assert_not_equal u1.raw_bytes, u2.raw_bytes
-			assert_not_equal u1.raw_bytes, u3.raw_bytes
-			assert_not_equal u2.raw_bytes, u3.raw_bytes
-		end
-
-		def test_pack
-			u1 = UUID.pack 0x6ba7b810, 0x9dad, 0x11d1, 0x80, 0xb4,
-			               "\000\300O\3240\310"
-			assert_equal UUID::NameSpace_DNS, u1
-		end
-
-		def test_unpack
-			tl, tm, th, cl, ch, m = UUID::NameSpace_DNS.unpack
-			assert_equal 0x6ba7b810, tl
-			assert_equal 0x9dad, tm
-			assert_equal 0x11d1, th
-			assert_equal 0x80, cl
-			assert_equal 0xb4, ch
-			assert_equal "\000\300O\3240\310", m
-		end
-
-		def test_parse
-			u1 = UUID.pack 0x6ba7b810, 0x9dad, 0x11d1, 0x80, 0xb4,
-			               "\000\300O\3240\310"
-			u2 = UUID.parse "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-			u3 = UUID.parse "urn:uuid:6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-			assert_equal u1, u2
-			assert_equal u1, u3
-		end
-
-		def test_to_s
-			u1 = UUID.parse "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-			assert_equal "6ba7b810-9dad-11d1-80b4-00c04fd430c8", u1.to_s
-		end
-
-		def test_to_i
-			u1 = UUID.parse "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-			assert_equal 0x6ba7b8109dad11d180b400c04fd430c8, u1.to_i
-		end
-
-		def test_version
-			u1 = UUID.create_v1
-			assert_equal 1, u1.version
-			u3 = UUID.create_v3 "foo", UUID::NameSpace_DNS
-			assert_equal 3, u3.version
-			u4 = UUID.create_v4
-			assert_equal 4, u4.version
-			u5 = UUID.create_v5 "foo", UUID::NameSpace_DNS
-			assert_equal 5, u5.version
-		end
-	end
+	Nil = parse '00000000-0000-0000-0000-000000000000'
 end

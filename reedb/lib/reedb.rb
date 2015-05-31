@@ -1,11 +1,17 @@
 # ====================================================
 # Copyright 2015 Lonely Robot (see @author)
-# @author: Katharina Sabel | www.2rsoftworks.de
+# @author: Katharina Sabel | www.lonelyrobot.io
 #
 # Distributed under the GNU Lesser GPL Version 3
 # (See accompanying LICENSE file or get a copy at
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
+
+'''
+This is the core file for the Reedb module. It consists of
+multiple sub-modules that handle different operations of the
+Reedb daemon/ toolkit (when developing with it as a Gem depenency.
+'''
 
 # Internal requirements
 require_relative 'reedb/errors/daemon_errors'
@@ -24,22 +30,6 @@ require_relative 'reedb/reevault'
 require 'securerandom'
 
 module Reedb
-	class << self
-		# Returns the platform/ architecture of the daemon and vault handler
-
-		def archos() (return @@archos) end
-
-		# Returns whether or not this is a daemon
-		def daemon?() (return @@daemon) end
-
-		# Returns the minimum passphrase length is
-		def passlength() (return @@pw_length) end
-
-		# Returns whether verbose mode is enabled
-		def verbose?() (return @@verbose) end			
-	end
-
-
 	def self.included(api)
 		class << api
 
@@ -56,7 +46,7 @@ module Reedb
 			@@daemon = true
 			@@archos = nil
 			@@lock_file = nil
-			
+
 			# Stores the active vaults
 			@@active_vaults = {}
 
@@ -78,7 +68,7 @@ module Reedb
 			#
 			# => Base64 encoded token
 			#
-			def generate_token(uuid, path)
+			def generate_token(uuid, path, permanent)
 				# Concatinates the token together and base64 encodes it
 				token = Base64.encode64("#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{uuid}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{path}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}")
 				token.delete!("\n")
@@ -107,7 +97,7 @@ module Reedb
 				write_config
 			end
 
-			def untrack_vault uuid
+			def untrack_vault(uuid)
 				@@config[:vaults]["#{uuid}"] = nil if @@config[:vaults].include?(uuid)
 			end
 
@@ -131,7 +121,7 @@ module Reedb
 				token.delete!("\n")
 				return nil unless @@config[:vaults].include?(uuid)
 				return nil unless @@config[:vaults]["#{uuid}"][:tokens].include?(token)
-				
+
 				@@config[:vaults]["#{uuid}"][:tokens].delete(token)
 				write_config
 			end
@@ -159,11 +149,11 @@ module Reedb
 
 				# At this point @@config has been loaded
 				vault_count = @@config[:vaults].size
-				DaemonLogger.write("Found #{vault_count} vault(s) on the system.", "debug")
+				DaemonLogger.write("Found #{vault_count} vault(s) on the system.", 'debug')
 			end
 
 			# Check vault integreties here!
-			# Will try every vault in the config and remove the ones that are no longer 
+			# Will try every vault in the config and remove the ones that are no longer
 			# available to avoid errors and access corruptions
 			#
 			def check_vault_integreties
@@ -179,7 +169,9 @@ module Reedb
 					# puts "Removing: #{uuid}"
 					DaemonLogger.write("Removing corrupted vault #{uuid}", 'warn')
 					@@config[:vaults].delete(uuid)
-				end
+        end
+
+        # Now save the mess you've made.
 				write_config
 			end
 
@@ -190,10 +182,24 @@ module Reedb
 			end
 
 			def read_config
-				data = File.open(@@config_path, "rb").read()
+				data = File.open(@@config_path, 'rb').read
 				@@config = Marshal.load(data)
 			end
-		end
+		end # Implicit required file, not inspected
+	end
+
+	class << self
+     # Returns the platform/ architecture of the daemon and vault handler
+    @@archos = nil ; def archos; return @@archos end
+
+    # Returns the minimum passphrase length is
+    @@pw_length = -1 ; def passlength; return @@pw_length	end
+
+    # Returns whether verbose mode is enabled
+    @@verbose = false ; def verbose?; return @@archos	end
+
+    # Returns whether Reedb is running as a daemon
+    @@daemon = true ; def daemon?; return @@archos end
 	end
 
 	# Core submodule of the Interface stack
@@ -213,31 +219,31 @@ module Reedb
 			#
 			def init(options)
 				unless options.include?(:os) && options.include?(:pw_length)
-					puts "Missing :os (:linux|:osx) and/or :pw_length fields from options!"
+					puts 'Missing :os (:linux|:osx) and/or :pw_length fields from options!'
 					return nil
 				end
 
-
-				@@daemon = if options.include?(:daemon) then options[:daemon] else true end
+				@@daemon = options.include?(:daemon) ? options[:daemon] : true
 				@@archos = options[:os]
 				@@pw_length = options[:pw_length]
-				@@verbose = if options.include?(:verbose) then options[:verbose] else false end
-				@@no_token = if options.include?(:no_token) then options[:no_token] else false end
+				@@verbose = options.include?(:verbose) ? options[:verbose] : false
+				@@no_token = options.include?(:no_token) ? options[:no_token] : false
+        override = options.include?(:override) ? options[:override] : false
 
 				if @@no_token
-					puts "NO_TOKEN mode has not been implemented yet! Please just use token authentication mode."
+          puts 'NO_TOKEN mode has not been implemented yet! Defaulting to token mode.'
 					@@no_token = false
 				end
 				
 				# Now @@path is either a path OR a placeholder.
-				@@path = if options.include?(:path) then options[:path] else Reedb::DEFAULT_PATH end
+				@@path = options.include?(:path) ? options[:path] : Reedb::DEFAULT_PATH
 
 				# Enable cleanup mode
 				# This means that the config will be cleaned and unused tokens removed
 				# instead of leaving them in the file and configurations.
 				# It is recommended to use cleanup mode.
 				#
-				@@cleanup = if options.include?(:cleanup) then options[:cleanup] else true end
+				@@cleanup = options.include?(:cleanup) ? options[:cleanup] : true
 
 				# Set of vaults that map a VaultBuffer to the vault itself.
 				# Never exposed outside the API
@@ -250,61 +256,63 @@ module Reedb
 				#
 				@@tokens = {} unless @@no_token
 
+
+
 				# This is called when the default path applies
 				if @@path == Reedb::DEFAULT_PATH
 
 					# For good operating systems.
 					if @@archos == :linux
 						master_path = File.expand_path('~/.config/reedb/')
-						master_path = "/etc/reedb" if Utilities::parse_user == 'root'
+						master_path = '/etc/reedb' if Utilities::parse_user == 'root'
 
 						log_path = File.expand_path('~/.config/reedb/logs/')
 
 					# For OSX
 					elsif @@archos == :osx
 						master_path = File.expand_path('~/Library/Application\ Support/reedb/')
-						master_path = "/Library/Application\ Support/reedb" if Utilities::parse_user == 'root'
+						master_path = '/Library/Application\ Support/reedb' if Utilities::parse_user == 'root'
 
 						log_path = File.expand_path('~/Library/Application\ Support/reedb/logs/')
 				
 					elsif @@archos == :win
-						puts "This is currently not supported :( Sorry."
+						puts 'This is currently not supported :( Sorry.'
 						# Windows crap
-					elsif @@archos == :other
-						raise UnknownOSError.new, "Operating system was not specified, yet an override path was not specified either. Can not continue without more information!"
-					else
-						raise UnknownOSError.new, "Could not recognise specified OS. What are you running? Why don't you go here: getfedora.org :)"
+          elsif @@archos == :other
+						raise UnknownOSError.new, 'Operating system was not specified, yet an override path was not specified either. Can not continue without more information!'
+          else
+						raise UnknownOSError.new, "Could not recognise specified OS. What are you running? Why don't you go here:
+ getfedora.org :)"
 					end
-
-					# Sets up the config path
-				else
-					master_path = @@path
-					log_path = File.join("#{master_path}", "logs")
+        else
+          master_path = @@path
+					log_path = File.join("#{master_path}", 'logs')
 				end
-				@@config_path = File.join("#{master_path}", "master.cfg")
-				@@lock_file = File.join("#{master_path}", "lock")
+
+        # Sets up the config path
+				@@config_path = File.join("#{master_path}", 'master.cfg')
+				@@lock_file = File.join("#{master_path}", 'lock')
 
 				# Now go create directories if they need to be created.
-				FileUtils::mkdir_p("#{log_path}") unless FileUtils.is_dir("#{log_path}")
+				FileUtils::mkdir_p("#{log_path}") unless File.directory?("#{log_path}")
 				FileUtils::chmod_R(0744, "#{log_path}")
 				FileUtils::chmod_R(0744, "#{master_path}")
 
 				# Now that pathing has been established, check if there is a lock file.
-				if File.exist?(@@lock_file)
-					puts "[FATAL ERROR] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!"
+				if File.exist?(@@lock_file) && !override
+					puts '[FATAL ERROR] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!'
 					exit 1
 				end
-				
 
 				# Create a lock file
-				File.open(@@lock_file, 'w+') { |f| f.write("Hier koennte Ihre Werbung stehen.") }
+				File.open(@@lock_file, 'w') { |f| f.write('Hier koennte Ihre Werbung stehen.') }
 
 				# Start up the logging service.
 				Reedb::DaemonLogger.setup("#{log_path}")
 
 				# Now go and declare this daemon started and log it.
 				@@started = true
-				Reedb::DaemonLogger.write("Reedb was started successfully. Reading vault information now...", 'debug')
+				Reedb::DaemonLogger.write('Reedb was started successfully. Reading vault information now...', 'debug')
 
 				# Now cache the config
 				cache_config
@@ -323,21 +331,21 @@ module Reedb
 			# @return nil
 			#
 			def terminate(reason = nil)
-				puts "Must start process first" unless @@started
+				puts 'Must start process first' unless @@started
 
-				new_reason = "unknown reason"
-				new_reason = "a user request" if reason == "user"
-				new_reason = "a system request" if reason == "root"
+				new_reason = 'unknown reason'
+				new_reason = 'a user request' if reason == 'user'
+        new_reason = 'a system request' if reason == 'root'
 
 				# My first easter-egg. Yay! :)
-				new_reason = "the illuminati" if reason == "aliens"
+				new_reason = 'the illuminati' if reason == 'aliens'
 
 				DaemonLogger.write("[TERMINATION]: Scheduling termination because of #{new_reason}.")
 
 				# TODO: Close the debounce thread here.
 
 				# Closing open vaults here
-				counter = 0 ; @@active_vaults.each { |k, v| v.close; counter += 1 }
+				counter = 0 ; @@active_vaults.each { |_, v| v.close; counter += 1 }
 				@@started = false
 				File.delete(@@lock_file)
 				DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
@@ -355,20 +363,23 @@ module Reedb
 				# be unloaded or the daemon will lock itself.
 				# Time provided in seconds
 				#
-				def global_timeout dt
+				def global_timeout(dt)
+          dt << ''
 				end
 
 				# Set the log state of the daemon. That determines what error calls will
 				# be logged and what will be ommited.
 				#
-				def logging_state state
+				def logging_state(state)
+          state << ''
 				end
 
 				# Define a minimal passphrase length for vaults to have. This can
 				# break access to vaults if they were created on a different system
 				# so be careful with this!
 				# 
-				def passphrase_length length
+				def passphrase_length(length)
+          length << ''
 				end
 
 				# Because Reedb can be operated out of different paths at runtime
@@ -395,13 +406,18 @@ module Reedb
 		module Vault
 			include Reedb
 			class << self
-				def set_vault_timeout dt
+				def set_vault_timeout(dt)
+          dt << ''
 				end
 
 				def add_header_field(field, type)
+          field << ''
+          type << field
 				end
 
 				def change_passphrase(old_phrase, new_phrase)
+          old_phrase << ''
+          new_phrase << '\n'
 				end
 
 				def read_config
@@ -489,7 +505,10 @@ module Reedb
 			# returns a confirmation that vault access was granted.
 			#
 			def access_vault(uuid, passphrase)
-				raise FunctionNotImplementedError.new, "This has not been implemented yet! Use token authentication via the DAEMON module."
+        raise MissingTokenError.new, 'Reedb is running in token mode. Please specify a token via the DAEMON module
+access handler' unless @@no_token
+
+				raise FunctionNotImplementedError.new, 'This has not been implemented yet! Use token authentication via the DAEMON module.'
 				return false
 			end
 
@@ -531,7 +550,7 @@ module Reedb
 			#
 			def scope_vault(name, path)
 				# Checks if that specific vault was already scoped
-				@@config[:vaults].each do |key, value|
+				@@config[:vaults].each do |_, value|
 					if value[:meta].name == "#{name}" && value[:meta].path == "#{path}"
 						DaemonLogger.write("Vault already scoped at #{path}", 'info')
 						raise VaultAlreadyScopedError.new, "Vault #{name} already scoped!"
@@ -592,12 +611,10 @@ module Reedb
 			#
 			def access_headers(uuid, token, search = nil)
 				token.delete!("\n")
-				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
-				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
-
-				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
-
+				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
+				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				return @@active_vaults["#{uuid}"].list_headers(search)
 			end
@@ -617,11 +634,11 @@ module Reedb
 			#
 			def access_file(uuid, token, file_name, history = false)
 				token.delete!("\n")
-				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
-				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+        raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+        raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
+        raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
 				return @@active_vaults["#{uuid}"].read_file(file_name, history)
 			end
 
@@ -645,13 +662,12 @@ module Reedb
 			#
 			def insert(uuid, token, file_name, data)
 				token.delete!("\n")
-				raise VaultNotAvailableError.new, "The vault you wish to insert data to is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
-				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+        raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+        raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
+        raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
-
-				DaemonLogger.write("Writing data to #{uuid}", 'debug')
+        DaemonLogger.write("Writing data to #{uuid}", 'debug')
 
 				@@active_vaults["#{uuid}"].update(file_name, data)
 				return nil
@@ -669,13 +685,12 @@ module Reedb
 			#
 			def remove(uuid, token, file_name)
 				token.delete!("\n")
-				raise VaultNotAvailableError.new, "The vault you wish to insert data to is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
-				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+        raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+        raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
+        raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
-
-				DaemonLogger.write("Writing data to #{uuid}", 'debug')
+        DaemonLogger.write("Writing data to #{uuid}", 'debug')
 
 				@@active_vaults["#{uuid}"].remove_file(file_name)
 				return nil
@@ -694,13 +709,12 @@ module Reedb
 			#
 			def close_vault(uuid, token)
 				token.delete!("\n")
-				raise VaultNotAvailableError.new, "The vault you have requested data from is not currently active on this system." unless @@active_vaults["#{uuid}"]
 
-				raise UnknownTokenError.new, "The token you provided is unknown to this system. Access denied!" unless @@tokens[token]
+        raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+        raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
+        raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				raise UnautherisedTokenError.new, "The token you provided currently has no access to the desired vault. Access denied!" unless @@tokens[token].include?(uuid)
-
-				DaemonLogger.write("Closing vault with #{uuid}.", "debug")
+        DaemonLogger.write("Closing vault with #{uuid}.", "debug")
 
 				# Close the vault
 				@@active_vaults["#{uuid}"].close
@@ -714,7 +728,6 @@ module Reedb
 				@@tokens.delete(token)
 
 				# Removes token from config
-				# TODO: FIX ME?!
 				@@config[:vaults]["#{uuid}"][:tokens].delete(token)
 				write_config
 			end
@@ -730,24 +743,26 @@ module Reedb
 			# Only used if @@no_token == false. Unlocks a vault as well
 			# with the user passphrase
 			#
-			# @param name [String] Name of the vault
+			# @param uuid [String] Internal UUID of the vault
 			# @param passphrase [String] Passphrase of the vault.
+      # @param permanent [Boolean] Indicates whether or not the app intends to come back
 			#
 			# @return token [Base64 String]
 			#
-			def request_token(uuid, passphrase, parmanent = false)
+			def request_token(uuid, passphrase, permanent = false)
 				# If the vault is not currently open
 				unless @@active_vaults.include?(uuid)
 					unless @@config[:vaults][uuid]
-						DaemonLogger.write("The requested vault is unknown to this system. Aborting operation!", 'error')
+						DaemonLogger.write('The requested vault is unknown to this system. Aborting operation!', 'error')
 						raise VaultNotScopedError.new, "Requested vault #{uuid} is unknown to reedb. Has it been scoped before?"
-					end
+          end
+
 					# Continue
 					name = @@config[:vaults][uuid][:meta].name
 					path = @@config[:vaults][uuid][:meta].path
 					@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load(passphrase)
 				end
-				token = generate_token(uuid, path)
+				token = generate_token(uuid, path, permanent)
 				return token
 			end
 
@@ -755,7 +770,8 @@ module Reedb
 			# an authentication token for a vault.
 			#
 			def access_with_token(uuid, token, passphrase)
-				token.delete!("\n")
+				token.delete!('\n')
+				raise UnknownTokenError.new, 'Unknown Token!' unless @@config['tokens']["#{uuid}"]
 			end
 
 			# Call this function to free a token and remove it from the access
@@ -769,7 +785,7 @@ module Reedb
 				token.delete!("\n")
 
 				# Throw a warning if the token isn't valid in the first place.
-				raise UnknownTokenError.new, "The token you provided is unknown to this system" unless @@tokens.include?(token)
+				raise UnknownTokenError.new, 'The token you provided is unknown to this system' unless @@tokens.include?(token)
 
 				@@tokens[token].each do |uuid|
 					@@config[:vaults]["#{uuid}"][:tokens].delete(token)
@@ -782,10 +798,15 @@ module Reedb
 end # Module Reedb end
 
 # These options should be set when using Reedb as a normal dependency
-# options = {
-# 	:daemon => false, # !!! IMPORTANT !!!
-# 	:archos => :something, # Pick whichever one applies (:linux, :osx, :win, :other)
-# 	:pw_length => 16, # Is mandatory anyways
-# 	:no_token => true, # Important!
-# 	:path => "/some/path/here" # !!! IMPORTANT !!!
-# }
+options = {
+ 	:daemon => false, # !!! IMPORTANT !!!
+ 	:os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
+ 	:pw_length => 16, # Is mandatory anyways
+ 	# :no_token => true, # Important!
+  # :path => "/some/path/here" # !!! IMPORTANT !!!
+ }
+
+puts 'Yay, this is awesome too.'
+
+Reedb::Core::init(options)
+Reedb::Core::terminate('user')
