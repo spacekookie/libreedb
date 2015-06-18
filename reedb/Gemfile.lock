@@ -36,6 +36,3 @@ DEPENDENCIES
   rake (~> 10.0)
   reedb!
   yard (~> 0.8)
-
-BUNDLED WITH
-   1.10.2
