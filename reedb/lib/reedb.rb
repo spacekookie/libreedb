@@ -355,7 +355,7 @@ module Reedb
 				' ''
 
 				# Open debounce object
-				@@debouncer = Reedb::Debouncer.new(self, @@active_vaults)
+				@@debouncer = Reedb::Debouncer.new(self)
 
 				# Now actually run the code on two threads and hope that the scheduler does it's job!
 				@@debouncer = new Thread { @@debouncer.main }
