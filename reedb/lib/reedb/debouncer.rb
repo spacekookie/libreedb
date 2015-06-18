@@ -16,6 +16,8 @@ on a specified vault which makes it "debounce" back to the start of the counter.
 module Reedb
 	class Debouncer
 
+		attr_accessor :running
+
 		#
 		# @param core [Object] the owning container instance to
 		#               register the debounce close of a vault
@@ -25,7 +27,17 @@ module Reedb
 		#
 		def initialize(core, vault_list)
 			@reedb = core
+			@running = true
 			update_vaults(vault_list)
+		end
+
+		# The main loop to run in a thread
+		def main
+			last = Time.new
+			while @running
+
+				sleep(Reedb::DEBOUNCE_DELTA)
+			end
 		end
 
 		# Updates the vault instances every time the vault set changes. Only changes values

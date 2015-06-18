@@ -18,5 +18,9 @@ module Reedb
 	TOKEN_BYTE_SIZE = 16 # in bytes
 	DEFAULT_PATH = '__sysmas__' # Placeholder
 	FILE_CACHE_TIME = 2500 # Time in ms
+
+	# Debounce constants
+	DEBOUNCE_DELTA = 5
 	KEY_CACHE_TIME = (15 * 60) * 1000 # (30 minutes in ms)
+	THREAD_TIMEOUT_TIME = Reedb::DEBOUNCE_DELTA * 1.25
 end

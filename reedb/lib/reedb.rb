@@ -26,8 +26,8 @@ require_relative 'reedb/utils/uuids'
 
 # Internals
 require_relative 'reedb/constants'
-require_relative 'reedb/reevault'
 require_relative 'reedb/debouncer'
+require_relative 'reedb/reevault'
 
 
 # System requirements
@@ -242,10 +242,16 @@ module Reedb
 			#
 			# @return nil
 			#
-			def init(options, &user_function)
+			def init(options, &user_code)
 				unless options.include?(:os) && options.include?(:pw_length)
 					puts 'Missing :os (:linux|:osx) and/or :pw_length fields from options!'
-					return nil
+					exit Reedb::EXIT_OS_PARSE
+				end
+
+				# Checks if user code was provided and exits the entire application if not provided!
+				if user_code == nil && options.include?(:daemon) && options[:daemon] == false
+					puts 'No user function was provided to run! Reedb must run in daemon mode to do that!'
+					exit Reedb::EXIT_MISSING_USER_CODE
 				end
 
 				@@daemon = options.include?(:daemon) ? options[:daemon] : true
@@ -343,19 +349,22 @@ module Reedb
 				# Now cache the config
 				cache_config
 
-				# The bottom part initiates the main run look that bounces between debouncer thread and user code.
-				# This function only returns after all the user code was handled.
+				'' '
+				The bottom part initiates the main run look that bounces between debouncer thread and user code.
+				This function only returns after all the user code was handled.
+				' ''
 
-				# Open debounce tread and mirror current vault information onto it.
-
+				# Open debounce object
+				@@debouncer = Reedb::Debouncer.new(self, @@active_vaults)
 
 				# Now actually run the code on two threads and hope that the scheduler does it's job!
-				@@debouncer = new Thread {}
-				user = new Thread { &user_function }
+				@@debouncer = new Thread { @@debouncer.main }
+				user = new Thread(&user_code)
 				user.join
 
 				Reedb::Core::terminate('null') if @@started
-				@run_debouncer = false
+				@@debouncer.running = false
+				sleep(Reedb::THREAD_TIMEOUT_TIME)
 				@@debouncer.join
 			end
 
