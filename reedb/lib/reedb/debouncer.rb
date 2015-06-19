@@ -39,6 +39,10 @@ module Reedb
 			@token_set = {}
 		end
 
+		def set_custom_timeout(time)
+			@time = time
+		end
+
 		# The main loop to run in a thread
 		def main
 			last = Time.new
@@ -51,11 +55,11 @@ module Reedb
 
 					# Make sure that the vault set is current
 					if data == VINS
-						@vaults[uuid] = Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = @time | Reedb::KEY_CACHE_TIME
 					elsif data == VREM
 						@vaults.delete(uuid)
 					elsif data == DRES
-						@vaults[uuid] = Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = @time | Reedb::KEY_CACHE_TIME
 					end
 				end
 
@@ -64,8 +68,11 @@ module Reedb
 
 				# Now actually iterate through the vaults and subtract delta time
 				@vaults.each do |uuid, _|
+
+					# Subtract real delta time from timeset
 					@vaults[uuid] -= r_delta
 
+					# Then go through and check what needs to be closed
 					if @vaults[uuid] <= 0
 						Reedb::Vault::close_vault(uuid, @token_set[uuid])
 						@vaults.delete(uuid)

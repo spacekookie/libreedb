@@ -360,9 +360,12 @@ module Reedb
 				# Now actually run the code on two threads and hope that the scheduler does it's job!
 				@@debouncer = new Thread { @@debouncer.main }
 				user = new Thread(&user_code)
+
+				# Wait for user code to terminate
 				user.join
 
-				Reedb::Core::terminate('null') if @@started
+				# Then call terminate just in case they haven't yet
+				Reedb::Core::terminate('null', true) if @@started
 				@@debouncer.running = false
 				sleep(Reedb::THREAD_TIMEOUT_TIME)
 				@@debouncer.join
@@ -377,8 +380,8 @@ module Reedb
 			#
 			# @return nil
 			#
-			def terminate(reason = nil)
-				puts 'Must start process first' unless @@started
+			def terminate(reason = nil, silent = false)
+				(puts 'Must start process first'; return) if !@@started && !silent
 
 				new_reason = 'unknown reason'
 				new_reason = 'a user request' if reason == 'user'
@@ -388,8 +391,6 @@ module Reedb
 				new_reason = 'the illuminati' if reason == 'aliens'
 
 				DaemonLogger.write("[TERMINATION]: Scheduling termination because of #{new_reason}.")
-
-				# TODO: Close the debounce thread here.
 
 				# Closing open vaults here
 				counter = 0; @@active_vaults.each { |_, v| v.close; counter += 1 }
@@ -411,7 +412,7 @@ module Reedb
 				# Time provided in seconds
 				#
 				def global_timeout(dt)
-					dt << ''
+					Reedb::debouncer.set_custom_timeout(dt)
 				end
 
 				# Set the log state of the daemon. That determines what error calls will
@@ -536,6 +537,7 @@ module Reedb
 				unless @@no_token
 					token = generate_token(uuid, path)
 					track_vault(name, path, 0, uuid)
+					Reedb::debouncer.add_vault(uuid, token)
 					return token.delete!("\n")
 				end
 
@@ -845,10 +847,12 @@ access handler' unless @@no_token
 end # Module Reedb end
 
 # These options should be set when using Reedb as a normal dependency
-# options = {
-#  	:daemon => false, # !!! IMPORTANT !!!
-#  	:os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
-#  	:pw_length => 16, # Is mandatory anyways
-#  	# :no_token => true, # Important!
-#   # :path => "/some/path/here" # !!! IMPORTANT !!!
-#  }
+options = {
+ 	:daemon => false, # !!! IMPORTANT !!!
+ 	:os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
+ 	:pw_length => 16, # Is mandatory anyways
+ 	# :no_token => true, # Important!
+  # :path => "/some/path/here" # !!! IMPORTANT !!!
+ }
+
+Reedb::Core::init(options) {  }
