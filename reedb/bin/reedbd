@@ -9,8 +9,37 @@
 # 	https://www.gnu.org/licenses/lgpl.html)
 # ====================================================
 
+#  Checks the ruby version for ruby 2.1! This is the only supported version so far and if you run as something else
+# then guess what: I ain't gonna care when it breaks, bitch! :)
+# (Okay, that was unneccesarily ghetto. Sorry.)
+#
+rv = RUBY_VERSION
+unless rv[0..-3] == '2.1'
+	puts 'You are running Reedb with an unsupported Ruby version! Officially only 2.1.* is supported!'
+	puts 'Do you want to take the risk and run Reedb anyways? [y/N] '
+	a = gets.chomp.to_s.upcase
+	if a == 'N' || a == ''
+		exit(0x8)
+	else
+		puts "Don't complain..."
+		sleep(0.25)
+		puts ''
+	end
+end
+
 # Only loads the constants section to read the version.
-require 'reedb/constants'
+spec = nil
+begin
+	spec = Gem::Specification.find_by_name('reedb')
+	require 'reedb/constants'
+rescue Gem::LoadError => e
+	begin
+		require_relative '../lib/reedb/constants'
+	rescue
+		puts 'Error: reedb not installed!'
+		exit(0x21)
+	end
+end
 
 W_NAME = 'reedbd'
 C_NAME = 'reedb'
@@ -19,7 +48,7 @@ C_NAME = 'reedb'
 if File.basename(__FILE__) == W_NAME
 	if ARGV.include? '--version'
 		puts Reedb::VERSION
-		exit
+		exit(0)
 	end
 
 	if ARGV == []
@@ -47,17 +76,23 @@ if File.basename(__FILE__) == W_NAME
 	end
 
 	options = {
-		:app_name   => 'reedb',
-		:backtrace  => true
+		 :app_name => 'reedb',
+		 :backtrace => true
 	}
 
-	spec = Gem::Specification.find_by_name('reedb')
-	(puts 'Error: reedb not installed!' ; exit) unless spec
-	g_path = (spec.gem_dir) + '/lib/reedb'
+	unless spec
+		puts "Reedb isn't properly installed on your system!
+Please make sure Gems can load it before trying to run this daemon again!
+Exit code: #{0x9}"
 
-	# NOW load the required modules to run. 
-	require 'daemons'
+		exit(0x9)
+	end
+
+	g_path = (spec.gem_dir) + '/lib/reedb'
 	require 'reedb'
+
+	# NOW load the required modules to run.
+	require 'daemons'
 
 	# Then actually start the wrapper.
 	Daemons.run(File.join(g_path, 'daemon_wrapper.rb'), options)

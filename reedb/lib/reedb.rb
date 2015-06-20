@@ -851,19 +851,19 @@ access handler' unless @@no_token
 	end # module Daemon end
 end # Module Reedb end
 
-# These options should be set when using Reedb as a normal dependency
-options = {
-	 :daemon => false, # !!! IMPORTANT !!!
-	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
-	 :pw_length => 16, # Is mandatory anyways
-	 # :no_token => true, # Important!
-	 # :path => "/some/path/here" # !!! IMPORTANT !!!
-}
-
-def my_code
-	puts 'This is my code'
-	sleep(Reedb::DEBOUNCE_DELTA * 3)
-	puts 'Ending'
-end
-
-Reedb::Core::init(options) { my_code }
+# # These options should be set when using Reedb as a normal dependency
+# options = {
+# 	 :daemon => false, # !!! IMPORTANT !!!
+# 	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
+# 	 :pw_length => 16, # Is mandatory anyways
+# 	 # :no_token => true, # Important!
+# 	 # :path => "/some/path/here" # !!! IMPORTANT !!!
+# }
+#
+# def my_code
+# 	puts 'This is my code'
+# 	sleep(Reedb::DEBOUNCE_DELTA * 3)
+# 	puts 'Ending'
+# end
+#
+# Reedb::Core::init(options) { my_code }
