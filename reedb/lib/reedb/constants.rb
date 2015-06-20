@@ -1,6 +1,6 @@
 # ====================================================
 # Copyright 2015 Lonely Robot (see @author)
-# @author: Katharina Sabel | www.2rsoftworks.de
+# @author: Katharina Sabel | www.lonelyrobot.io
 #
 # Distributed under the GNU Lesser GPL Version 3
 # (See accompanying LICENSE file or get a copy at
@@ -20,8 +20,8 @@ module Reedb
 	FILE_CACHE_TIME = 2500 # Time in ms
 
 	# Debounce constants
-	DEBOUNCE_DELTA = 5
-	KEY_CACHE_TIME = (30 * 60) * 1000 # (30 minutes in ms)
+	DEBOUNCE_DELTA = 1
+	KEY_CACHE_TIME = (15 * 60) # (15 minutes in seconds)
 	THREAD_TIMEOUT_TIME = DEBOUNCE_DELTA * 1.0125
 
 	# Debouncer markers

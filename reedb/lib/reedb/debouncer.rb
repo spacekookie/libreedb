@@ -37,10 +37,11 @@ module Reedb
 			@delta_vaults = {}
 			@vaults = {}
 			@token_set = {}
+			@timeout = Reedb::KEY_CACHE_TIME
 		end
 
 		def set_custom_timeout(time)
-			@time = time
+			@timeout = time
 		end
 
 		# The main loop to run in a thread
@@ -55,11 +56,11 @@ module Reedb
 
 					# Make sure that the vault set is current
 					if data == VINS
-						@vaults[uuid] = Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = @timeout
 					elsif data == VREM
 						@vaults.delete(uuid)
 					elsif data == DRES
-						@vaults[uuid] = Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = @timeout
 					end
 				end
 
@@ -77,7 +78,7 @@ module Reedb
 						Reedb::Vault::close_vault(uuid, @token_set[uuid])
 					end
 				end
-
+				
 				last = tmp # Update last time and then sleep
 				sleep(Reedb::DEBOUNCE_DELTA)
 			end

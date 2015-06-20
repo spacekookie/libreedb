@@ -108,8 +108,6 @@ module Reedb
 				token = Base64.encode64("#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{uuid}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{path}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}")
 				token.delete!("\n")
 
-				puts "Create new token: #{token}"
-
 				@@tokens[token] = [] unless @@tokens.include?(token)
 				@@tokens[token] << uuid
 
@@ -430,16 +428,12 @@ module Reedb
 				# Then join it and be done with it
 				@@debouncerThread.join
 
-				puts @@config
-
 				# Closing open vaults here
 				counter = 0
 
 				# Iterate over active vaults
 				@@active_vaults.each do |uuid, vault|
 					vault.close
-
-					puts "For vault #{uuid} => #{@@config[:vaults][uuid][:tokens]}"
 
 					# Iterate over the token list and remove them until all are gone
 					# TODO: Search for a more Ruby-esk way to do this.
@@ -838,7 +832,7 @@ access handler' unless @@no_token
 				DaemonLogger.write("Closing vault with #{uuid}.", "debug")
 
 				# Remove the vault from the debouncer
-				Reedb::debouncer.remove_vault(uuid)
+				@@debouncer.remove_vault(uuid)
 
 				# Close the vault
 				@@active_vaults[uuid].close
@@ -916,8 +910,6 @@ access handler' unless @@no_token
 			def free_token(token, batch = false)
 				token.delete!("\n")
 
-				puts "Freeing token #{token}"
-
 				# Throw a warning if the token isn't valid in the first place.
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system' unless @@tokens.include?(token)
 
@@ -944,14 +936,12 @@ options = {
 def test_script
 	userpw = 'peterpanistderheld'
 
-	# Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw); return
-
+	Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
 	all = Reedb::Vault::available_vaults
 	tuuid = nil
 	all.each { |uuid, data| tuuid = uuid if data[:name] == 'default' && data[:path] == '/home/spacekookie/Desktop' }
 
 	token = Reedb::Daemon::request_token(tuuid, userpw)
-	puts "My token: #{token}"
 
 	data = {
 		 'body' => {
@@ -964,7 +954,9 @@ def test_script
 		 }
 	}
 
-	Reedb::Vault::insert(tuuid, token, 'Lonely Robot', data)
+	sleep(15)
+
+	# Reedb::Vault::insert(tuuid, token, 'Lonely Robot', data)
 end
 
 # Running Reedb with custom user code
