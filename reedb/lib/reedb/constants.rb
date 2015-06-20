@@ -13,7 +13,7 @@ module Reedb
 	# The version of reedb. This is actually written into vaults to identify
 	# breaking changes and using an older sub-set of the API to interact with
 	# legacy vaults.
-	VERSION = '0.10.6'
+	VERSION = '0.10.7'
 	NET_PORT = 55736
 	TOKEN_BYTE_SIZE = 48 # in bytes
 	DEFAULT_PATH = '__sysmas__' # Placeholder
@@ -22,5 +22,5 @@ module Reedb
 	# Debounce constants
 	DEBOUNCE_DELTA = 5
 	KEY_CACHE_TIME = (30 * 60) * 1000 # (30 minutes in ms)
-	THREAD_TIMEOUT_TIME = Reedb::DEBOUNCE_DELTA * 1.25
+	THREAD_TIMEOUT_TIME = DEBOUNCE_DELTA * 1.0125
 end

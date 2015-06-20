@@ -600,18 +600,21 @@ options[:daemon] = true
 options[:port] = Reedb::NET_PORT
 options[:os] = Reedb::Utilities::parse_os
 options[:path] = Reedb::DEF_MASTER_PATH
+options[:dave] = false
 
 #create parsers
 opts = OptionParser.new
 opts.on('-l', '--pw-length INTEGER') { |o| options[:pw_length] = o }
 opts.on('-p', '--port INTEGER') { |o| options[:port] = o }
 opts.on('-v', '--verbose') { options[:verbose] = true }
+opts.on('--dave') { options[:dave] = true }
 opts.on('-d', '--no-daemon') { options[:daemon] = false }
 opts.on('-a', '--app-path STRING') { |o| options[:path] = o }
 opts.parse! unless ARGV == []
 
 # This creates the Reedb module and binds it to a variable to be interacted with in the future
-Reedb::Core::init({:os => options[:os], :pw_length => options[:pw_length], 
-	:daemon => options[:daemon], :verbose => options[:verbose], :path => options[:path]})
+# Gives more information to the core classes than they need
+Reedb::Core::init(options)
+
 # Next up we start the HTTP server and that's that. We're up and running :)
-Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => options[:port], :BindAddress => "localhost"})
+Rack::Handler::WEBrick.run(ReedbHandler.new, {:Port => options[:port], :BindAddress => 'localhost'})

@@ -23,7 +23,7 @@ if File.basename(__FILE__) == W_NAME
 	end
 
 	if ARGV == []
-		puts "[ERROR]: Invalid application arguments!"
+		puts '[ERROR]: Invalid application arguments!'
 		puts "Usage: reedb (daemon options) [-- reedb options]
 
   Available [reedb options]:
@@ -47,13 +47,13 @@ if File.basename(__FILE__) == W_NAME
 	end
 
 	options = {
-		:app_name   => "reedb",
+		:app_name   => 'reedb',
 		:backtrace  => true
 	}
 
-	spec = Gem::Specification.find_by_name("reedb")
-	(puts "Error: reedb not installed!" ; exit) unless spec
-	g_path = (spec.gem_dir) + "/lib/reedb"
+	spec = Gem::Specification.find_by_name('reedb')
+	(puts 'Error: reedb not installed!' ; exit) unless spec
+	g_path = (spec.gem_dir) + '/lib/reedb'
 
 	# NOW load the required modules to run. 
 	require 'daemons'

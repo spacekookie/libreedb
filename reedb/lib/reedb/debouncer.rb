@@ -8,7 +8,7 @@
 # ====================================================
 
 '' '
-THis file contains the debounce handler for the daemon.
+This file contains the debounce handler for the daemon.
 That means that it is handed vault information and woken up every time there is an action
 on a specified vault which makes it "debounce" back to the start of the counter.
 ' ''
@@ -48,7 +48,9 @@ module Reedb
 			last = Time.new
 			while @running
 				# Update the delta time
-				tmp = Time.new; r_delta = tmp - last;
+				tmp = Time.new; r_delta = tmp - last
+
+				puts r_delta
 
 				# Work through the delta_vaults file to check what info needs to change
 				@delta_vaults.each do |uuid, data|
@@ -72,7 +74,7 @@ module Reedb
 					# Subtract real delta time from timeset
 					@vaults[uuid] -= r_delta
 
-					# Then go through and check what needs to be closed
+					# Then check if that vault needs to be closed
 					if @vaults[uuid] <= 0
 						Reedb::Vault::close_vault(uuid, @token_set[uuid])
 						@vaults.delete(uuid)
@@ -82,6 +84,7 @@ module Reedb
 				last = tmp # Update last time and then sleep
 				sleep(Reedb::DEBOUNCE_DELTA)
 			end
+			# puts 'I can feel my mind going, Dave'
 		end
 
 		# Updates the vault instances every time the vault set changes. Only changes values
@@ -91,9 +94,9 @@ module Reedb
 		# @param [String] token as a Base64 encoded string
 		#
 		def add_vault(uuid, token)
-			if @vaults.contains(uuid)
-
-			else
+			unless @vaults.contains(uuid)
+				@delta_vaults[uuid] = VINS
+				@token_set[uuid] = token
 			end
 		end
 

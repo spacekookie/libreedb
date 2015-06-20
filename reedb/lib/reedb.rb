@@ -249,7 +249,7 @@ module Reedb
 				end
 
 				# Checks if user code was provided and exits the entire application if not provided!
-				if user_code == nil && options.include?(:daemon) && options[:daemon] == false
+				if user_code == nil && !options[:daemon]
 					puts 'No user function was provided to run! Reedb must run in daemon mode to do that!'
 					exit Reedb::EXIT_MISSING_USER_CODE
 				end
@@ -310,11 +310,11 @@ module Reedb
 						# Windows crap
 					elsif @@archos == :other
 						raise UnknownOSError.new, 'Operating system was not specified, yet an override path was not specified either. Can not continue without more information!'
-						exit(2) #TODO: Create exit status codes
+						exit(Reedb::EXIT_OS_PARSE)
 					else
 						raise UnknownOSError.new, "Could not recognise specified OS. What are you running? Why don't you go here:
  getfedora.org :)"
-						exit(2) # Status 2: OS Parse Error
+						exit(Reedb::EXIT_OS_PARSE)
 					end
 				else
 					master_path = @@path
@@ -332,12 +332,12 @@ module Reedb
 
 				# Now that pathing has been established, check if there is a lock file.
 				if File.exist?(@@lock_file) && !override
-					puts '[FATAL ERROR] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!'
-					exit(1)
+					puts '[FATAL] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!'
+					exit(Reedb::EXIT_STILL_LOCKED)
 				end
 
 				# Create a lock file
-				File.open(@@lock_file, 'w') { |f| f.write('Hier koennte Ihre Werbung stehen.') }
+				File.open(@@lock_file, 'w+') { |f| f.write('Hier koennte Ihre Werbung stehen.') }
 
 				# Start up the logging service.
 				Reedb::DaemonLogger.setup("#{log_path}")
@@ -358,17 +358,21 @@ module Reedb
 				@@debouncer = Reedb::Debouncer.new(self)
 
 				# Now actually run the code on two threads and hope that the scheduler does it's job!
-				@@debouncer = new Thread { @@debouncer.main }
-				user = new Thread(&user_code)
+				dthread = Thread.new { @@debouncer.main }
+				user = Thread.new(&user_code)
 
 				# Wait for user code to terminate
 				user.join
 
 				# Then call terminate just in case they haven't yet
-				Reedb::Core::terminate('null', true) if @@started
+				Reedb::Core::terminate('null', true)
+
+				# Let the debouncer thread time out
 				@@debouncer.running = false
 				sleep(Reedb::THREAD_TIMEOUT_TIME)
-				@@debouncer.join
+
+				# Then join it and be done with it
+				dthread.join
 			end
 
 			# Terminate Reedb with a reason. After calling this function the
@@ -381,7 +385,8 @@ module Reedb
 			# @return nil
 			#
 			def terminate(reason = nil, silent = false)
-				(puts 'Must start process first'; return) if !@@started && !silent
+				puts 'Must start process first' if !@@started && !silent
+				return unless @@started
 
 				new_reason = 'unknown reason'
 				new_reason = 'a user request' if reason == 'user'
@@ -395,7 +400,7 @@ module Reedb
 				# Closing open vaults here
 				counter = 0; @@active_vaults.each { |_, v| v.close; counter += 1 }
 				@@started = false
-				File.delete(@@lock_file)
+				File.delete(@@lock_file) if File.exist?(@@lock_file)
 				DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
 			end
 		end
@@ -809,7 +814,7 @@ access handler' unless @@no_token
 					# Continue
 					name = @@config[:vaults][uuid][:meta].name
 					path = @@config[:vaults][uuid][:meta].path
-					@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load(passphrase)
+					@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load("#{passphrase}")
 				end
 				token = generate_token(uuid, path, permanent)
 				return token
@@ -848,11 +853,17 @@ end # Module Reedb end
 
 # These options should be set when using Reedb as a normal dependency
 options = {
- 	:daemon => false, # !!! IMPORTANT !!!
- 	:os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
- 	:pw_length => 16, # Is mandatory anyways
- 	# :no_token => true, # Important!
-  # :path => "/some/path/here" # !!! IMPORTANT !!!
- }
+	 :daemon => false, # !!! IMPORTANT !!!
+	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
+	 :pw_length => 16, # Is mandatory anyways
+	 # :no_token => true, # Important!
+	 # :path => "/some/path/here" # !!! IMPORTANT !!!
+}
 
-Reedb::Core::init(options) {  }
+def my_code
+	puts 'This is my code'
+	sleep(Reedb::DEBOUNCE_DELTA * 3)
+	puts 'Ending'
+end
+
+Reedb::Core::init(options) { my_code }
