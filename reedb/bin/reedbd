@@ -61,6 +61,7 @@ if File.basename(__FILE__) == W_NAME
      -a, --app-path STRING      Change the path for the reedb config files/ logs. (default: ~)
      -v, --verbose               Enable verbose logging about the Reedb daemon.
      -d, --no-daemon             Don't run Reedb as a background daemon. Log to STOUT instead of log file.
+		 -f, --force               Force Reedb to start a new instance in case an old one was locked. (Dangerous!)
 
   Available [daemon options]:
      start                       Start an instance of the #{C_NAME} daemon

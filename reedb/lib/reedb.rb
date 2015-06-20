@@ -201,6 +201,12 @@ module Reedb
 			@@debouncer
 		end
 
+		@@debounceThread = nil
+		# @return [Object] Debouncer THREAD! to handle updates on vaults
+		def debounceThread;
+			@@debounceThread
+		end
+
 		@@archos = nil
 		# @return [String] the platform/ architecture of the daemon and vault handler
 		def archos;
@@ -259,7 +265,7 @@ module Reedb
 				@@pw_length = options[:pw_length]
 				@@verbose = options.include?(:verbose) ? options[:verbose] : false
 				@@no_token = options.include?(:no_token) ? options[:no_token] : false
-				override = options.include?(:override) ? options[:override] : false
+				override = options.include?(:force) ? options[:force] : false
 
 				if @@no_token
 					puts 'NO_TOKEN mode has not been implemented yet! Defaulting to token mode.'
@@ -334,6 +340,8 @@ module Reedb
 				if File.exist?(@@lock_file) && !override
 					puts '[FATAL] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!'
 					exit(Reedb::EXIT_STILL_LOCKED)
+				elsif File.exist?(@@lock_file) && override
+					puts "There was another instance of Reedb running but you forced my hands. It's dead now..."
 				end
 
 				# Create a lock file
@@ -358,7 +366,7 @@ module Reedb
 				@@debouncer = Reedb::Debouncer.new(self)
 
 				# Now actually run the code on two threads and hope that the scheduler does it's job!
-				dthread = Thread.new { @@debouncer.main }
+				@@debouncerThread = Thread.new { @@debouncer.main }
 				user = Thread.new(&user_code)
 
 				# Wait for user code to terminate
@@ -366,13 +374,6 @@ module Reedb
 
 				# Then call terminate just in case they haven't yet
 				Reedb::Core::terminate('null', true)
-
-				# Let the debouncer thread time out
-				@@debouncer.running = false
-				sleep(Reedb::THREAD_TIMEOUT_TIME)
-
-				# Then join it and be done with it
-				dthread.join
 			end
 
 			# Terminate Reedb with a reason. After calling this function the
@@ -395,13 +396,23 @@ module Reedb
 				# My first easter-egg. Yay! :)
 				new_reason = 'the illuminati' if reason == 'aliens'
 
-				DaemonLogger.write("[TERMINATION]: Scheduling termination because of #{new_reason}.")
+				DaemonLogger.write("[TERM]: Scheduling termination because of #{new_reason}.")
+
+				# Let the debouncer thread time out
+				@@debouncer.running = false
+				sleep(Reedb::THREAD_TIMEOUT_TIME)
+
+				# Then join it and be done with it
+				@@debouncerThread.join
 
 				# Closing open vaults here
 				counter = 0; @@active_vaults.each { |_, v| v.close; counter += 1 }
+
+				# Then declare Reedb terminated and remove the lock file
 				@@started = false
 				File.delete(@@lock_file) if File.exist?(@@lock_file)
-				DaemonLogger.write("[TERMINATION]: Closed #{counter} vaults. Done!")
+				DaemonLogger.write("[TERM]: Closed #{counter} vaults. Done!")
+				return 0
 			end
 		end
 	end # module core end.

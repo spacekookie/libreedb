@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    reedb (0.10.rc2)
+    reedb (0.10.7)
       aes (~> 0.5)
       daemons (~> 1.2)
       digest-tiger (~> 1.0)

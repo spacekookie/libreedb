@@ -50,8 +50,6 @@ module Reedb
 				# Update the delta time
 				tmp = Time.new; r_delta = tmp - last
 
-				puts r_delta
-
 				# Work through the delta_vaults file to check what info needs to change
 				@delta_vaults.each do |uuid, data|
 
