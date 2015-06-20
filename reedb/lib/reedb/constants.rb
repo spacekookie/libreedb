@@ -23,4 +23,8 @@ module Reedb
 	DEBOUNCE_DELTA = 5
 	KEY_CACHE_TIME = (30 * 60) * 1000 # (30 minutes in ms)
 	THREAD_TIMEOUT_TIME = DEBOUNCE_DELTA * 1.0125
+
+	# Debouncer markers
+	DEB_ADD = :add
+	DEB_REM = :remove
 end

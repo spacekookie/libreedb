@@ -63,6 +63,34 @@ module Reedb
 			# PRIVATE FUNCTIONS BELOW
 			private
 
+			@@debouncer = nil
+			# @return [Object] Debouncer class to handle updates on vaults
+			def debouncer;
+				@@debouncer
+			end
+
+			@@debounce_thread = nil
+			# @return [Object] Debouncer THREAD! to handle updates on vaults
+			def debounce_thread;
+				@@debounce_thread
+			end
+
+			# Method that gets called whenever a change to the currently active vault set occurs.
+			# It will give change information to the debounce handler that then updates it's secondary vault set
+			# for debouncing.
+			# This can UNDER NO CIRCUMSTANCES (!) ever be called from an outside source!
+			#
+			# @param [String] uuid of the vault
+			# @param [String] token for the vault
+			# @param [Enum] marker to describe what to do
+			#
+			# @return nil
+			#
+			def mirror_debounce(uuid, token, marker)
+				return Reedb::debouncer.add_vault(uuid, token) if marker == Reedb::DEB_ADD
+				return Reedb::debouncer.remove_vault(uuid) if marker == Reedb::DEB_REM
+			end
+
 			# Generates an authentication token for vault access.
 			# The function also adds the token, bound to the vault name, to the
 			# @@tokens set.
@@ -194,18 +222,6 @@ module Reedb
 
 	class << self
 		# Returns
-
-		@@debouncer = nil
-		# @return [Object] Debouncer class to handle updates on vaults
-		def debouncer;
-			@@debouncer
-		end
-
-		@@debounceThread = nil
-		# @return [Object] Debouncer THREAD! to handle updates on vaults
-		def debounceThread;
-			@@debounceThread
-		end
 
 		@@archos = nil
 		# @return [String] the platform/ architecture of the daemon and vault handler
@@ -364,6 +380,7 @@ module Reedb
 
 				# Open debounce object
 				@@debouncer = Reedb::Debouncer.new(self)
+
 
 				# Now actually run the code on two threads and hope that the scheduler does it's job!
 				@@debouncerThread = Thread.new { @@debouncer.main }
@@ -552,8 +569,12 @@ module Reedb
 				# Generates a token
 				unless @@no_token
 					token = generate_token(uuid, path)
+
+					debouncer_token = generate_token(uuid, path)
+					check = Reedb::mirror_debounce(uuid, debouncer_token, Reedb::DEB_ADD)
+					Reedb::remove_token(uuid, debouncer_token) unless check
+
 					track_vault(name, path, 0, uuid)
-					Reedb::debouncer.add_vault(uuid, token)
 					return token.delete!("\n")
 				end
 
@@ -575,6 +596,11 @@ access handler' unless @@no_token
 
 				raise FunctionNotImplementedError.new, 'This has not been implemented yet! Use token authentication via the DAEMON module.'
 				return false
+
+				# debouncer_token = generate_token(uuid, path)
+				# check = Reedb::mirror_debounce(uuid, debouncer_token, Reedb::DEB_ADD)
+				# Reedb::remove_token(uuid, debouncer_token) unless check
+
 			end
 
 			# Removes a vault from the file system. This requires special privileges
@@ -654,7 +680,7 @@ access handler' unless @@no_token
 			def unscope_vault(uuid)
 				unless @@config[:vaults]["#{uuid}"]
 					raise VaultNotScopedError.new, "Vault #{name} not scoped!"
-					return nilp
+					return nil
 				end
 
 				path = @@config[:vaults]["#{uuid}"][:path]
@@ -681,6 +707,8 @@ access handler' unless @@no_token
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
+				Reedb::debouncer.debounce_vault(uuid)
+
 				return @@active_vaults["#{uuid}"].list_headers(search)
 			end
 
@@ -703,6 +731,8 @@ access handler' unless @@no_token
 				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
+
+				Reedb::debouncer.debounce_vault(uuid)
 
 				return @@active_vaults["#{uuid}"].read_file(file_name, history)
 			end
@@ -733,6 +763,7 @@ access handler' unless @@no_token
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
+				Reedb::debouncer.debounce_vault(uuid)
 
 				@@active_vaults["#{uuid}"].update(file_name, data)
 				return nil
@@ -756,6 +787,7 @@ access handler' unless @@no_token
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
+				Reedb::debouncer.debounce_vault(uuid)
 
 				@@active_vaults["#{uuid}"].remove_file(file_name)
 				return nil
@@ -780,6 +812,9 @@ access handler' unless @@no_token
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Closing vault with #{uuid}.", "debug")
+
+				# Remove the vault from the debouncer
+				Reedb::debouncer.remove_vault(uuid)
 
 				# Close the vault
 				@@active_vaults["#{uuid}"].close

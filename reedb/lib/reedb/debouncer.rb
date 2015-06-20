@@ -75,7 +75,6 @@ module Reedb
 					# Then check if that vault needs to be closed
 					if @vaults[uuid] <= 0
 						Reedb::Vault::close_vault(uuid, @token_set[uuid])
-						@vaults.delete(uuid)
 					end
 				end
 
@@ -91,16 +90,35 @@ module Reedb
 		# @param [String] uuid of a vault for identification
 		# @param [String] token as a Base64 encoded string
 		#
+		# @return Boolean to indicate whether there was already a token for this vault
+		#
 		def add_vault(uuid, token)
-			unless @vaults.contains(uuid)
+			if @vaults.contains(uuid)
+				return false
+			else
 				@delta_vaults[uuid] = VINS
 				@token_set[uuid] = token
+				return true
 			end
+		end
+
+		def remove_vault(uuid)
+			@delta_vaults[uuid] = VREM
+			@token_set.delete(uuid)
 		end
 
 		# This is called every time an action is performed on a vault.
 		def debounce_vault(vault_id)
 			@delta_vaults[vault_id] = DRES
+		end
+
+		# Some utility and helper functions to plug into the Reedb main interface
+		def knows_vault(uuid)
+			return @vaults.contains(uuid)
+		end
+
+		def get_token(uuid)
+			return @token_set[uuid]
 		end
 
 	end

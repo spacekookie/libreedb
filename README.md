@@ -12,15 +12,13 @@ Proudly powering [Reepass] - (and others).
 Installation
 ------------
 
-ReeDB is a system daemon that developers can talk to via a JSON powered RESTful API. This interface allows access management, remote vault management and easy integration into projects of different languages. As long as the ReeDB daemon is installed on the system your application can use secure vaults. (See details below)
+Reedb is a system daemon that developers can talk to via a JSON powered RESTful API. This interface allows access management, remote vault management and easy integration into projects of different languages. As long as the Reedb daemon is installed on the system your application can use secure vaults. (See details below)
 
 End-users packages and binary installers are being provided (check the wiki [here])
 
 Usage
 -----
-In order to develop applications that use ReeDB 
-
-In order to develop applications that use ReeDB you need to register your application with the vault daemon and get an authentication token in order to insert or get data from a secure vault.
+In order to develop applications that use Reedb you need to register your application with the vault daemon and get an authentication token in order to insert or get data from a secure vault.
 
 Alternatively (if you develop in Ruby) you can use Reedb as a gem dependency. This way you can run your own instance of Reedb in a custom directory with a lot more control over what the daemon does in the background.
 
@@ -64,6 +62,6 @@ A: No. Reedb is written without camel case. Because the combination of the lette
 A. Great. Check out the wiki first to really understand what Reedb does, maybe poke around the issue tracker for ideas of what is currently still missing. Fork this repo, implement and then create a merge-request. So far all of them have been accepted :)
 
 
-[Reepass]: https://github.com/2RSoftworks/reepass
+[Reepass]: https://github.com/tr-lonelyrobot/reepass
 [here]: https://github.com/tr-lonelyrobot/reedb/wiki/binaries
 [wiki]: https://github.com/tr-lonelyrobot/reedb/wiki
