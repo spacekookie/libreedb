@@ -13,9 +13,9 @@ module Reedb
 	# The version of reedb. This is actually written into vaults to identify
 	# breaking changes and using an older sub-set of the API to interact with
 	# legacy vaults.
-	VERSION = '0.10.7'
+	VERSION = '0.10.8'
 	NET_PORT = 55736
-	TOKEN_BYTE_SIZE = 48 # in bytes
+	TOKEN_BYTE_SIZE = 8 # in bytes
 	DEFAULT_PATH = '__sysmas__' # Placeholder
 	FILE_CACHE_TIME = 2500 # Time in ms
 

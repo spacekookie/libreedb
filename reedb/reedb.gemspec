@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
 	spec.add_dependency 'json', '~> 1.8'
 	spec.add_dependency 'daemons', '~> 1.2'
 	spec.add_dependency 'sinatra', '~> 1.4'
+	spec.add_dependency 'uuid', '~> 2.3'
 end

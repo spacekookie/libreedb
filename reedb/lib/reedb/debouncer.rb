@@ -55,11 +55,11 @@ module Reedb
 
 					# Make sure that the vault set is current
 					if data == VINS
-						@vaults[uuid] = @time | Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = Reedb::KEY_CACHE_TIME
 					elsif data == VREM
 						@vaults.delete(uuid)
 					elsif data == DRES
-						@vaults[uuid] = @time | Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = Reedb::KEY_CACHE_TIME
 					end
 				end
 
@@ -67,10 +67,10 @@ module Reedb
 				@delta_vaults = {}
 
 				# Now actually iterate through the vaults and subtract delta time
-				@vaults.each do |uuid, _|
+				@vaults.each do |uuid, data|
 
 					# Subtract real delta time from timeset
-					@vaults[uuid] -= r_delta
+					@vaults[uuid] = data - r_delta
 
 					# Then check if that vault needs to be closed
 					if @vaults[uuid] <= 0
@@ -93,7 +93,7 @@ module Reedb
 		# @return Boolean to indicate whether there was already a token for this vault
 		#
 		def add_vault(uuid, token)
-			if @vaults.contains(uuid)
+			if @vaults.include?(uuid)
 				return false
 			else
 				@delta_vaults[uuid] = VINS
@@ -114,7 +114,7 @@ module Reedb
 
 		# Some utility and helper functions to plug into the Reedb main interface
 		def knows_vault(uuid)
-			return @vaults.contains(uuid)
+			return @vaults.include?(uuid)
 		end
 
 		def get_token(uuid)

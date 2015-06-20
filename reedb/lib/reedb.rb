@@ -22,7 +22,7 @@ require_relative 'reedb/errors/exit_errors'
 require_relative 'reedb/utils/meta_vault'
 require_relative 'reedb/utils/utilities'
 require_relative 'reedb/utils/logger'
-require_relative 'reedb/utils/uuids'
+# require_relative 'reedb/utils/uuids'
 
 # Internals
 require_relative 'reedb/constants'
@@ -32,6 +32,7 @@ require_relative 'reedb/reevault'
 
 # System requirements
 require 'securerandom'
+require 'uuid'
 
 module Reedb
 	def self.included(api)
@@ -87,8 +88,8 @@ module Reedb
 			# @return nil
 			#
 			def mirror_debounce(uuid, token, marker)
-				return Reedb::debouncer.add_vault(uuid, token) if marker == Reedb::DEB_ADD
-				return Reedb::debouncer.remove_vault(uuid) if marker == Reedb::DEB_REM
+				return @@debouncer.add_vault(uuid, token) if marker == Reedb::DEB_ADD
+				return @@debouncer.remove_vault(uuid) if marker == Reedb::DEB_REM
 			end
 
 			# Generates an authentication token for vault access.
@@ -100,13 +101,17 @@ module Reedb
 			#
 			# @return [String] Base64 encoded token
 			#
-			def generate_token(uuid, path, permanent)
+			def generate_token(uuid, path, permanent = false)
+				puts '[WARN] Not implemented!' if permanent
+
 				# Concatinates the token together and base64 encodes it
 				token = Base64.encode64("#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{uuid}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{path}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}")
 				token.delete!("\n")
+
 				@@tokens[token] = [] unless @@tokens.include?(token)
 				@@tokens[token] << uuid
-				update_tracked_vault("#{uuid}", nil, nil, nil, token)
+
+				update_tracked_vault(uuid, nil, nil, nil, token)
 				return token
 			end
 
@@ -119,30 +124,31 @@ module Reedb
 			# 					tokens => Authentication token for applications
 			#
 			def track_vault(name, path, size, uuid)
-				@@config[:vaults]["#{uuid}"] = {} unless @@config[:vaults].include?(uuid)
+				@@config[:vaults][uuid] = {} unless @@config[:vaults].include?(uuid)
 
 				# Adds actual size as soon as the vault gets unlocked by an application
-				@@config[:vaults]["#{uuid}"][:meta] = MetaVault.new("#{name}", "#{path}", size, "#{uuid}")
-				@@config[:vaults]["#{uuid}"][:tokens] = [] unless @@config[:vaults]["#{uuid}"][:tokens]
-				@@config[:vaults]["#{uuid}"][:tokens] = []
+				@@config[:vaults][uuid][:meta] = MetaVault.new("#{name}", "#{path}", size, uuid)
+				@@config[:vaults][uuid][:tokens] = [] unless @@config[:vaults][uuid][:tokens]
+				@@config[:vaults][uuid][:tokens] = [] # Do I need this?
 
 				write_config
 			end
 
 			def untrack_vault(uuid)
-				@@config[:vaults]["#{uuid}"] = nil if @@config[:vaults].include?(uuid)
+				@@config[:vaults].delete(uuid) if @@config[:vaults].include?(uuid)
+				write_config
 			end
 
 			def update_tracked_vault(uuid, name, path, size, token)
 				token.delete!("\n")
-				return nil unless @@config[:vaults].include?(uuid)
+				(puts 'ERROR! UUID not in config!'; return nil) unless @@config[:vaults].include?(uuid)
 
-				@@config[:vaults]["#{uuid}"][:meta].name = name if name
-				@@config[:vaults]["#{uuid}"][:meta].path = path if path
-				@@config[:vaults]["#{uuid}"][:meta].size = size if size
+				@@config[:vaults][uuid][:meta].name = name if name
+				@@config[:vaults][uuid][:meta].path = path if path
+				@@config[:vaults][uuid][:meta].size = size if size
 
-				@@config[:vaults]["#{uuid}"][:tokens] = [] unless @@config[:vaults]["#{uuid}"][:tokens]
-				@@config[:vaults]["#{uuid}"][:tokens] << token if token
+				@@config[:vaults][uuid][:tokens] = [] unless @@config[:vaults][uuid][:tokens]
+				@@config[:vaults][uuid][:tokens] << token if token
 
 				write_config
 			end
@@ -152,9 +158,9 @@ module Reedb
 			def remove_token(uuid, token)
 				token.delete!("\n")
 				return nil unless @@config[:vaults].include?(uuid)
-				return nil unless @@config[:vaults]["#{uuid}"][:tokens].include?(token)
+				return nil unless @@config[:vaults][uuid][:tokens].include?(token)
 
-				@@config[:vaults]["#{uuid}"][:tokens].delete(token)
+				@@config[:vaults][uuid][:tokens].delete(token)
 				write_config
 			end
 
@@ -357,7 +363,7 @@ module Reedb
 					puts '[FATAL] Another instance of Reedb is already operating from this directory! Choose another directory or terminate the old instance first!'
 					exit(Reedb::EXIT_STILL_LOCKED)
 				elsif File.exist?(@@lock_file) && override
-					puts "There was another instance of Reedb running but you forced my hands. It's dead now..."
+					puts "There was another instance of Reedb running but you forced my hand. It's dead now..."
 				end
 
 				# Create a lock file
@@ -423,7 +429,12 @@ module Reedb
 				@@debouncerThread.join
 
 				# Closing open vaults here
-				counter = 0; @@active_vaults.each { |_, v| v.close; counter += 1 }
+				counter = 0; @@active_vaults.each do |uuid, vault|
+					vault.close
+					@@config[:vaults][uuid][:tokens].each { |token| Reedb::Daemon::free_token(token) }
+					counter += 1
+				end
+				write_config
 
 				# Then declare Reedb terminated and remove the lock file
 				@@started = false
@@ -524,11 +535,11 @@ module Reedb
 				available = {}
 
 				@@config[:vaults].each do |uuid, value|
-					# puts @@config[:vaults]["#{uuid}"]
-					available["#{uuid}"] = {}
-					available["#{uuid}"][:name] = value[:meta].name
-					available["#{uuid}"][:path] = value[:meta].path
-					available["#{uuid}"][:size] = value[:meta].size
+					# puts @@config[:vaults][uuid]
+					available[uuid] = {}
+					available[uuid][:name] = value[:meta].name
+					available[uuid][:path] = value[:meta].path
+					available[uuid][:size] = value[:meta].size
 				end
 				return available
 			end
@@ -550,9 +561,9 @@ module Reedb
 			#
 			def create_vault(name, path, passphrase, encryption = :auto)
 				# Creates new UUIDs until one is found that doesn't already exist in the scope
-				uuid = nil
+				uuid = UUID.new
 				loop do
-					uuid = UUID::create_v1
+					uuid = uuid.generate
 					(break) unless @@config[:vaults].include?(uuid)
 				end
 
@@ -561,26 +572,25 @@ module Reedb
 				tmp_vault = ReeVault.new("#{name}", "#{path}", encryption).create("#{passphrase}")
 
 				# Creates a metavault with name, path, size and uuid to be tracked on the system
-				# metavault = MetaVault.new("#{name}", "#{path}", 0, "#{uuid}")
+				# metavault = MetaVault.new("#{name}", "#{path}", 0, uuid)
 
 				# Adds vault to the active set of vaults
 				@@active_vaults[uuid] = tmp_vault
 
-				# Generates a token
-				unless @@no_token
-					token = generate_token(uuid, path)
+				# Track the vault in the config
+				track_vault(name, path, 0, uuid)
 
-					debouncer_token = generate_token(uuid, path)
-					check = Reedb::mirror_debounce(uuid, debouncer_token, Reedb::DEB_ADD)
-					Reedb::remove_token(uuid, debouncer_token) unless check
+				# Generate a token
+				token = generate_token(uuid, path)
 
-					track_vault(name, path, 0, uuid)
-					return token.delete!("\n")
-				end
+				# Generate a token for the debouncer and remove it if the vault was already accessable
+				debouncer_token = generate_token(uuid, path)
+				check = mirror_debounce(uuid, debouncer_token, Reedb::DEB_ADD)
+				Reedb::remove_token(uuid, debouncer_token) unless check
 
-				# In case token authentication was disabled
-				track_vault(uuid, nil)
-				return nil
+				# Then return the token for the user
+				token.delete!("\n")
+				return token
 			end
 
 			# !!! NOT IMPLEMENTED YET !!!
@@ -651,14 +661,14 @@ access handler' unless @@no_token
 				vault = ReeVault.new("#{name}", "#{path}", :auto)
 				# If it hasn't, proceed here
 				if vault.try?
-					uuid = nil
+					uuid = UUID.new
 					loop do
-						uuid = UUID::create_v1
+						uuid = uuid.generate
 						(break) unless @@config[:vaults].include?(uuid)
 					end
 
 					# At this point a vault has been confirmed and a UUID generated
-					track_vault(name, path, vault.count, "#{uuid}")
+					track_vault(name, path, vault.count, uuid)
 					DaemonLogger.write("Vault successfully scoped at #{path}", 'info')
 					cache_config
 					return true
@@ -678,15 +688,15 @@ access handler' unless @@no_token
 			# @return success [Boolean]
 			#
 			def unscope_vault(uuid)
-				unless @@config[:vaults]["#{uuid}"]
+				unless @@config[:vaults][uuid]
 					raise VaultNotScopedError.new, "Vault #{name} not scoped!"
 					return nil
 				end
 
-				path = @@config[:vaults]["#{uuid}"][:path]
+				path = @@config[:vaults][uuid][:path]
 				DaemonLogger.write("Unscoping vault #{uuid} at #{path}")
-				@@active_vaults["#{uuid}"].close if @@active_vaults["#{uuid}"]
-				@@config[:vaults].delete("#{uuid}")
+				@@active_vaults[uuid].close if @@active_vaults[uuid]
+				@@config[:vaults].delete(uuid)
 				cache_config
 			end
 
@@ -703,13 +713,13 @@ access handler' unless @@no_token
 			def access_headers(uuid, token, search = nil)
 				token.delete!("\n")
 
-				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults[uuid]
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				Reedb::debouncer.debounce_vault(uuid)
 
-				return @@active_vaults["#{uuid}"].list_headers(search)
+				return @@active_vaults[uuid].list_headers(search)
 			end
 
 			# Access file contents with a file ID in a vault that a token has already
@@ -728,13 +738,13 @@ access handler' unless @@no_token
 			def access_file(uuid, token, file_name, history = false)
 				token.delete!("\n")
 
-				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults[uuid]
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				Reedb::debouncer.debounce_vault(uuid)
 
-				return @@active_vaults["#{uuid}"].read_file(file_name, history)
+				return @@active_vaults[uuid].read_file(file_name, history)
 			end
 
 
@@ -758,14 +768,14 @@ access handler' unless @@no_token
 			def insert(uuid, token, file_name, data)
 				token.delete!("\n")
 
-				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults[uuid]
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
-				Reedb::debouncer.debounce_vault(uuid)
+				@@debouncer.debounce_vault(uuid)
 
-				@@active_vaults["#{uuid}"].update(file_name, data)
+				@@active_vaults[uuid].update(file_name, data)
 				return nil
 			end
 
@@ -782,14 +792,14 @@ access handler' unless @@no_token
 			def remove(uuid, token, file_name)
 				token.delete!("\n")
 
-				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults[uuid]
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 				Reedb::debouncer.debounce_vault(uuid)
 
-				@@active_vaults["#{uuid}"].remove_file(file_name)
+				@@active_vaults[uuid].remove_file(file_name)
 				return nil
 			end
 
@@ -807,7 +817,7 @@ access handler' unless @@no_token
 			def close_vault(uuid, token)
 				token.delete!("\n")
 
-				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults["#{uuid}"]
+				raise VaultNotAvailableError.new, 'The vault you have requested data from is not currently active on this system.' unless @@active_vaults[uuid]
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
@@ -817,10 +827,10 @@ access handler' unless @@no_token
 				Reedb::debouncer.remove_vault(uuid)
 
 				# Close the vault
-				@@active_vaults["#{uuid}"].close
+				@@active_vaults[uuid].close
 
 				# Delete the vault from the active_vault record with UUID
-				@@active_vaults.delete("#{uuid}")
+				@@active_vaults.delete(uuid)
 
 				# TODO: Alert other applications
 				# TODO: Don't delete the token if it is being used to access
@@ -828,7 +838,7 @@ access handler' unless @@no_token
 				@@tokens.delete(token)
 
 				# Removes token from config
-				@@config[:vaults]["#{uuid}"][:tokens].delete(token)
+				@@config[:vaults][uuid][:tokens].delete(token)
 				write_config
 			end
 		end # self class end
@@ -863,6 +873,7 @@ access handler' unless @@no_token
 					@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load("#{passphrase}")
 				end
 				token = generate_token(uuid, path, permanent)
+				puts "Tokens: #{@@tokens}"
 				return token
 			end
 
@@ -871,7 +882,7 @@ access handler' unless @@no_token
 			#
 			def access_with_token(uuid, token, passphrase)
 				token.delete!('\n')
-				raise UnknownTokenError.new, 'Unknown Token!' unless @@config['tokens']["#{uuid}"]
+				raise UnknownTokenError.new, 'Unknown Token!' unless @@config['tokens'][uuid]
 			end
 
 			# Call this function to free a token and remove it from the access
@@ -881,35 +892,55 @@ access handler' unless @@no_token
 			#
 			# @param token [String] Token to be freed
 			#
-			def free_token(token)
+			def free_token(token, batch = false)
 				token.delete!("\n")
 
 				# Throw a warning if the token isn't valid in the first place.
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system' unless @@tokens.include?(token)
 
 				@@tokens[token].each do |uuid|
-					@@config[:vaults]["#{uuid}"][:tokens].delete(token)
+					@@config[:vaults][uuid][:tokens].delete(token)
 				end
 
-				write_config
+				write_config unless batch
 			end
 		end # self class end
 	end # module Daemon end
 end # Module Reedb end
 
-# # These options should be set when using Reedb as a normal dependency
-# options = {
-# 	 :daemon => false, # !!! IMPORTANT !!!
-# 	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
-# 	 :pw_length => 16, # Is mandatory anyways
-# 	 # :no_token => true, # Important!
-# 	 # :path => "/some/path/here" # !!! IMPORTANT !!!
-# }
-#
-# def my_code
-# 	puts 'This is my code'
-# 	sleep(Reedb::DEBOUNCE_DELTA * 3)
-# 	puts 'Ending'
-# end
-#
-# Reedb::Core::init(options) { my_code }
+# These options should be set when using Reedb as a normal dependency
+options = {
+	 :daemon => false, # !!! IMPORTANT !!!
+	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
+	 :pw_length => 16, # Is mandatory anyways
+	 :force => true, # Overwrites old instances of Reedb that might still be running
+	 # :no_token => true, # Doesn't actually do anything yet right now.
+	 # :path => "/some/path/here" # !!! IMPORTANT !!!
+}
+
+def my_code
+	userpw = 'peterpanistderheld'
+
+	all = Reedb::Vault::available_vaults
+	tuuid = nil
+	all.each { |uuid, data| tuuid = uuid if data[:name] == 'default' && data[:path] == '/home/spacekookie/Desktop' }
+
+	token = Reedb::Daemon::request_token(tuuid, userpw)
+	puts "My token: #{token}"
+
+	data = {
+		 'body' => {
+				'password' => 'mega_secure_password',
+				'username' => 'spacekookie'
+		 },
+		 'header' => {
+				'urls' => 'www.lonelyrobot.io',
+				'tags' => %w(website games awesome)
+		 }
+	}
+
+	Reedb::Vault::insert(tuuid, token, 'Lonely Robot', data)
+	# Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
+end
+
+Reedb::Core::init(options) { my_code }
