@@ -108,6 +108,8 @@ module Reedb
 				token = Base64.encode64("#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{uuid}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}--#{path}--#{SecureRandom.base64(Reedb::TOKEN_BYTE_SIZE)}")
 				token.delete!("\n")
 
+				puts "Create new token: #{token}"
+
 				@@tokens[token] = [] unless @@tokens.include?(token)
 				@@tokens[token] << uuid
 
@@ -428,10 +430,22 @@ module Reedb
 				# Then join it and be done with it
 				@@debouncerThread.join
 
+				puts @@config
+
 				# Closing open vaults here
-				counter = 0; @@active_vaults.each do |uuid, vault|
+				counter = 0
+
+				# Iterate over active vaults
+				@@active_vaults.each do |uuid, vault|
 					vault.close
-					@@config[:vaults][uuid][:tokens].each { |token| Reedb::Daemon::free_token(token) }
+
+					puts "For vault #{uuid} => #{@@config[:vaults][uuid][:tokens]}"
+
+					# Iterate over the token list and remove them until all are gone
+					# TODO: Search for a more Ruby-esk way to do this.
+					while !@@config[:vaults][uuid][:tokens].empty?
+						Reedb::Daemon::free_token(@@config[:vaults][uuid][:tokens][0])
+					end
 					counter += 1
 				end
 				write_config
@@ -867,13 +881,20 @@ access handler' unless @@no_token
 						raise VaultNotScopedError.new, "Requested vault #{uuid} is unknown to reedb. Has it been scoped before?"
 					end
 
-					# Continue
+					# Continue by initialising the vault according to saved information
 					name = @@config[:vaults][uuid][:meta].name
 					path = @@config[:vaults][uuid][:meta].path
 					@@active_vaults[uuid] = ReeVault.new("#{name}", "#{path}", :auto).load("#{passphrase}")
 				end
+
 				token = generate_token(uuid, path, permanent)
-				puts "Tokens: #{@@tokens}"
+
+				# Adds a token to the debouncer if it needs one, removes it again if it already knows and tracks the vault.
+				debouncer_token = generate_token(uuid, path)
+				check = mirror_debounce(uuid, debouncer_token, Reedb::DEB_ADD)
+				Reedb::remove_token(uuid, debouncer_token) unless check
+
+				# puts "Tokens: #{@@tokens}"
 				return token
 			end
 
@@ -894,6 +915,8 @@ access handler' unless @@no_token
 			#
 			def free_token(token, batch = false)
 				token.delete!("\n")
+
+				puts "Freeing token #{token}"
 
 				# Throw a warning if the token isn't valid in the first place.
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system' unless @@tokens.include?(token)
@@ -918,8 +941,10 @@ options = {
 	 # :path => "/some/path/here" # !!! IMPORTANT !!!
 }
 
-def my_code
+def test_script
 	userpw = 'peterpanistderheld'
+
+	# Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw); return
 
 	all = Reedb::Vault::available_vaults
 	tuuid = nil
@@ -940,7 +965,7 @@ def my_code
 	}
 
 	Reedb::Vault::insert(tuuid, token, 'Lonely Robot', data)
-	# Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
 end
 
-Reedb::Core::init(options) { my_code }
+# Running Reedb with custom user code
+Reedb::Core::init(options) { test_script }

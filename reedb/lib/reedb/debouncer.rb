@@ -94,6 +94,9 @@ module Reedb
 		#
 		def add_vault(uuid, token)
 			if @vaults.include?(uuid)
+
+				# Marks the vault to debounce because it was just interacted with but already in scope
+				@delta_vaults[uuid] = DRES
 				return false
 			else
 				@delta_vaults[uuid] = VINS
