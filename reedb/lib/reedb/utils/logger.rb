@@ -36,17 +36,17 @@ module Reedb
 		# 'warn':: Logs a warning. Should be event that won't impact stability.
 		# 'error':: Logs an error. Should be recoverable event.
 		# 'fatal':: Logs a fatal crash. Should make the Reepass daemon crash!
-		def self.write(message, level = "")
-			if level == "warn"
+		def self.write(message, level = '')
+			if level == 'warn'
 				@@logger.warn(message)
 
-			elsif level == "debug"
+			elsif level == 'debug'
 				@@logger.debug(message)
 
-			elsif level == "error"
+			elsif level == 'error'
 				@@logger.error(message)
 
-			elsif level == "fatal"
+			elsif level == 'fatal'
 				@@logger.fatal(message)
 				
 			else

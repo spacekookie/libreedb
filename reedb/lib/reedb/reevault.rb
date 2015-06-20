@@ -135,18 +135,13 @@ module Reedb
 				# => This rules out lots of code to be run
 				needs_creation = false
 			else
-				if Reedb::archos == :linux || Reedb::archos == :osx
-					FileUtils::mkdir_p(File.expand_path("#{@path}/data")) # => Data dir
-					FileUtils::mkdir(File.expand_path("#{@path}/shasums")) # => Checksum dir
-					FileUtils::mkdir(File.expand_path("#{@path}/logs")) # => Logs dir
-
+				FileUtils::mkdir_p(File.expand_path("#{@path}/data")) # => Data dir
+				FileUtils::mkdir(File.expand_path("#{@path}/shasums")) # => Checksum dir
+				FileUtils::mkdir(File.expand_path("#{@path}/logs")) # => Logs dir
+				
+				# On *nix devices change permissions.
+				if Reedb::archos == :linux || Reedb::archos == :osx || Reedb::archos == :vars
 					FileUtils::chmod_R(0744, "#{@path}")
-
-				# This is used for windows because windows fucking sucks!
-				else
-					FileUtils::mkdir_p(File.expand_path("#{@path}/data")) # => Data dir
-					FileUtils::mkdir(File.expand_path("#{@path}/shasums")) # => Checksum dir
-					FileUtils::mkdir(File.expand_path("#{@path}/logs")) # => Logs dir
 				end
 			end
 
