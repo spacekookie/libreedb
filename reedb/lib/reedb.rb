@@ -725,7 +725,7 @@ access handler' unless @@no_token
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				Reedb::debouncer.debounce_vault(uuid)
+				debouncer.debounce_vault(uuid)
 
 				return @@active_vaults[uuid].list_headers(search)
 			end
@@ -750,7 +750,7 @@ access handler' unless @@no_token
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				Reedb::debouncer.debounce_vault(uuid)
+				debouncer.debounce_vault(uuid)
 
 				return @@active_vaults[uuid].read_file(file_name, history)
 			end
@@ -886,7 +886,7 @@ access handler' unless @@no_token
 				# Adds a token to the debouncer if it needs one, removes it again if it already knows and tracks the vault.
 				debouncer_token = generate_token(uuid, path)
 				check = mirror_debounce(uuid, debouncer_token, Reedb::DEB_ADD)
-				Reedb::remove_token(uuid, debouncer_token) unless check
+				remove_token(uuid, debouncer_token) unless check
 
 				# puts "Tokens: #{@@tokens}"
 				return token
@@ -936,7 +936,12 @@ options = {
 def test_script
 	userpw = 'peterpanistderheld'
 
-	Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
+	begin
+		Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
+	rescue
+		puts 'Vault already exists...'
+	end
+
 	all = Reedb::Vault::available_vaults
 	tuuid = nil
 	all.each { |uuid, data| tuuid = uuid if data[:name] == 'default' && data[:path] == '/home/spacekookie/Desktop' }
@@ -953,10 +958,23 @@ def test_script
 				'tags' => %w(website games awesome)
 		 }
 	}
+	Reedb::Vault::insert(tuuid, token, 'My Face', data)
 
+	file = Reedb::Vault::access_file(tuuid, token, 'My Face')
+	puts file
+
+	Reedb::Daemon::free_token(token)
+
+	new_token = Reedb::Daemon::request_token(tuuid, userpw)
+
+	begin
+		Reedb::Vault::insert(uuid, token, 'MegaBlast', data)
+	rescue
+		puts 'This token is no longer valid!'
+	end
+
+	Reedb::Vault::insert(uuid, new_token, 'MegaBlast', data)
 	sleep(15)
-
-	# Reedb::Vault::insert(tuuid, token, 'Lonely Robot', data)
 end
 
 # Running Reedb with custom user code

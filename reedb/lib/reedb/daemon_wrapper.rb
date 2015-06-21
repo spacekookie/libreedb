@@ -188,8 +188,6 @@ class ReedbHandler < Sinatra::Base
 	post '/vaults/*/request_token' do
 		vault_uuid = params[:splat][0]
 
-		puts vault_uuid
-
 		if vault_uuid == nil
 			return build_response(400, 'Missing vault access id.')
 		end
@@ -207,7 +205,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		passphrase = data["passphrase"] if data["passphrase"]
+		passphrase = data['passphrase'] if data['passphrase']
 		permanent = false # TODO: Implement this!
 
 		if passphrase == nil || permanent == nil
@@ -283,7 +281,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data["token"] if data["token"]
+		token = data['token'] if data['token']
 
 		unless token
 			return build_response(400, 'Required data fields are missing from JSON data body!')
@@ -306,7 +304,6 @@ class ReedbHandler < Sinatra::Base
 		end
 
 		return build_response(200, "Vault #{vault_uuid} successfully closed.")
-
 	end
 
 	# [AUTH] Request headers for a vault with token/ id
@@ -379,14 +376,9 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data["token"].delete!("\n") if data["token"]
+		token = data['token'].delete("\n") if data['token']
 
-		puts "#{token}\n"
-		puts "#{Reedb::Config::Master::dump_config}\n"
-
-		if token == nil
-			return build_response(400, 'Required data fields are missing from JSON data body!')
-		end
+		return build_response(400, 'Required data fields are missing from JSON data body!') if token == nil
 
 		file = nil
 		begin
@@ -429,10 +421,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data["token"].delete!("\n") if data["token"]
-
-		puts "#{token}\n"
-		puts "#{Reedb::Config::Master::dump_config}\n"
+		token = data['token'].delete("\n") if data['token']
 
 		unless token
 			return build_response(400, 'Required data fields are missing from JSON data body!')
@@ -478,18 +467,16 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data["token"] if data["token"]
-		name = data["name"] if data["name"]
-		file_data = data["data"] if data["data"]
+		token = data['token'] if data['token']
+		name = data['name'] if data['name']
+		file_data = data['data'] if data['data']
 
 		if token == nil || name == nil || file_data == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')
 		end
 
 		headers = Reedb::Vault::access_headers(vault_uuid, token, nil)
-		unless headers.include?(name)
-			return build_response(400, "File already exists. Use update POST instead.")
-		end
+		return build_response(400, 'File already exists. Use update POST instead.') if headers.include?(name)
 
 		begin
 			Reedb::Vault::insert(vault_uuid, token, name, file_data)
@@ -506,7 +493,10 @@ class ReedbHandler < Sinatra::Base
 			return build_response(418, "Dont take this error code too seriously: #{e.message}")
 		end
 
-		return build_response(200, "File successfully created!")
+		headers = Reedb::Vault::access_headers(vault_uuid, token, nil)
+
+		# Adds the file name as a handle to the payload so that it can be referenced in a future request
+		return build_response(200, 'File successfully created!', { 'file_handle' => headers[name]['name'] })
 	end
 
 	# [AUTH] Update file contents
@@ -531,8 +521,8 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data["token"] if data["token"]
-		file_data = data["data"] if data["data"]
+		token = data['token'] if data['token']
+		file_data = data['data'] if data['data']
 
 		unless token || file_data
 			return build_response(400, 'Required data fields are missing from JSON data body!')
