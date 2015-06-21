@@ -20,7 +20,7 @@ module Reedb
 	FILE_CACHE_TIME = 2500 # Time in ms
 
 	# Debounce constants
-	DEBOUNCE_DELTA = 1
+	DEBOUNCE_DELTA = 2.5 # 2500 ms
 	KEY_CACHE_TIME = (15 * 60) # (15 minutes in seconds)
 	THREAD_TIMEOUT_TIME = DEBOUNCE_DELTA * 1.0125
 

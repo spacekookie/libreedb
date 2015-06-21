@@ -49,13 +49,20 @@ class RestTester:
 		token_body = {'passphrase':'peterpanistderheld'}
 		conn.request("POST","/vaults/%s/request_token" % self.uuid, json.dumps(token_body), header)
 		res = conn.getresponse()
-		data = json.loads(res.read())
 
-		if data['success']: success = "[PASS]\t"
+		data = None
+		try:
+			data = json.loads(res.read())
+		except:
+			print res.read()
+
+
+		if data and data['success']: success = "[PASS]\t"
 		else: success = "[FAIL]\t"
 
 		print success, "POST /vaults/UUID/request_token", res.status, res.reason, ":'%s'" % data['message']
 		self.my_token = data['payload']
+		print self.my_token
 
 
 	''' FREE TOKEN '''
@@ -143,10 +150,12 @@ class RestTester:
 
 		template = {'header':{'tags':['social', 'hipster', 'awesome'], 'urls':['www.myface.com']}, 'body':{'passphrase':'lkj23l4kj23lkj234', 'note':'This is an awesome social network that combines facebook with myspace. MYFACE!', 'username':'spacekookie'}}
 
+		success = ''
 		if data['success']:
 			if data == template:
 				success = "[PASS]\t"
-		else: success = "[FAIL]\t"
+		else: 
+			success = "[FAIL]\t"
 		print success, "PUT /vaults/UUID/files", res.status, res.reason, ":'%s'" % data['message']
 
 
@@ -166,34 +175,36 @@ class RestTester:
 
 	def __init__(self):
 		# Create a vault and get a token
-		self.create_vault()
+		# self.create_vault()
+
+		# Free the token again to test
 
 		# Get available vaults (self.vaults)
 		self.available_vaults()
 
-		# Free the token again to test
-		self.free_token()
-
 		# Now get a new token (self.my_token)
 		self.request_token()
 
+		
+
+		self.free_token()
 		# Get headers (fills self.headers)
-		self.get_headers()
+		# self.get_headers()
 
 		# Insert a new file
-		self.insert_file()
+		# self.insert_file()
 
 		# Then update it
-		self.update_file()
+		# self.update_file()
 
 		# Then return the file and mirror it with what it should be
-		self.get_file_body()
+		# self.get_file_body()
 
 		# Then check the versioning history matches
-		self.get_file_history()
+		# self.get_file_history()
 
 		# Close the vault
-		self.close_vault()
+		# self.close_vault()
 
 
 rt = RestTester()

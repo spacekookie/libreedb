@@ -782,7 +782,6 @@ access handler' unless @@no_token
 
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 				@@debouncer.debounce_vault(uuid)
-
 				@@active_vaults[uuid].update(file_name, data)
 				return nil
 			end
@@ -829,7 +828,7 @@ access handler' unless @@no_token
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
-				DaemonLogger.write("Closing vault with #{uuid}.", "debug")
+				DaemonLogger.write("Closing vault with #{uuid}.", 'debug')
 
 				# Remove the vault from the debouncer
 				@@debouncer.remove_vault(uuid)
@@ -924,58 +923,58 @@ access handler' unless @@no_token
 end # Module Reedb end
 
 # These options should be set when using Reedb as a normal dependency
-options = {
-	 :daemon => false, # !!! IMPORTANT !!!
-	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
-	 :pw_length => 16, # Is mandatory anyways
-	 :force => true, # Overwrites old instances of Reedb that might still be running
-	 # :no_token => true, # Doesn't actually do anything yet right now.
-	 # :path => "/some/path/here" # !!! IMPORTANT !!!
-}
-
-def test_script
-	userpw = 'peterpanistderheld'
-
-	begin
-		Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
-	rescue
-		puts 'Vault already exists...'
-	end
-
-	all = Reedb::Vault::available_vaults
-	tuuid = nil
-	all.each { |uuid, data| tuuid = uuid if data[:name] == 'default' && data[:path] == '/home/spacekookie/Desktop' }
-
-	token = Reedb::Daemon::request_token(tuuid, userpw)
-
-	data = {
-		 'body' => {
-				'password' => 'mega_secure_password',
-				'username' => 'spacekookie'
-		 },
-		 'header' => {
-				'urls' => 'www.lonelyrobot.io',
-				'tags' => %w(website games awesome)
-		 }
-	}
-	Reedb::Vault::insert(tuuid, token, 'My Face', data)
-
-	file = Reedb::Vault::access_file(tuuid, token, 'My Face')
-	puts file
-
-	Reedb::Daemon::free_token(token)
-
-	new_token = Reedb::Daemon::request_token(tuuid, userpw)
-
-	begin
-		Reedb::Vault::insert(uuid, token, 'MegaBlast', data)
-	rescue
-		puts 'This token is no longer valid!'
-	end
-
-	Reedb::Vault::insert(uuid, new_token, 'MegaBlast', data)
-	sleep(15)
-end
-
-# Running Reedb with custom user code
-Reedb::Core::init(options) { test_script }
+# options = {
+# 	 :daemon => false, # !!! IMPORTANT !!!
+# 	 :os => :linux, # Pick whichever one applies (:linux, :osx, :win, :other)
+# 	 :pw_length => 16, # Is mandatory anyways
+# 	 :force => true, # Overwrites old instances of Reedb that might still be running
+# 	 # :no_token => true, # Doesn't actually do anything yet right now.
+# 	 # :path => "/some/path/here" # !!! IMPORTANT !!!
+# }
+#
+# def test_script
+# 	userpw = 'peterpanistderheld'
+#
+# 	begin
+# 		Reedb::Vault::create_vault('default', '/home/spacekookie/Desktop', userpw)
+# 	rescue
+# 		puts 'Vault already exists...'
+# 	end
+#
+# 	all = Reedb::Vault::available_vaults
+# 	tuuid = nil
+# 	all.each { |uuid, data| tuuid = uuid if data[:name] == 'default' && data[:path] == '/home/spacekookie/Desktop' }
+#
+# 	token = Reedb::Daemon::request_token(tuuid, userpw)
+#
+# 	data = {
+# 		 'body' => {
+# 				'password' => 'mega_secure_password',
+# 				'username' => 'spacekookie'
+# 		 },
+# 		 'header' => {
+# 				'urls' => 'www.lonelyrobot.io',
+# 				'tags' => %w(website games awesome)
+# 		 }
+# 	}
+# 	Reedb::Vault::insert(tuuid, token, 'My Face', data)
+#
+# 	file = Reedb::Vault::access_file(tuuid, token, 'My Face')
+# 	puts file
+#
+# 	Reedb::Daemon::free_token(token)
+#
+# 	new_token = Reedb::Daemon::request_token(tuuid, userpw)
+#
+# 	begin
+# 		Reedb::Vault::insert(tuuid, token, 'MegaBlast', data)
+# 	rescue
+# 		puts 'This token is no longer valid!'
+# 	end
+#
+# 	Reedb::Vault::insert(tuuid, new_token, 'MegaBlast', data)
+# 	sleep(15)
+# end
+#
+# # Running Reedb with custom user code
+# Reedb::Core::init(options) { test_script }

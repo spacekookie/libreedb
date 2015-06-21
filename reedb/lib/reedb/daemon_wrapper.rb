@@ -376,13 +376,13 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data['token'].delete("\n") if data['token']
+		token = data['token'] if data['token']
 
 		return build_response(400, 'Required data fields are missing from JSON data body!') if token == nil
 
 		file = nil
 		begin
-			file = Reedb::Vault::access_file(vault_uuid, file_id, token, false)
+			file = Reedb::Vault::access_file(vault_uuid, token, file_id, false)
 		rescue FileNotFoundError => e
 			return build_response(404, e.message)
 
@@ -396,7 +396,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(403, e.message)
 
 		end
-		return build_response(200, "File read without version history", file)
+		return build_response(200, 'File read without version history', file)
 	end
 
 	# [AUTH] Return history of a file
@@ -421,7 +421,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		token = data['token'].delete("\n") if data['token']
+		token = data['token'] if data['token']
 
 		unless token
 			return build_response(400, 'Required data fields are missing from JSON data body!')
@@ -429,7 +429,7 @@ class ReedbHandler < Sinatra::Base
 
 		file = nil
 		begin
-			file = Reedb::Vault::access_file(vault_uuid, file_id, token, true)
+			file = Reedb::Vault::access_file(vault_uuid, token, file_id, true)
 		rescue FileNotFoundError => e
 			return build_response(404, e.message)
 
@@ -524,7 +524,7 @@ class ReedbHandler < Sinatra::Base
 		token = data['token'] if data['token']
 		file_data = data['data'] if data['data']
 
-		unless token || file_data
+		if token == nil || file_data == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')
 		end
 
@@ -544,7 +544,7 @@ class ReedbHandler < Sinatra::Base
 			return build_response(418, "Dont take this error code too seriously: #{e.message}")
 		end
 
-		return build_response(200, "File successfully updated!")
+		return build_response(200, 'File successfully updated!')
 	end
 
 	# [AUTH] Removes a file
