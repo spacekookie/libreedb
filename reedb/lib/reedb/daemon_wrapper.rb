@@ -355,7 +355,7 @@ class ReedbHandler < Sinatra::Base
 	end
 
 	# [AUTH] Return body of a file
-	post '/vaults/*/files/*' do
+	post '/vaults/*/files/*/body' do
 		vault_uuid = params[:splat][0]
 		file_id = params[:splat][1]
 

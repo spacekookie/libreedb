@@ -780,9 +780,12 @@ access handler' unless @@no_token
 				raise UnknownTokenError.new, 'The token you provided is unknown to this system. Access denied!' unless @@tokens[token]
 				raise UnautherisedTokenError.new, 'The token you provided currently has no access to the desired vault. Access denied!' unless @@tokens[token].include?(uuid)
 
+
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 				@@debouncer.debounce_vault(uuid)
 				@@active_vaults[uuid].update(file_name, data)
+
+				update_tracked_vault(uuid, nil, nil, @@active_vaults[uuid].count, token)
 				return nil
 			end
 
@@ -806,7 +809,9 @@ access handler' unless @@no_token
 				DaemonLogger.write("Writing data to #{uuid}", 'debug')
 				Reedb::debouncer.debounce_vault(uuid)
 
+
 				@@active_vaults[uuid].remove_file(file_name)
+				update_tracked_vault(uuid, nil, nil, @@active_vaults[uuid].count, token)
 				return nil
 			end
 

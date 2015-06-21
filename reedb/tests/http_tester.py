@@ -185,9 +185,7 @@ class RestTester:
 		# Now get a new token (self.my_token)
 		self.request_token()
 
-		
-
-		self.free_token()
+		# self.free_token()
 		# Get headers (fills self.headers)
 		# self.get_headers()
 
