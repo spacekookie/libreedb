@@ -37,10 +37,11 @@ module Reedb
 			@delta_vaults = {}
 			@vaults = {}
 			@token_set = {}
+			@timeout = Reedb::KEY_CACHE_TIME
 		end
 
 		def set_custom_timeout(time)
-			@time = time
+			@timeout = time
 		end
 
 		# The main loop to run in a thread
@@ -55,11 +56,11 @@ module Reedb
 
 					# Make sure that the vault set is current
 					if data == VINS
-						@vaults[uuid] = @time | Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = @timeout
 					elsif data == VREM
 						@vaults.delete(uuid)
 					elsif data == DRES
-						@vaults[uuid] = @time | Reedb::KEY_CACHE_TIME
+						@vaults[uuid] = @timeout
 					end
 				end
 
@@ -67,17 +68,17 @@ module Reedb
 				@delta_vaults = {}
 
 				# Now actually iterate through the vaults and subtract delta time
-				@vaults.each do |uuid, _|
+				@vaults.each do |uuid, data|
 
 					# Subtract real delta time from timeset
-					@vaults[uuid] -= r_delta
+					@vaults[uuid] = data - r_delta
 
 					# Then check if that vault needs to be closed
 					if @vaults[uuid] <= 0
 						Reedb::Vault::close_vault(uuid, @token_set[uuid])
 					end
 				end
-
+				
 				last = tmp # Update last time and then sleep
 				sleep(Reedb::DEBOUNCE_DELTA)
 			end
@@ -93,7 +94,10 @@ module Reedb
 		# @return Boolean to indicate whether there was already a token for this vault
 		#
 		def add_vault(uuid, token)
-			if @vaults.contains(uuid)
+			if @vaults.include?(uuid)
+
+				# Marks the vault to debounce because it was just interacted with but already in scope
+				@delta_vaults[uuid] = DRES
 				return false
 			else
 				@delta_vaults[uuid] = VINS
@@ -114,7 +118,7 @@ module Reedb
 
 		# Some utility and helper functions to plug into the Reedb main interface
 		def knows_vault(uuid)
-			return @vaults.contains(uuid)
+			return @vaults.include?(uuid)
 		end
 
 		def get_token(uuid)

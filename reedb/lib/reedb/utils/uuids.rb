@@ -165,6 +165,9 @@ class UUID
 						fp.chmod(777) # must be world writable
 					end
 				end
+
+				puts "TRYING TO OPEN: #{STATE_FILE}"
+
 				open STATE_FILE, 'r+' do |fp|
 					fp.flock IO::LOCK_EX
 					c, m = read_state fp

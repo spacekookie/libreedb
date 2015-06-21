@@ -81,16 +81,20 @@ if File.basename(__FILE__) == W_NAME
 		 :backtrace => true
 	}
 
-	unless spec
-		puts "Reedb isn't properly installed on your system!
-Please make sure Gems can load it before trying to run this daemon again!
-Exit code: #{0x9}"
+	if spec
+		g_path = (spec.gem_dir) + '/lib/reedb'
+		require 'reedb'
 
-		exit(0x9)
+	# 	puts "Reedb isn't properly installed on your system!
+ # Please make sure Gems can load it before trying to run this daemon again!
+ # Exit code: #{0x9}"
+ #
+ # 		exit(0x9)
+	else
+		g_path = '../lib/reedb/'
+		require_relative '../lib/reedb'
 	end
 
-	g_path = (spec.gem_dir) + '/lib/reedb'
-	require 'reedb'
 
 	# NOW load the required modules to run.
 	require 'daemons'
