@@ -616,7 +616,16 @@ at_exit { Reedb::Core::terminate('root', true) }
 
 # Next up we start the HTTP server and that's that. We're up and running :)
 def http_server
-	Rack::Handler::WEBrick.run(ReedbHandler.new, { :Port => @options[:port], :BindAddress => 'localhost' })
+
+	if not Reedb::Utilities::check_port(@options[:port])
+		Rack::Handler::WEBrick.run(ReedbHandler.new, { :Port => @options[:port], :BindAddress => 'localhost' })
+	else
+		# This temporary
+		puts 'The port is closed. You should do this:'
+		puts '$ sudo netstat -lpn | grep 55736'
+		puts '$ kill -9 <pid>'
+		exit
+	end
 end
 
 # This creates the Reedb module and binds it to a variable to be interacted with in the future
