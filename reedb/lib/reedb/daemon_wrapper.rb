@@ -610,6 +610,7 @@ opts.parse! unless ARGV == []
 # Define what to do when that evil SIGTERM comes
 at_exit { Reedb::Core::terminate('root', true) }
 
+# TODO: Move this function into the FUCKING security package.
 def generate_cert(years, path)
 	root_key = OpenSSL::PKey::RSA.new 4096 # the CA's public/private key
 	root_ca = OpenSSL::X509::Certificate.new
@@ -665,7 +666,7 @@ begin
 	Reedb::Core::init(@options) { http_server }
 rescue Interrupt => e
 	puts e.message
-	puts 'User interrupt fired! Abandon ship...abandon ship!\n'
+	puts 'User interrupt fired! Abandon ship...abandon ship!'
 	puts 'Waiting for background threads to die...'
 	Reedb::Core::terminate('user', true)
 	puts "Exit code #{Reedb::EXIT_PANIC_INTERUPT}"
