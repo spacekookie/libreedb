@@ -13,8 +13,16 @@
 # (unless you know what you're doing...)
 
 # System requirements (HTTP stuff)
-require 'optparse'
+require 'sinatra/base'
 require 'sinatra'
+
+require 'webrick/https'
+require 'webrick'
+
+require 'openssl/ssl'
+require 'openssl'
+
+require 'optparse'
 require 'rack'
 
 # Reedb requirements
@@ -25,29 +33,14 @@ rescue LoadError => e
 	require_relative '../reedb'
 end
 
+require_relative 'security/certificate'
 require_relative 'errors/exit_errors'
+require_relative 'constants'
 
 # HTTP handler class that registers the functions
 # for the vault interface
 #
 class ReedbHandler < Sinatra::Base
-
-	# 	funct 	url 										descr
-	#
-	# 	 GET 	/vaults 									List of all vaults
-	# 	 PUT 	/vaults 									Create a new vault.
-	# 	 PUT 	/vaults/scope 								Scope a vault that already exists
-
-	# 	 POST 	/vaults/*vault-id*/request_token			Auth for vault with ID
-	# [AUTH] POST 	/vaults/*vault-id*/headers					Return vault headers
-	# [AUTH] POST 	/vaults/*vault-id*/close					Close vault with ID
-
-	# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*			Returns body of a file
-	# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*/history	Returns history of a file (???)
-
-	# [AUTH] PUT 	/vaults/*vault-id*/files					Create file
-	# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*			Update file contents
-	# [AUTH] POST 	/vaults/*vault-id*/files/*file-id*/remove	Removes a file
 
 	configure :production, :development do
 		enable :logging
@@ -65,7 +58,7 @@ class ReedbHandler < Sinatra::Base
 	# Returns a list of vaults scoped on the system
 	get '/vaults' do
 		payload = Reedb::Vault::available_vaults
-		return build_response(200, "Currently scoped vaults", payload)
+		return build_response(200, 'Currently scoped vaults', payload)
 	end
 
 	# Create a new vault on the system
@@ -167,8 +160,8 @@ class ReedbHandler < Sinatra::Base
 			return build_response(400, 'JSON data was malformed!')
 		end
 
-		name = data["name"] if data["name"]
-		path = data["path"] if data["path"]
+		name = data['name'] if data['name']
+		path = data['path'] if data['path']
 
 		if name == nil || path == nil
 			return build_response(400, 'Required data fields are missing from JSON data body!')
@@ -181,7 +174,7 @@ class ReedbHandler < Sinatra::Base
 		end
 
 		# If everything went well
-		return build_response(200, "Vault successfully unscoped and will not show up in vault lists anymore.")
+		return build_response(200, 'Vault successfully unscoped and will not show up in vault lists anymore.')
 	end
 
 	#  Request a token for a vault
@@ -600,6 +593,9 @@ end
 @options[:dave] = false
 @options[:force] = false
 
+# Defines the folder to put the SSL certificate
+@options[:cert_path] = File.join('/home/spacekookie/.config/reedb', '.sec')
+
 # Create argument parsers and handle them
 opts = OptionParser.new
 opts.on('-l', '--pw-length INTEGER') { |o| @options[:pw_length] = o }
@@ -614,9 +610,52 @@ opts.parse! unless ARGV == []
 # Define what to do when that evil SIGTERM comes
 at_exit { Reedb::Core::terminate('root', true) }
 
+def generate_cert(years, path)
+	root_key = OpenSSL::PKey::RSA.new 4096 # the CA's public/private key
+	root_ca = OpenSSL::X509::Certificate.new
+	root_ca.version = 2 # cf. RFC 5280 - to make it a "v3" certificate
+	root_ca.serial = 1
+	root_ca.subject = OpenSSL::X509::Name.parse('/DC=org/DC=ruby-lang/CN=Ruby CA')
+	root_ca.issuer = root_ca.subject # root CA's are "self-signed"
+	root_ca.public_key = root_key.public_key
+	root_ca.not_before = Time.now
+	root_ca.not_after = root_ca.not_before + years * 365 * 24 * 60 * 60 # 2 years validity
+
+	ef = OpenSSL::X509::ExtensionFactory.new
+	ef.subject_certificate = root_ca
+	ef.issuer_certificate = root_ca
+	root_ca.add_extension(ef.create_extension('basicConstraints', 'CA:TRUE', true))
+	root_ca.add_extension(ef.create_extension('keyUsage', 'keyCertSign, cRLSign', true))
+	root_ca.add_extension(ef.create_extension('subjectKeyIdentifier', 'hash', false))
+	root_ca.add_extension(ef.create_extension('authorityKeyIdentifier', 'keyid:always', false))
+	root_ca.sign(root_key, OpenSSL::Digest::SHA512.new)
+
+	FileUtils::mkdir_p(path) unless File.directory?(path)
+
+	File.open(File.join(path, Reedb::CERT_PATH), 'w+') { |file| file.write(root_ca) }
+	File.open(File.join(path, Reedb::KEY_PATH), 'w+') { |file| file.write(root_key) }
+end
+
 # Next up we start the HTTP server and that's that. We're up and running :)
 def http_server
-	Rack::Handler::WEBrick.run(ReedbHandler.new, { :Port => @options[:port], :BindAddress => 'localhost' })
+
+	# Check if certificate files exist.
+	unless File.exist?(File.join(@options[:cert_path], 'reedb.crt')) && File.exist?(File.join(@options[:cert_path], 'reedb.key'))
+		generate_cert(4, @options[:cert_path])
+	end
+
+	web_options = {
+		 :Port => @options[:port],
+		 :BindAddress => 'localhost',
+		 :SSLEnable => true,
+		 #  :SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE,
+		 :SSLCertificate => OpenSSL::X509::Certificate.new(File.open(File.join(@options[:cert_path], 'reedb.crt')).read),
+		 :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.open(File.join(@options[:cert_path], 'reedb.key')).read),
+		 :SSLCertName => [['CN', WEBrick::Utils::getservername]]
+
+	}
+
+	Rack::Handler::WEBrick.run(ReedbHandler.new, web_options)
 end
 
 # This creates the Reedb module and binds it to a variable to be interacted with in the future

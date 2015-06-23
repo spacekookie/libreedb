@@ -27,4 +27,7 @@ module Reedb
 	# Debouncer markers
 	DEB_ADD = :add
 	DEB_REM = :remove
+
+	CERT_PATH = 'reedb.crt'
+	KEY_PATH = 'reedb.key'
 end
