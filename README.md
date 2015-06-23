@@ -34,7 +34,7 @@ Here are some questions that we get asked frequently.
 
 **Q: How does Reedb work?**
 
-A: Reedb is a very complex daemon. It allows you to securely write information in databases from your own applications without having to worry about where it is exactly written, how it is serialised and how it is kept secure.
+A: Reedb is a system daemon that provides an interface to developers to write sensitive information to disk in an encrypted form. Files are organised in so called vaults. It attempts to make it both easy to use but give users and developers enough flexibility to use it in a variety of application projects.
 
 ---
 
