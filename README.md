@@ -1,9 +1,9 @@
 Reedb
 =====
 
-:lock: Spicy and secure Ruby file-based database.
+:lock: Spicy ruby data storage containers
 
-Reedb is a system daemon that brings its own libraries and manages databases (Reevaults) fast and securely.
+Reedb is a system daemon that brings its own libraries and manages databases (Vaults) fast and securely.
 Made for native app development, to protect sensitive information that are worth protecting with AES and Twofish.
 
 Proudly powering [Reepass] - (and others).
@@ -48,8 +48,6 @@ A: Reedb is a file-based database that is addressed by the daemon with a UUID an
 
 A: Reedb uses 256-bit AES (less commonly known as Rijndael) by default but can be setup very easily (with one parameter) to use the 256-bit Twofish, a runnerup of the AES contenst.
 For integrety checking it uses SHA-256 hashes of files and filenames are created with the 192-bit Tiger2 hashing algorithm.
-
-When communicating to Reedb via HTTP the weak link is of course the connection. A feature to add RSA encryption as a transport-layer security is planned, however not currently implemented. When dealing with Reedb via a Gem dependency this problem is less promiment.
 
 ---
 **Q: Shouldn't it be camel-case?**
