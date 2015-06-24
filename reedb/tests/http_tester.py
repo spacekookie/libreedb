@@ -190,7 +190,7 @@ class RestTester:
 		# self.get_headers()
 
 		# Insert a new file
-		# self.insert_file()
+		self.insert_file()
 
 		# Then update it
 		# self.update_file()
