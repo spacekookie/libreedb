@@ -20,6 +20,7 @@ build/
 /_yardoc/
 /doc/
 /rdoc/
+/.metadata/
 
 ## Environment normalisation:
 /.bundle/
