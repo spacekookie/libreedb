@@ -21,6 +21,7 @@ build/
 /doc/
 /rdoc/
 /.metadata/
+/RemoteSystemsTempFiles/
 
 ## Environment normalisation:
 /.bundle/
