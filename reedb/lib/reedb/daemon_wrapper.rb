@@ -610,6 +610,7 @@ opts.parse! unless ARGV == []
 # Define what to do when that evil SIGTERM comes
 at_exit { Reedb::Core::terminate('root', true) }
 
+# TODO: Move this function into the FUCKING security package.
 def generate_cert(years, path)
 	root_key = OpenSSL::PKey::RSA.new 4096 # the CA's public/private key
 	root_ca = OpenSSL::X509::Certificate.new
@@ -639,23 +640,15 @@ end
 # Next up we start the HTTP server and that's that. We're up and running :)
 def http_server
 
-	# Check if certificate files exist.
-	unless File.exist?(File.join(@options[:cert_path], 'reedb.crt')) && File.exist?(File.join(@options[:cert_path], 'reedb.key'))
-		generate_cert(4, @options[:cert_path])
+	if not Reedb::Utilities::check_port(@options[:port])
+		Rack::Handler::WEBrick.run(ReedbHandler.new, { :Port => @options[:port], :BindAddress => 'localhost' })
+	else
+		# This temporary
+		puts 'The port is closed. You should do this:'
+		puts '$ sudo netstat -lpn | grep 55736'
+		puts '$ kill -9 <pid>'
+		exit
 	end
-
-	web_options = {
-		 :Port => @options[:port],
-		 :BindAddress => 'localhost',
-		 :SSLEnable => true,
-		 #  :SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE,
-		 :SSLCertificate => OpenSSL::X509::Certificate.new(File.open(File.join(@options[:cert_path], 'reedb.crt')).read),
-		 :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.open(File.join(@options[:cert_path], 'reedb.key')).read),
-		 :SSLCertName => [['CN', WEBrick::Utils::getservername]]
-
-	}
-
-	Rack::Handler::WEBrick.run(ReedbHandler.new, web_options)
 end
 
 # This creates the Reedb module and binds it to a variable to be interacted with in the future
