@@ -1,10 +1,12 @@
 Reedb
 =====
 
-:lock: Spicy ruby data storage containers
+:lock: Spicy ruby database that puts security first.
 
-Reedb is a system daemon that brings its own libraries and manages databases (Vaults) fast and securely.
-Made for native app development, to protect sensitive information that are worth protecting with AES and Twofish.
+Maybe storage containers might be a better word. 
+
+Reedb allows you to store sensitive user information in so called vaults in encrypted form. Vaults store information on a file-by-file basis and are easy to sync across different systems as they are just folders with a fancy name.
+Made for native application development. Using LibGCrypt in the background, can be used via C++ & Ruby bindings or via an HTTP(s) server on `localhost` to use any language and framework you want.
 
 Proudly powering [Reepass] - (and others).
 
@@ -12,15 +14,26 @@ Proudly powering [Reepass] - (and others).
 Installation
 ------------
 
-Reedb is a system daemon that developers can talk to via a JSON powered RESTful API. This interface allows access management, remote vault management and easy integration into projects of different languages. As long as the Reedb daemon is installed on the system your application can use secure vaults. (See details below)
+Reedb can be installed on a variety of ways. As it is primarilty written in Ruby it can easily be installed via Rubygems. The latest stable version is always uploaded to www.rubygems.org.
 
-End-users packages and binary installers are being provided (check the wiki [here])
+`gem install reedb`
+
+To get unstable/ development versions either use the `--pre` parameter for gem or clone this repo's develop branch.
+
+`git clone -b develop https://github.com/tr-lonelyrobot/reedb.git`
+
+End-user packages as well as binary installers are provided. Check out the wiki [here] to get instructions on how to install. Please note that Reedb is both distributed as packages for different Linux distributions and self contained archives (with a Ruby interpreter and all the dependencies in it).
+For the latter version there is an updater that can be found <here> (TODO: Create updater :) )
+
 
 Usage
 -----
-In order to develop applications that use Reedb you need to register your application with the vault daemon and get an authentication token in order to insert or get data from a secure vault.
 
-Alternatively (if you develop in Ruby) you can use Reedb as a gem dependency. This way you can run your own instance of Reedb in a custom directory with a lot more control over what the daemon does in the background.
+At it's core Reedb provides a simple interface to store information (text, bytestreams, etc) on the filesystem in encrypted form. With that in mind it is possible to use Reedb as both a library and a daemon.
+
+As a library there is a Ruby interface and C/C++ bindings in the planning/ making and you are thus restricted to the use of either one of those languages.
+
+When developing in a different language Reedb can run on a user system as a daemon that runs a very minimal HTTPs server and provides a RESTful API to exchange information with your application.
 
 To find out how to use Reedb in either of those ways, please check the [wiki] for details.
 
@@ -34,20 +47,22 @@ Here are some questions that we get asked frequently.
 
 **Q: How does Reedb work?**
 
-A: Reedb is a system daemon that provides an interface to developers to write sensitive information to disk in an encrypted form. Files are organised in so called vaults. It attempts to make it both easy to use but give users and developers enough flexibility to use it in a variety of application projects.
+A: Reedb takes information (usually json), encrypts it and writes it to a file in a vault. At it's core, that's it. In addition to that it also provides interfaces to get the data back ( which is sometimes non-optional ) and do data integrety checking as well as data versioning and merge conflict resolution (the way git does just a *lot* simpler)
 
 ---
 
 **Q: What kind of database is Reedb?**
 
-A: Reedb is a file-based database that is addressed by the daemon with a UUID and found under a name and path on the filesystem. This way it makes integration into other services easy and convenient.
+A: Reedb is a file-based database that is addressed by a UUID by applications but can be found under a name and path on the filesystem. (Vaults are folder that have a .reevault suffix). This way it makes integration into other services easy and convenient.
 
 ---
 
 **Q: What encryption does Reedb use?**
 
-A: Reedb uses 256-bit AES (less commonly known as Rijndael) by default but can be setup very easily (with one parameter) to use the 256-bit Twofish, a runnerup of the AES contenst.
-For integrety checking it uses SHA-256 hashes of files and filenames are created with the 192-bit Tiger2 hashing algorithm.
+A: Primarily Reedb uses the 256-bit version of Rijndael but can easily be setup to use other ciphers (e.g. Twofish or Serpent). The encryption is handled by the GCrypt library which provides the backend to the GnuPG. Asymmetric encryption (RSA) is in the planning stage.
+
+Integrety checking and file control is done with SHA-256 hashes and filenames are salted 192-bit Tiger hashes.
+When using Reedb via the HTTP interface HTTPs keys and certificates are generated by the 'server'.
 
 ---
 **Q: Shouldn't it be camel-case?**
