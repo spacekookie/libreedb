@@ -8,12 +8,15 @@
 # ====================================================
 
 require 'socket'
+require 'timeout'
+
 
 module Reedb
 
 	class Timestamp
 		attr_accessor :utc
-		def initialize 
+
+		def initialize
 			@utc = Time.now.getutc
 		end
 
@@ -76,17 +79,18 @@ module Reedb
 			def is_i?(i)
 				i.to_i.to_s == i
 			end
+
 			is_i?(version[0]) and is_i?(version[2]) ? true : false
 		end
 
 		# Fix the actual inputs (aka test on virtual machines)
 		def self.parse_os
 			platform = RUBY_PLATFORM
-			if platform.end_with?("linux")
+			if platform.end_with?('linux')
 				return :linux
-			elsif platform.end_with?("Windows")
+			elsif platform.end_with?('Windows')
 				return :win
-			elsif platform.end_with?("Mac OS X")
+			elsif platform.end_with?('Mac OS X')
 				return :osx
 			end
 		end
@@ -105,11 +109,27 @@ module Reedb
 			end
 		end
 
+		def self.check_port(port)
+			begin
+				Timeout::timeout(1) do
+					begin
+						s = TCPSocket.new('127.0.0.1', port)
+						s.close
+						return true
+					rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+						return false
+					end
+				end
+			rescue Timeout::Error
+				return false
+			end
+		end
+
 		def self.get_time(only_date = false)
 			time = Time.now
 			val_h = "#{time.year}-#{'%02d' % time.month}-#{'%02d' % time.day}"
 			val_t = "#{time.hour}:#{'%02d' % time.min}:#{'%02d' % time.sec}"
-			
+
 			# => TODO: Make this more Ruby-Like
 			if only_date
 				return "#{val_h}"
