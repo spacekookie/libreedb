@@ -39,3 +39,4 @@ build/
 # Sublime stuff
 .sublime-workspace
 .idea/
+/Debug/
