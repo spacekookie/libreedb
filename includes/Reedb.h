@@ -25,11 +25,11 @@ private:
 	Vault *_vault;
 	Daemon *_daemon;
 
-public:
 	static Reedb& getInstance() {
 		static Reedb instance;
 		return instance;
 	}
+public:
 
 	virtual ~Reedb();
 	/** Sub modules */

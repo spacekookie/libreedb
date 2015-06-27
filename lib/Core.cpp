@@ -6,8 +6,11 @@
  */
 
 #include "../includes/Core.h"
+#include "../includes/Constants.h"
 
 #include <stdio.h>
+
+using namespace std;
 
 Core::Core() {
 }
@@ -16,5 +19,6 @@ Core::~Core() {
 }
 
 void Core::terminate() {
+
 	printf("Welcome!\n");
 }
