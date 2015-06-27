@@ -22,7 +22,7 @@ public:
 	virtual ~Core();
 
 	/** Init the*/
-	void init(int *(*f)(void));
+	void init();
 
 	/** Terminate the currently running instance with a user reason defined in the constants.h */
 	void terminate();
