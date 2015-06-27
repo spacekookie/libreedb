@@ -1,18 +1,18 @@
 /*
- * Config.cpp
+ * Daemon.cpp
  *
  *  Created on: 27 Jun 2015
  *      Author: spacekookie
  */
 
-#include "../includes/Config.h"
+#include "../public/daemon.h"
 
-Config::Config() {
+Daemon::Daemon() {
 	// TODO Auto-generated constructor stub
 
 }
 
-Config::~Config() {
+Daemon::~Daemon() {
 	// TODO Auto-generated destructor stub
 }
 

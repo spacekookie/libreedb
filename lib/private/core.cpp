@@ -5,12 +5,13 @@
  *      Author: spacekookie
  */
 
-#include "../includes/Core.h"
-#include "../includes/utils/Utilities.h"
+#include "../public/core.h"
 
-#include <stdio.h>
+#include <cstdio>
+#include <iostream>
 #include <string>
 
+#include "utils/utilities.h"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ Core::~Core() {
 
 void Core::init() {
 	string uuid = Utilities::generateUuid();
-	printf("%s\n", uuid);
+	cout << uuid << endl;
 }
 
 int Core::terminate() {

@@ -5,12 +5,13 @@
  *      Author: spacekookie
  */
 
-#include "../../includes/utils/Utilities.h"
+#include "utilities.h"
 
-#include <string>
-#include <stdlib.h>
-#include <cmath>
 #include <time.h>
+#include <stdlib.h>
+#include <iostream>
+#include <cstring>
+
 using namespace std;
 
 Utilities::Utilities() {
@@ -19,26 +20,28 @@ Utilities::Utilities() {
 Utilities::~Utilities() {
 }
 
-short UUID_LENGTH = 16;
-short UUID_SECTIONS = 4;
-
+const short UUID_LENGTH = 32;
+const short UUID_SECTIONS = 4;
 
 string Utilities::generateUuid() {
-	const char alphanum[] = "0123456789"
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-			"abcdefghijklmnopqrstuvwxyz";
+	const char *sequence = "0123abcdefg456hijklmnop789qrstuvwxyz";
+	const int ALPH_SIZE = strlen(sequence);
 
 	char *uuid = new char[UUID_LENGTH];
 
-	for (int n = 0; n < UUID_LENGTH; n++) {
-		uuid[n] = alphanum[rand() % (sizeof(alphanum)) - 1];
-	}
+	/** Setup the random seed */
 
+	srand(time(NULL));
+	for (int n = 0; n < UUID_LENGTH; n++) {
+		int picker = rand() % ALPH_SIZE;
+
+		uuid[n] = sequence[picker];
+	}
 
 	/** Now split up the UUID into sections again*/
 	int splitter = UUID_LENGTH / UUID_SECTIONS;
 
-	for(int c = 1; c < UUID_SECTIONS; c++) {
+	for (int c = 1; c < UUID_SECTIONS; c++) {
 		uuid[splitter * c] = '-';
 	}
 

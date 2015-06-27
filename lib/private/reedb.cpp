@@ -5,7 +5,7 @@
  *      Author: spacekookie
  */
 
-#include "../includes/Reedb.h"
+#include "../public/reedb.h"
 
 Reedb::Reedb() {
 	this->_core = new Core();

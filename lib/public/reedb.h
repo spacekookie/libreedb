@@ -8,10 +8,10 @@
 #ifndef REEDB_H_
 #define REEDB_H_
 
-#include "Config.h"
-#include "Core.h"
-#include "Daemon.h"
-#include "Vault.h"
+#include "vault.h"
+#include "config.h"
+#include "core.h"
+#include "daemon.h"
 
 class Reedb {
 

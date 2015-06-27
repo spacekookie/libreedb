@@ -5,9 +5,8 @@
  *      Author: spacekookie
  */
 
-#include "../../includes/utils/TokenFactory.h"
+#include "token_factory.h"
 
-#include <string>
 using namespace std;
 
 TokenFactory::TokenFactory() {

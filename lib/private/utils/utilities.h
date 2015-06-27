@@ -9,7 +9,7 @@
 #define UTILS_UTILITIES_H_
 
 #include <string>
-#include "../Constants.h"
+
 using namespace std;
 
 class Utilities {

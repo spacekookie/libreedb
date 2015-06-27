@@ -5,7 +5,7 @@
  *      Author: spacekookie
  */
 
-#include "Constants.h"
+#include "../private/constants.h"
 
 #ifndef CORE_H_
 #define CORE_H_
