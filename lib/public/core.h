@@ -16,7 +16,7 @@ private:
 	bool active;
 	char *path;
 	char *user;
-	OS os;
+	OS_Type os;
 
 public:
 	Core();

@@ -21,7 +21,7 @@ Core::Core() {
 Core::~Core() {
 }
 
-void Core::init() {
+void Core::init(options options) {
 	string uuid = Utilities::generateUuid();
 	cout << uuid << endl;
 }
