@@ -3,12 +3,11 @@
 
 #include "../includes/Reedb.h"
 
-
 /**
  * Some main function to test shit.
  */
 int main(int a, char**params) {
-	Reedb::core()->terminate();
+	Reedb::core()->init();
 
-	return 0;
+	return Reedb::core()->terminate();
 }

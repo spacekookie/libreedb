@@ -13,6 +13,7 @@
 class Core {
 
 private:
+	bool active;
 	char *path;
 	char *user;
 	OS os;
@@ -25,7 +26,7 @@ public:
 	void init();
 
 	/** Terminate the currently running instance with a user reason defined in the constants.h */
-	void terminate();
+	int terminate();
 };
 
 #endif /* CORE_H_ */
