@@ -41,7 +41,7 @@ void aesTest(int gcry_mode, char * iniVector) {
 	size_t keyLength = gcry_cipher_get_algo_keylen(GCRY_CIPHER);
 	size_t blkLength = gcry_cipher_get_algo_blklen(GCRY_CIPHER);
 	char * txtBuffer =
-			"123456789 abcdefghijklmnopqrstuvwzyz ABCDEFGHIJKLMNOPQRSTUVWZYZ";
+			"This is some random text that is the exact same length as the p";
 	size_t txtLength = strlen(txtBuffer) + 1; // string plus termination
 	char * encBuffer = malloc(txtLength);
 	char * outBuffer = malloc(txtLength);
@@ -115,6 +115,7 @@ void aesTest(int gcry_mode, char * iniVector) {
 	printf("\n");
 
 	printf("outBuffer = %s\n", outBuffer);
+	printf("\n");
 
 	// clean up after ourselves
 	gcry_cipher_close(gcryCipherHd);
@@ -123,8 +124,8 @@ void aesTest(int gcry_mode, char * iniVector) {
 }
 
 int main(void) {
-	aesTest(GCRY_CIPHER_MODE_CBC, "a test ini value");
-	//aesTest(GCRY_CIPHER_MODE_ECB, "different value!");
+	aesTest(GCRY_CIPHER_MODE_CBC, "Some random IV value!");
+	aesTest(GCRY_CIPHER_MODE_ECB, "Some random IV value!");
 	//aesTest(GCRY_CIPHER_MODE_CBC, "a test ini value");
 	//aesTest(GCRY_CIPHER_MODE_CBC, "different value!");
 }
