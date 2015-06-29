@@ -19,21 +19,17 @@ Reedb::~Reedb() {
 }
 
 Core *Reedb::core() {
-	Reedb::getInstance();
-	return getInstance()._core;
+	return this->_core;
 }
 
 Config *Reedb::config() {
-	Reedb::getInstance();
-	return getInstance()._config;
+	return this->_config;
 }
 
 Vault *Reedb::vault() {
-	Reedb::getInstance();
-	return getInstance()._vault;
+	return this->_vault;
 }
 
 Daemon *Reedb::daemon() {
-	Reedb::getInstance();
-	return getInstance()._daemon;
+	return this->_daemon;
 }

@@ -8,11 +8,8 @@
 #include "../public/daemon.h"
 
 Daemon::Daemon() {
-	// TODO Auto-generated constructor stub
-
 }
 
 Daemon::~Daemon() {
-	// TODO Auto-generated destructor stub
 }
 

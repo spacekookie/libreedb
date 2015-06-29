@@ -16,28 +16,21 @@
 class Reedb {
 
 private:
-	Reedb();
-	Reedb(Reedb const& copy);
-	Reedb& operator=(Reedb const& copy);
-
 	Core *_core;
 	Config *_config;
 	Vault *_vault;
 	Daemon *_daemon;
 
-	static Reedb& getInstance() {
-		static Reedb instance;
-		return instance;
-	}
 public:
-
+	/* Constructor & Destructor */
 	virtual ~Reedb();
-	/** Sub modules */
+	Reedb();
 
-	static Core *core();
-	static Config *config();
-	static Vault *vault();
-	static Daemon *daemon();
+	/** Sub modules */
+	Core *core();
+	Config *config();
+	Vault *vault();
+	Daemon *daemon();
 };
 
 #endif /* REEDB_H_ */

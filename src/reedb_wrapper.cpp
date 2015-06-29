@@ -1,5 +1,5 @@
-#include "../lib/private/constants.h"
 #include "../lib/public/core.h"
+#include "../lib/public/reec.h"
 #include "../lib/public/reedb.h"
 
 /**
@@ -8,9 +8,12 @@
 int main(int argc, char *argv[]) {
 
 	options my_options { OS_Type::Linux, 16 };
-	//options *my_options = new options(OS_Type::Linux, 16);
-	// Reedb::core()->init(&my_options);
+	my_options.verbose = true;
 
-	Reedb::core()->terminate();
+	Reedb *rdb = new Reedb();
+	rdb->core()->init(my_options);
+
+	// Cleanup here
+	delete rdb;
 	return 0;
 }

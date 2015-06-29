@@ -8,22 +8,11 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
-enum class OS_Type {
-	Linux, OSX, Win
-};
+#include <string>
 
-struct options {
-	options(OS_Type os, unsigned pw_length) :
-			os(os), pw_length(pw_length) {
-	}
-
-public:
-	OS_Type os;
-	unsigned pw_length;
-	bool daemon = true;
-	bool verbose = false;
-	bool token = true;
-
-};
+const std::string DEFAULT_PATH = "__FILL_IN_PLEASE__";
+const std::string DEFAULT_LINUX = "~/.config/reedb";
+const std::string DEFAULT_OSX = "~/Library/Application\\ Support/reedb";
+const std::string DEFAULT_WIN = "/Users/**USER**/Applications/reedb";
 
 #endif /* CONSTANTS_H_ */
