@@ -38,15 +38,15 @@ unsigned int decryptAES(unsigned char *key, // Key for encryption. If no key is 
  *
  * Can return non 0 values for error codes (Look those up)
  */
-unsigned int encryptAES(unsigned char *key, // Key for encryption. If none is provided one will be generated.
-		unsigned char *string_in, // Input array to encrypt.
-		char *string_out, // Output buffer that the binary or base64 encrypted data will end in.
+unsigned int encryptAES(unsigned char **key, // Key for encryption. If none is provided one will be generated.
+		char *string_in, // Input array to encrypt.
+		unsigned char **string_out, // Output buffer that the binary or base64 encrypted data will end in.
 		bool base64) // Specify whether or not base64 encoding should be used automatically.
 {
 	if (!has_been_init) return ERROR_CRYPT_NO_INIT;
 
 	// Set up how long the cipher text will be
-	unsigned int input_size = strlen(string_in) * sizeof(char);
+	unsigned int input_size = strlen(string_in) * sizeof(unsigned char);
 	unsigned int ciphertext_length = crypto_secretbox_MACBYTES + input_size;
 
 	// Set up some criptographic random nonsense
@@ -54,11 +54,11 @@ unsigned int encryptAES(unsigned char *key, // Key for encryption. If none is pr
 	randombytes_buf(nonce, sizeof nonce);
 
 	// Generate a key if none was provided
-	if (key == 0)
+	if ((*key) == NULL)
 	{
 		printf("[VERBOSE]: Generating key because none was provided\n");
-		key = calloc(crypto_secretbox_KEYBYTES, sizeof(unsigned char));
-		randombytes_buf(key, sizeof key);
+		(*key) = calloc(crypto_secretbox_KEYBYTES, sizeof(unsigned char));
+		randombytes_buf((*key), sizeof(*key));
 	}
 
 	// Set up the array for the ciphertext here with the correct length
@@ -67,25 +67,32 @@ unsigned int encryptAES(unsigned char *key, // Key for encryption. If none is pr
 	/** == MAGIC ZONE == */
 
 	// Puts the encrypted binary data in ciphertext buffer
-	crypto_secretbox_easy(ciphertext, string_in, input_size, nonce, key);
+	crypto_secretbox_easy(ciphertext, (unsigned char*) string_in, input_size,
+			nonce, (*key));
 
 	/** == END OF MAGIC ZONE == **/
 
 	if (base64)
 	{
-		char *tmp = base64_encode(ciphertext, sizeof(ciphertext));
-		printf("Temp: %s\n", tmp);
+		(*string_out) = (unsigned char*) base64_encode(ciphertext,
+				sizeof(ciphertext));
 	}
 	else
 	{
-		string_out = (unsigned char*) calloc(sizeof(ciphertext), sizeof(char));
+		(*string_out) = (unsigned char*) calloc(sizeof(ciphertext),
+				sizeof(unsigned char));
 
 		// Now the encrypted binary is in string_out
-		memcpy(string_out, ciphertext, sizeof(ciphertext));
+		memcpy((*string_out), ciphertext, sizeof(ciphertext));
 	}
 
-	// Free some resources to avoid memory leak.
-	//free(ciphertext);
+	// This crashes. So I assume something else has freed it already? But what could have?
+	// TODO: Check if this has actually been freed before.
+	// free(ciphertext);
+
+	// Dump encrypted binary that's no longer needed from memory!
+	memset(ciphertext, 0, sizeof(ciphertext) * sizeof(unsigned char));
+	*ciphertext = NULL;
 
 	// Return for success
 	return 0;
@@ -93,22 +100,24 @@ unsigned int encryptAES(unsigned char *key, // Key for encryption. If none is pr
 
 int main(void)
 {
-	printf("[VERBOSE]: First!\n");
 	if (sodium_init() == -1)
 	{
 		fputs("Sodium Init Failed!\n", stderr);
 		return 1;
 	}
+	int err;
+	char *my_text =
+			"This is my sentence I want to encrypt! Even longer strings! YAY!";
+	unsigned char *encrypted;
+	unsigned char *key = NULL;
 
-	printf("[VERBOSE]: Init done!\n");
+	err = encryptAES(&key, my_text, &encrypted, 1);
 
-	char *my_text = "This is my sentence I want to encrypt!";
-	char *encrypted;
-	encryptAES(0, my_text, encrypted, 0);
+	// Check errors!
+	if (err) fputs("An error has occured!", stderr);
 
-	printf("[VERBOSE]: Back home!\n");
-
-	printf("Outside: %s\n", encrypted);
+	printf("Encrypted: %s\n", encrypted);
+	printf("My new shiny encryption key: %s", key);
 
 	return 0;
 }
