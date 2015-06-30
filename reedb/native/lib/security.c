@@ -8,6 +8,7 @@
 #include "base64.h"
 #include "error_codes.h"
 
+#include "security.h"
 /**
  * Global variable and constants definition here
  */
@@ -19,15 +20,32 @@ bool has_been_init = true;
  * By default it handles binary input however if a boolean for base64 is provided (or value of 1)
  * it will also decode base64 on the fly and then decrypt.
  *
+ * Takes a pointer to an encryption key and a pointer to a string_out array to write the
+ * clear text into again. The cipher text is copied onto the stack.
+ *
  * Can return non 0 values for error codes. (Look those up)
  */
-unsigned int decryptAES(unsigned char *key, // Key for encryption. If no key is provided the decryption will fail.
+unsigned int decryptAES(unsigned char **key, // Key for encryption. If no key is provided the decryption will fail.
+		unsigned char **nonce, // Provide a pointer to the nonce for this data stream
 		char *string_in, // Encrypted input string as Base64 or binary string (depending on bool base64).
-		char *string_out, // Buffer for the decrypted string.
-		unsigned int s_size, // Manually specify input buffer size here.
+		char **string_out, // Buffer for the decrypted string.
 		bool base64) // Specify whether or not input buffer is base64 encoded.
 {
-	if (!key) return ERROR_CRYPT_MISSING_KEY;
+	if (!(*key)) return ERROR_CRYPT_MISSING_KEY;
+
+	// Defint the lengths for our data buffers.
+	unsigned int cipher_t_length = strlen(string_in) * sizeof(unsigned char);
+	unsigned int clear_t_length = crypto_secretbox_MACBYTES - cipher_t_length;
+
+	// Set up the array for the cleartext here with the correct length
+	unsigned char *cleartext = malloc(clear_t_length);
+
+	/** MAGIC ZONE */
+	crypto_secretbox_open_easy(cleartext, string_in, cipher_t_length, (*nonce),
+			(*key));
+
+	printf("Hello\n");
+	/** MAGIC ZONE END */
 
 	return 0;
 }
@@ -39,6 +57,7 @@ unsigned int decryptAES(unsigned char *key, // Key for encryption. If no key is 
  * Can return non 0 values for error codes (Look those up)
  */
 unsigned int encryptAES(unsigned char **key, // Key for encryption. If none is provided one will be generated.
+		unsigned char **nonce, // Provide a pointer to the nonce for this data stream. If none is provided it will generate one
 		char *string_in, // Input array to encrypt.
 		unsigned char **string_out, // Output buffer that the binary or base64 encrypted data will end in.
 		bool base64) // Specify whether or not base64 encoding should be used automatically.
@@ -49,9 +68,12 @@ unsigned int encryptAES(unsigned char **key, // Key for encryption. If none is p
 	unsigned int input_size = strlen(string_in) * sizeof(unsigned char);
 	unsigned int ciphertext_length = crypto_secretbox_MACBYTES + input_size;
 
-	// Set up some criptographic random nonsense
-	unsigned char nonce[crypto_secretbox_NONCEBYTES];
-	randombytes_buf(nonce, sizeof nonce);
+	// Set up some cryptographic random nonsense
+	if ((*nonce) == NULL)
+	{
+		(*nonce) = malloc(crypto_secretbox_NONCEBYTES);
+		randombytes_buf(nonce, sizeof nonce);
+	}
 
 	// Generate a key if none was provided
 	if ((*key) == NULL)
@@ -110,14 +132,21 @@ int main(void)
 			"This is my sentence I want to encrypt! Even longer strings! YAY!";
 	unsigned char *encrypted;
 	unsigned char *key = NULL;
+	unsigned char *nonce = NULL;
 
-	err = encryptAES(&key, my_text, &encrypted, 1);
+	err = encryptAES(&key, &nonce, my_text, &encrypted, 1);
 
 	// Check errors!
 	if (err) fputs("An error has occured!", stderr);
 
 	printf("Encrypted: %s\n", encrypted);
-	printf("My new shiny encryption key: %s", key);
+
+	// printf("My new shiny encryption key: %s", key);
+
+	/** NOW GO AND DECRYPT THE DATA */
+	unsigned char *decrypted;
+	err = decryptAES(&key, &nonce, encrypted, &decrypted, 1);
+	if (err) fputs("An error has occured!", stderr);
 
 	return 0;
 }

@@ -6,8 +6,10 @@
  */
 
 #include <json-c/json.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-int readFile(char *path) {
-	return 0;
-}
+//unsigned int openFile(void* f, const struct *data_dump, bool decrypt)
+//{
+//	return 0;
+//}
