@@ -23,7 +23,7 @@ bool has_been_init = true;
  */
 unsigned int decryptAES(unsigned char *key, // Key for encryption. If no key is provided the decryption will fail.
 		char *string_in, // Encrypted input string as Base64 or binary string (depending on bool base64).
-		char *string_out, // Decrypted string in buffer array.
+		char *string_out, // Buffer for the decrypted string.
 		unsigned int s_size, // Manually specify input buffer size here.
 		bool base64) // Specify whether or not input buffer is base64 encoded.
 {
@@ -40,16 +40,14 @@ unsigned int decryptAES(unsigned char *key, // Key for encryption. If no key is 
  */
 unsigned int encryptAES(unsigned char *key, // Key for encryption. If none is provided one will be generated.
 		unsigned char *string_in, // Input array to encrypt.
-		unsigned char *string_out, // Output buffer that the binary or base64 encrypted data will end in.
-		unsigned int s_size, // Specify the length of the data manually here.
+		char *string_out, // Output buffer that the binary or base64 encrypted data will end in.
 		bool base64) // Specify whether or not base64 encoding should be used automatically.
 {
 	if (!has_been_init) return ERROR_CRYPT_NO_INIT;
 
-	printf("[VERBOSE]: Encryption has been init!\n");
-
 	// Set up how long the cipher text will be
-	unsigned int ciphertext_length = crypto_secretbox_MACBYTES + s_size;
+	unsigned int input_size = strlen(string_in) * sizeof(char);
+	unsigned int ciphertext_length = crypto_secretbox_MACBYTES + input_size;
 
 	// Set up some criptographic random nonsense
 	unsigned char nonce[crypto_secretbox_NONCEBYTES];
@@ -69,30 +67,25 @@ unsigned int encryptAES(unsigned char *key, // Key for encryption. If none is pr
 	/** == MAGIC ZONE == */
 
 	// Puts the encrypted binary data in ciphertext buffer
-	crypto_secretbox_easy(ciphertext, string_in, s_size, nonce, key);
-	printf("[VERBOSE]: Encryption all done!\n");
+	crypto_secretbox_easy(ciphertext, string_in, input_size, nonce, key);
 
 	/** == END OF MAGIC ZONE == **/
 
 	if (base64)
 	{
-		string_out = base64_encode(ciphertext, sizeof(ciphertext));
-		printf("%s\n", string_out);
-		// string_out = string_out[sizeof(tmp)];
-
-		// memcpy(string_out, tmp, sizeof(string_out));
+		char *tmp = base64_encode(ciphertext, sizeof(ciphertext));
+		printf("Temp: %s\n", tmp);
 	}
 	else
 	{
-		string_out = calloc(sizeof(ciphertext), sizeof(char));
+		string_out = (unsigned char*) calloc(sizeof(ciphertext), sizeof(char));
 
 		// Now the encrypted binary is in string_out
 		memcpy(string_out, ciphertext, sizeof(ciphertext));
 	}
 
 	// Free some resources to avoid memory leak.
-	free(ciphertext);
-	free(nonce);
+	//free(ciphertext);
 
 	// Return for success
 	return 0;
@@ -109,14 +102,13 @@ int main(void)
 
 	printf("[VERBOSE]: Init done!\n");
 
-	char *my_text =
-			"{'header':{'name':'Master', 'tags':['awesome', 'bdsm'], urls:['www.google.de']}, 'body':{'1::872372837':{'passphrase':'abcdefghijklmnop'}}}\0";
+	char *my_text = "This is my sentence I want to encrypt!";
 	char *encrypted;
-	encryptAES(0, my_text, encrypted, sizeof(my_text), 1);
+	encryptAES(0, my_text, encrypted, 0);
 
 	printf("[VERBOSE]: Back home!\n");
 
-	printf("Encrypted: %s\n", encrypted);
+	printf("Outside: %s\n", encrypted);
 
 	return 0;
 }
