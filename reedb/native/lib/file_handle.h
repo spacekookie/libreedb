@@ -13,8 +13,14 @@
 /** Stores streams of data for header, body and a nonce for a file */
 typedef struct data_dump
 {
-	unsigned char *nonce;
+	/* Size markers for encryption */
+	unsigned int paritySize;
+	unsigned int dataSize;
+
+	/* Data fields for the head, body, parity and crypto nonce */
 	unsigned char *header;
+	unsigned char *parity;
+	unsigned char *nonce;
 	unsigned char *body;
 };
 

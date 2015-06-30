@@ -35,10 +35,15 @@ unsigned int decryptAES(unsigned char **key, // Key for encryption. If no key is
 
 	// Defint the lengths for our data buffers.
 	unsigned int cipher_t_length = strlen(string_in) * sizeof(unsigned char);
-	unsigned int clear_t_length = crypto_secretbox_MACBYTES - cipher_t_length;
+	unsigned int clear_t_length = cipher_t_length - crypto_secretbox_MACBYTES;
+	// clear_t_length -= clear_t_length;
+
+	printf("Clear text length: %d\nCipher Length: %d\n", clear_t_length,
+			cipher_t_length);
 
 	// Set up the array for the cleartext here with the correct length
-	unsigned char *cleartext = malloc(clear_t_length);
+	unsigned char cleartext[clear_t_length];
+	// unsigned char *cleartext = malloc(clear_t_length);
 
 	/** MAGIC ZONE */
 	crypto_secretbox_open_easy(cleartext, string_in, cipher_t_length, (*nonce),
@@ -52,7 +57,9 @@ unsigned int decryptAES(unsigned char **key, // Key for encryption. If no key is
 
 /**
  * Encrypt a simple string with AES (NaCL implementation) and store it in an output array.
- * Either as binary or base64 encoded if the last parameter is true (or 1).
+ *
+ * Requires a pointer to the key, pointer to a nonce (unique to one file), string in and pointer to an output.
+ * Last value is either 0 or 1 to specify Base64 or binary mode.
  *
  * Can return non 0 values for error codes (Look those up)
  */
@@ -65,8 +72,11 @@ unsigned int encryptAES(unsigned char **key, // Key for encryption. If none is p
 	if (!has_been_init) return ERROR_CRYPT_NO_INIT;
 
 	// Set up how long the cipher text will be
-	unsigned int input_size = strlen(string_in) * sizeof(unsigned char);
+	unsigned int input_size = strlen(string_in) * sizeof(char);
 	unsigned int ciphertext_length = crypto_secretbox_MACBYTES + input_size;
+
+	printf("Input size: %d\nCipher_t size: %d\nMACBYTES: %d\n", input_size,
+			ciphertext_length, crypto_secretbox_MACBYTES);
 
 	// Set up some cryptographic random nonsense
 	if ((*nonce) == NULL)
@@ -113,11 +123,71 @@ unsigned int encryptAES(unsigned char **key, // Key for encryption. If none is p
 	// free(ciphertext);
 
 	// Dump encrypted binary that's no longer needed from memory!
+	// TODO: Replace with NaCl memclear
 	memset(ciphertext, 0, sizeof(ciphertext) * sizeof(unsigned char));
-	*ciphertext = NULL;
+	*(ciphertext) = NULL;
 
 	// Return for success
 	return 0;
+}
+
+int testingEncryption(void)
+{
+	// Source information
+	unsigned char *my_text = (unsigned char*) "This is some data that I want to keep safe.";
+	unsigned long msg_length = strlen(my_text);
+	unsigned int ciphertext_length = crypto_secretbox_MACBYTES + msg_length;
+
+	printf("Orig Size: %d\n", msg_length);
+
+	// Secret information to write to disk.
+	unsigned char encrypted[ciphertext_length];
+	unsigned char *mac;
+
+	// Byproducts
+	unsigned char *key;
+	unsigned char *nonce;
+
+	// Set up some cryptographic random nonsense
+	nonce = malloc(crypto_secretbox_NONCEBYTES);
+	randombytes_buf(nonce, sizeof(nonce));
+
+	// Generate a key if none was provided
+	key = calloc(crypto_secretbox_KEYBYTES, sizeof(unsigned char));
+	randombytes_buf(key, sizeof(key));
+
+	crypto_secretbox_easy(encrypted, my_text, msg_length, nonce, key);
+
+//	int crypto_secretbox( encrypted, mac, my_text, msg_length, nonce,
+//			key);
+
+	unsigned char *base64_encrypted = base64_encode(encrypted,
+			sizeof(encrypted));
+
+	unsigned char *base64_mac = base64_encode(mac, sizeof(mac));
+
+	printf("Encrypted data: %s\n", base64_encrypted);
+	// printf("Encrypted MAC : %s\n", base64_mac);
+	printf("Encrypted size: %d\n", strlen(base64_encrypted));
+
+	/**
+	 * This function encrypts a message m of length mlen with a key k and a nonce n, and puts the encrypted message into c.
+	 *  Exactly mlen bytes will be put into c, since this function does not prepend the authentication tag.
+	 *  The tag, whose size is crypto_secretbox_MACBYTES bytes, will be put into mac.
+
+	 int crypto_secretbox_open_detached(unsigned char *m,
+	 const unsigned char *c,
+	 const unsigned char *mac,
+	 unsigned long long clen,
+	 const unsigned char *n,
+	 const unsigned char *k);
+
+	 The crypto_secretbox_open_detached() function verifies and decrypts an encrypted message c whose length is clen. clen doesn't include the tag, so this length is the same as the plaintext.
+
+	 The plaintext is put into m after verifying that mac is a valid authentication tag for this ciphertext, with the given nonce n and key k.
+	 *
+	 */
+
 }
 
 int main(void)
@@ -127,34 +197,43 @@ int main(void)
 		fputs("Sodium Init Failed!\n", stderr);
 		return 1;
 	}
-	int err;
-	char *my_text =
-			"This is my sentence I want to encrypt! Even longer strings! YAY!";
-	unsigned char *encrypted;
-	unsigned char *key = NULL;
-	unsigned char *nonce = NULL;
 
-	err = encryptAES(&key, &nonce, my_text, &encrypted, 1);
+	testingEncryption();
 
-	// Check errors!
-	if (err) fputs("An error has occured!", stderr);
+	exit(0);
 
-	printf("Encrypted: %s\n", encrypted);
-
-	// printf("My new shiny encryption key: %s", key);
-
-	/** NOW GO AND DECRYPT THE DATA */
-	unsigned char *decrypted;
-	err = decryptAES(&key, &nonce, encrypted, &decrypted, 1);
-	if (err) fputs("An error has occured!", stderr);
-
-	return 0;
+//	int err;
+//
+//	// Some testing value that has lots of different characters
+//	//char *my_text = "Some1 mäkeß more Ca$h!";
+//	char *my_text = "ABCD";
+//	unsigned char *encrypted;
+//	unsigned char *key = NULL;
+//	unsigned char *nonce = NULL;
+//
+//	err = encryptAES(&key, &nonce, my_text, &encrypted, 1);
+//
+//	// Check errors!
+//	if (err) fputs("An error has occured!", stderr);
+//
+//	printf("Encrypted: %s\n", encrypted);
+//
+//	/** NOW GO AND DECRYPT THE DATA */
+//	unsigned char *decrypted;
+//	err = decryptAES(&key, &nonce, encrypted, &decrypted, 1);
+//	if (err) fputs("An error has occured!", stderr);
+//
+//	return 0;
 }
 
 //#define MESSAGE ((const unsigned char *) "{'header':{'name':'Master', 'tags':['awesome', 'bdsm'],
 //urls:['www.google.de']}, 'body':{'1::872372837':{'passphrase':'abcdefghijklmnop'}}}\0")
 //#define MESSAGE_LEN (strlen(MESSAGE) * sizeof(char))
 //#define CIPHERTEXT_LEN (crypto_secretbox_MACBYTES + MESSAGE_LEN)
+//
+// cipher = macbytes + clear | - clear
+// cipher - clear = macbytes | - cipher
+// - clear = macbytes - cipher
 //
 //	unsigned char nonce[crypto_secretbox_NONCEBYTES];
 //	unsigned char key[crypto_secretbox_KEYBYTES];
