@@ -5,8 +5,9 @@
  *      Author: spacekookie
  */
 
+#include <stdbool.h>
 
-//unsigned int openFile(void* f, const struct *data_dump, bool decrypt)
-//{
-//	return 0;
-//}
+unsigned int openFile(void* f, const struct reefile_t *data_dump, bool decrypt)
+{
+	return 0;
+}

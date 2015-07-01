@@ -5,11 +5,13 @@
  *      Author: spacekookie
  */
 
-//int testingEncryption(void)
-//{
-//
-//	int crypto_secretbox_detached(unsigned char *c, unsigned char *mac,
-//			const unsigned char *m, unsigned long long mlen,
-//			const unsigned char *n, const unsigned char *k);
-//
-//}
+#include <ruby.h>
+
+const int RCRY_VERBOSE = 1;
+const int RCRY_BASE64 = 1;
+const int RCRY_U_IV = 1;
+
+char *method_read_file()
+{
+	return NULL;
+}

@@ -313,3 +313,7 @@ char *base64_decode(unsigned char *in)
 	return (out);
 }
 
+int alive()
+{
+	return 1;
+}

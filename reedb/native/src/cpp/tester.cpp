@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 {
 	byte *key;
 
-	generateKey(RCRY_TWOFISH, &key);
+	rcry_generateKey(RCRY_TWOFISH, &key);
 
 	string encoded;
 	encoded.clear();
@@ -57,86 +57,32 @@ int main(int argc, char* argv[])
 			);// StringSource
 	cout << "key: " << encoded << endl;
 
-//	AutoSeededRandomPool prng;
-//
-//	byte key[AES::DEFAULT_KEYLENGTH];
-//	prng.GenerateBlock(key, sizeof(key));
-//
-//	byte iv[AES::BLOCKSIZE];
-//	prng.GenerateBlock(iv, sizeof(iv));
-//
-//	string plain = "This is something really awesome in CTR mode! YAy!";
-//	string cipher, encoded, recovered;
-//
-//	/*********************************\
-//	\*********************************/
-//
-//	// Pretty print key
-//	encoded.clear();
-//	StringSource(key, sizeof(key), true, new HexEncoder(new StringSink(encoded)) // HexEncoder
-//			);// StringSource
-//	cout << "key: " << encoded << endl;
-//
-//	// Pretty print iv
-//	encoded.clear();
-//	StringSource(iv, sizeof(iv), true, new HexEncoder(new StringSink(encoded)) // HexEncoder
-//			);// StringSource
-//	cout << "iv: " << encoded << endl;
-//
-//	/*********************************\
-//	\*********************************/
-//
-//	try
-//	{
-//		cout << "plain text: " << plain << endl;
-//
-//		CTR_Mode<AES>::Encryption e;
-//		e.SetKeyWithIV(key, sizeof(key), iv);
-//
-//		// The StreamTransformationFilter adds padding
-//		//  as required. ECB and CBC Mode must be padded
-//		//  to the block size of the cipher.
-//		StringSource(plain, true,
-//				new StreamTransformationFilter(e, new StringSink(cipher)) // StreamTransformationFilter
-//						);// StringSource
-//	} catch (const CryptoPP::Exception& e)
-//	{
-//		cerr << e.what() << endl;
-//		exit(1);
-//	}
-//
-//	/*********************************\
-//	\*********************************/
-//
-//	// Pretty print
-//	encoded.clear();
-//	StringSource(cipher, true, new HexEncoder(new StringSink(encoded)) // HexEncoder
-//			);// StringSource
-//	cout << "cipher text: " << encoded << endl;
-//
-//	/*********************************\
-//	\*********************************/
-//
-//	try
-//	{
-//		CTR_Mode<AES>::Decryption d;
-//		d.SetKeyWithIV(key, sizeof(key), iv);
-//
-//		// The StreamTransformationFilter removes
-//		//  padding as required.
-//		StringSource s(cipher, true,
-//				new StreamTransformationFilter(d, new StringSink(recovered)) // StreamTransformationFilter
-//						);// StringSource
-//
-//		cout << "recovered text: " << recovered << endl;
-//	} catch (const CryptoPP::Exception& e)
-//	{
-//		cerr << e.what() << endl;
-//		exit(1);
-//	}
-//
-//	/*********************************\
-//	\*********************************/
+	rcry_cryptoInit(RCRY_RIJNDAEL, &key);
 
+	//\\// RAW DATA FROM WRAPPER CODE \\//
+	raw_datafile_t *rdf = (struct raw_datafile_t*) malloc(
+			sizeof(struct raw_datafile_t));
+
+	rdf->body =
+			"{'1::1237823':{'passphrase':'qwertzuiop', 'username':'spacekookie'}, '2::234878':{'passphrase':'BetterCarHorseBattery'}}";
+	rdf->header =
+			"{'name'=>'Lonely Robot', 'urls'=>['www.myface.com', 'mobile.myface.com'], 'tags'=>['social media', 'awesome', 'web login']}";
+	rdf->meta_name = "Myface";
+
+	//\\// RAW DATA FROM WRAPPER CODE END \\//
+
+	// This is our dummy file for disk handling
+	reefile_t *myFile = (struct reefile_t*) malloc(sizeof(struct reefile_t));
+	myFile->context = (struct ree_ccontext_t*) malloc(
+			sizeof(struct ree_ccontext_t));
+
+	rcry_setCryptoContext(myFile->context);
+
+	rcry_encryptInContext(myFile->head, &rdf->header);
+	rcry_encryptInContext(myFile->body, &rdf->body);
+
+	rcry_cryptoStop();
+
+	cout << "Going down for a nap..." << endl;
 	return 0;
 }

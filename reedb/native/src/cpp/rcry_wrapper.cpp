@@ -20,9 +20,6 @@ using std::endl;
 #include <string>
 using std::string;
 
-#include <cstdlib>
-using std::exit;
-
 #include <cryptopp/cryptlib.h>
 using CryptoPP::Exception;
 
@@ -47,8 +44,14 @@ using CryptoPP::CTR_Mode;
 #include <assert.h>
 
 // Internal requirements
-#include "../file_handle.h"
 #include "rcry_wrapper.hpp"
+
+// C includes!
+extern "C"
+{
+#include "../file_handle.h"
+#include "../heads/base64.h"
+}
 
 /////////////////////////////
 // This is where variables such as current crypto context IV and key will be stored.
@@ -57,11 +60,12 @@ using CryptoPP::CTR_Mode;
 // \\// \\// \\// \\// \\// \\// \\// \\// \\// \\//
 
 byte *vault_key;
-struct ReeFile *context;
+struct ree_ccontext_t *context;
+ree_crypto_t target;
 
 // \\// \\// \\// \\// \\// \\// \\// \\// \\// \\//
 
-unsigned int generateKey(ree_crypto_t ctype, byte **key)
+unsigned int rcry_generateKey(ree_crypto_t ctype, byte **key)
 {
 	AutoSeededRandomPool prng;
 
@@ -74,7 +78,6 @@ unsigned int generateKey(ree_crypto_t ctype, byte **key)
 	{
 		(*key) = key[Twofish::MAX_KEYLENGTH];
 		prng.GenerateBlock((*key), sizeof((*key)));
-
 	}
 	else
 	{
@@ -87,7 +90,7 @@ unsigned int generateKey(ree_crypto_t ctype, byte **key)
 	return 0;
 }
 
-unsigned int cryptoInit(ree_crypto_t ctype, byte **key)
+unsigned int rcry_cryptoInit(ree_crypto_t ctype, byte **key)
 {
 	if (!vault_key) vault_key = (*key);
 	else
@@ -97,12 +100,103 @@ unsigned int cryptoInit(ree_crypto_t ctype, byte **key)
 				<< endl;
 		return 0xFB;
 	}
+
+	target = ctype;
 	return 0;
 }
 
-unsigned int cryptoStop()
+unsigned int rcry_cryptoStop()
 {
-	free(vault_key);
+	// Kill the encryption key from memory
+	// TODO: Test if it actually no longer shows up in coredump
+	CryptoPP::SecureWipeArray(vault_key, sizeof(vault_key));
 	vault_key = NULL;
+}
 
+unsigned int rcry_encryptInContext(byte *input, string *output)
+{
+	try
+	{
+		CTR_Mode<AES>::Encryption e;
+		e.SetKeyWithIV(vault_key, sizeof(vault_key), context->iv);
+		StringSource(input, true,
+				new StreamTransformationFilter(e, new StringSink(*output)) // StreamTransformationFilter
+						);// StringSource
+	} catch (const CryptoPP::Exception& e)
+	{
+		cerr << e.what() << endl;
+		return 0x44;
+	}
+	return 0;
+}
+
+unsigned int rcry_decryptInContext(byte *input, string *output)
+{
+	try
+	{
+		CTR_Mode<AES>::Decryption d;
+		d.SetKeyWithIV(vault_key, sizeof(vault_key), context->iv);
+
+		StringSource s(input, true,
+				new StreamTransformationFilter(d, new StringSink(*output)) // StreamTransformationFilter
+						);// StringSource
+
+	} catch (const CryptoPP::Exception& e)
+	{
+		cerr << e.what() << endl;
+		return 0x55;
+	}
+	return 0;
+}
+
+unsigned int rcry_setCryptoContext(struct ree_ccontext_t *newContext)
+{
+	if (newContext == NULL) return 0x65;
+
+	// This means that a new IV needs to be made. Yay!
+	if (newContext->fresh == 1)
+	{
+		if (target == RCRY_RIJNDAEL)
+		{
+			newContext->iv[AES::MAX_KEYLENGTH];
+		}
+		else if (target == RCRY_TWOFISH)
+		{
+			newContext->iv[Twofish::MAX_KEYLENGTH];
+		}
+		else return 0x66;
+
+		// Now there should be enough memory for a key!
+		AutoSeededRandomPool prng;
+		prng.GenerateBlock(newContext->iv, sizeof(newContext->iv));
+
+		// Make sure to update the fresh variable.
+		newContext->fresh = 0;
+	}
+
+	// Now go ahead, zero the old context and write over the new!
+	CryptoPP::SecureWipeArray(context, sizeof(context));
+	context = newContext;
+	return 0;
+}
+
+unsigned int rcry_toBase64Converter(byte *binary, string *base64, bool print)
+{
+	if (base64 == NULL) return 0xB0;
+
+	(*base64).clear();
+	StringSource(binary, sizeof((*binary)), true,
+			new HexEncoder(new StringSink((*base64))));
+
+	if (print) cout << "=> " << (*base64) << endl;
+	return 0;
+}
+
+unsigned int rcry_FromBase64Converter(string *base64, byte **binary, bool print)
+{
+	if (binary == NULL) return 0xB1;
+	(*binary) = (byte*) base64_decode((unsigned char*) (*base64).c_str());
+
+	if (print) cout << "B=> " << (*binary) << endl;
+	return 0;
 }

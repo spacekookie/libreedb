@@ -8,14 +8,23 @@
 #ifndef SRC_FILE_HANDLE_H_
 #define SRC_FILE_HANDLE_H_
 
+#include <stdbool.h>
+
+struct ree_ccontext_t
+{
+	bool fresh = 1;
+	byte *iv;
+	byte *mac;
+};
+
 /**
  * Basic file struct that holds an IV, head and body fields as well
  * as Message AuthentiCation tags for when they're being used.
  */
-struct ReeFile
+struct reefile_t
 {
-	byte *iv;
-	byte *mac;
+	/* Holds a crypto context for a file. mostly an IV and MAC */
+	ree_ccontext_t *context;
 
 	byte *head;
 	unsigned int headSize;
@@ -23,5 +32,18 @@ struct ReeFile
 	byte *body;
 	unsigned int bodySize;
 };
+
+struct raw_datafile_t
+{
+	string meta_name;
+	string header;
+	string body;
+};
+
+/** Dumps data in a reefile_t struct to disk in the apropriate directory */
+unsigned int dumpToDisk(unsigned char *name, struct reefile_t *data);
+
+/** Writes data from a file into a reefile_t struct */
+unsigned int pollFromDisk(unsigned char *name, struct reefile_t **data);
 
 #endif /* SRC_FILE_HANDLE_H_ */
