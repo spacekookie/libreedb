@@ -26,6 +26,9 @@ struct reefile_t
 	/* Holds a crypto context for a file. mostly an IV and MAC */
 	ree_ccontext_t *context;
 
+	// This holds a tiger hash of the meta_name
+	char *file_dump_name;
+
 	byte *head;
 	unsigned int headSize;
 
@@ -35,9 +38,9 @@ struct reefile_t
 
 struct raw_datafile_t
 {
-	string meta_name;
-	string header;
-	string body;
+	char *meta_name;
+	char *header;
+	char *body;
 };
 
 /** Dumps data in a reefile_t struct to disk in the apropriate directory */

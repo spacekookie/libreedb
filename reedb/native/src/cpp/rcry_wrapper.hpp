@@ -31,9 +31,9 @@ unsigned int rcry_encryptInContext(byte *input, string *output);
 
 unsigned int rcry_decryptInContext(byte *input, string *output);
 
-unsigned int rcry_toBase64Converter(byte *binary, string *base64);
+unsigned int rcry_toBase64Converter(byte *binary, string *base64, bool print);
 
-unsigned int rcry_FromBase64Converter(string *base64, byte *binary);
+unsigned int rcry_FromBase64Converter(string *base64, byte *binary, bool print);
 
 unsigned int rcry_cryptoStop();
 

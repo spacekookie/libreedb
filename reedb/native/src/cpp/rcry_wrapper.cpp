@@ -59,9 +59,9 @@ extern "C"
 ////////////////////////////
 // \\// \\// \\// \\// \\// \\// \\// \\// \\// \\//
 
-byte *vault_key;
-struct ree_ccontext_t *context;
-ree_crypto_t target;
+static byte *vault_key;
+static struct ree_ccontext_t *context;
+static ree_crypto_t target;
 
 // \\// \\// \\// \\// \\// \\// \\// \\// \\// \\//
 
@@ -71,12 +71,12 @@ unsigned int rcry_generateKey(ree_crypto_t ctype, byte **key)
 
 	if (ctype == RCRY_RIJNDAEL)
 	{
-		(*key) = key[AES::MAX_KEYLENGTH];
+		(*key) = (byte*) malloc(AES::MAX_KEYLENGTH);
 		prng.GenerateBlock((*key), sizeof((*key)));
 	}
 	else if (ctype == RCRY_TWOFISH)
 	{
-		(*key) = key[Twofish::MAX_KEYLENGTH];
+		(*key) = (byte*) malloc(AES::MAX_KEYLENGTH);
 		prng.GenerateBlock((*key), sizeof((*key)));
 	}
 	else
@@ -107,6 +107,7 @@ unsigned int rcry_cryptoInit(ree_crypto_t ctype, byte **key)
 
 unsigned int rcry_cryptoStop()
 {
+
 	// Kill the encryption key from memory
 	// TODO: Test if it actually no longer shows up in coredump
 	CryptoPP::SecureWipeArray(vault_key, sizeof(vault_key));
@@ -115,37 +116,55 @@ unsigned int rcry_cryptoStop()
 
 unsigned int rcry_encryptInContext(byte *input, string *output)
 {
-	try
+	if (target == RCRY_RIJNDAEL)
 	{
-		CTR_Mode<AES>::Encryption e;
-		e.SetKeyWithIV(vault_key, sizeof(vault_key), context->iv);
-		StringSource(input, true,
-				new StreamTransformationFilter(e, new StringSink(*output)) // StreamTransformationFilter
-						);// StringSource
-	} catch (const CryptoPP::Exception& e)
-	{
-		cerr << e.what() << endl;
-		return 0x44;
+		try
+		{
+			CTR_Mode<AES>::Encryption e;
+			e.SetKeyWithIV(vault_key, sizeof(vault_key), context->iv);
+			StringSource(input, true,
+					new StreamTransformationFilter(e, new StringSink(*output)) // StreamTransformationFilter
+							);// StringSource
+		} catch (const CryptoPP::Exception& e)
+		{
+			cerr << e.what() << endl;
+			return 0x44;
+		}
 	}
+	else
+	{
+		cerr << "Context not implemented! Use RCRY_RIJNAEL INSTEAD!" << endl;
+		return 0xFAF;
+	}
+
 	return 0;
 }
 
 unsigned int rcry_decryptInContext(byte *input, string *output)
 {
-	try
+	if (target == RCRY_RIJNDAEL)
 	{
-		CTR_Mode<AES>::Decryption d;
-		d.SetKeyWithIV(vault_key, sizeof(vault_key), context->iv);
+		try
+		{
+			CTR_Mode<AES>::Decryption d;
+			d.SetKeyWithIV(vault_key, sizeof(vault_key), context->iv);
 
-		StringSource s(input, true,
-				new StreamTransformationFilter(d, new StringSink(*output)) // StreamTransformationFilter
-						);// StringSource
+			StringSource s(input, true,
+					new StreamTransformationFilter(d, new StringSink(*output)) // StreamTransformationFilter
+							);// StringSource
 
-	} catch (const CryptoPP::Exception& e)
-	{
-		cerr << e.what() << endl;
-		return 0x55;
+		} catch (const CryptoPP::Exception& e)
+		{
+			cerr << e.what() << endl;
+			return 0x55;
+		}
 	}
+	else
+	{
+		cerr << "Context not implemented! Use RCRY_RIJNAEL INSTEAD!" << endl;
+		return 0xFAF;
+	}
+
 	return 0;
 }
 
@@ -154,15 +173,17 @@ unsigned int rcry_setCryptoContext(struct ree_ccontext_t *newContext)
 	if (newContext == NULL) return 0x65;
 
 	// This means that a new IV needs to be made. Yay!
-	if (newContext->fresh == 1)
+	if (newContext->fresh != 0)
 	{
 		if (target == RCRY_RIJNDAEL)
 		{
-			newContext->iv[AES::MAX_KEYLENGTH];
+			newContext->iv = (byte*) malloc(AES::MAX_KEYLENGTH * sizeof(byte));
+			cout << "IV Size: " << AES::MAX_KEYLENGTH * sizeof(byte) << endl;
 		}
 		else if (target == RCRY_TWOFISH)
 		{
-			newContext->iv[Twofish::MAX_KEYLENGTH];
+			newContext->iv = (byte*) malloc(
+					Twofish::MAX_KEYLENGTH * sizeof(byte));
 		}
 		else return 0x66;
 
@@ -173,6 +194,12 @@ unsigned int rcry_setCryptoContext(struct ree_ccontext_t *newContext)
 		// Make sure to update the fresh variable.
 		newContext->fresh = 0;
 	}
+	string buffer;
+	rcry_toBase64Converter(newContext->iv, &buffer, false);
+
+	cout << "My IV: " << buffer << endl;
+
+//	rcry_toBase64Converter(myFile->head, &buffer, true);
 
 	// Now go ahead, zero the old context and write over the new!
 	CryptoPP::SecureWipeArray(context, sizeof(context));
