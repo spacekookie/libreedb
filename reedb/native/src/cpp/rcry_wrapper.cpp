@@ -175,21 +175,26 @@ unsigned int rcry_setCryptoContext(struct ree_ccontext_t *newContext)
 	// This means that a new IV needs to be made. Yay!
 	if (newContext->fresh != 0)
 	{
+		byte *iv;
+
 		if (target == RCRY_RIJNDAEL)
 		{
-			newContext->iv = (byte*) malloc(AES::MAX_KEYLENGTH * sizeof(byte));
-			cout << "IV Size: " << AES::MAX_KEYLENGTH * sizeof(byte) << endl;
+			iv[AES::BLOCKSIZE];
 		}
 		else if (target == RCRY_TWOFISH)
 		{
-			newContext->iv = (byte*) malloc(
-					Twofish::MAX_KEYLENGTH * sizeof(byte));
+			iv[Twofish::MAX_KEYLENGTH];
 		}
 		else return 0x66;
 
 		// Now there should be enough memory for a key!
 		AutoSeededRandomPool prng;
 		prng.GenerateBlock(newContext->iv, sizeof(newContext->iv));
+
+		// Now malloc that bitch and assign the pointer to the struct
+		byte *final_iv = (byte*) malloc(sizeof(iv));
+		memcpy(final_iv, iv, sizeof(final_iv));
+		newContext->iv = final_iv;
 
 		// Make sure to update the fresh variable.
 		newContext->fresh = 0;

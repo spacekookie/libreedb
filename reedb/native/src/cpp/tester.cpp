@@ -56,9 +56,10 @@ extern "C"
 #include "../file_handle.h"
 }
 
+#include "bench.hpp";
+
 int main(int argc, char* argv[])
 {
-
 	byte *key;
 	rcry_generateKey(RCRY_RIJNDAEL, &key);
 
