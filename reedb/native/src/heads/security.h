@@ -8,8 +8,7 @@
 #ifndef SECURITY_H_
 #define SECURITY_H_
 
-#define TRUE 1
-#define FALSE 0
+#include <stdbool.h>
 
 ;
 // Why the fuck...?

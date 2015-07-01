@@ -5,9 +5,6 @@
  *      Author: spacekookie
  */
 
-#include <json-c/json.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 //unsigned int openFile(void* f, const struct *data_dump, bool decrypt)
 //{

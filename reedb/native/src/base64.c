@@ -29,10 +29,11 @@
  * @ingroup base64
  */
 
-#include <stdio.h>
+#include "heads/base64.h"
+
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "base64.h"
 
 #define XX 100
 

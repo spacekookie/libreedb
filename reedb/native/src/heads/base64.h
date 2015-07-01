@@ -32,6 +32,8 @@
 #ifndef _BASE64_H
 #define _BASE64_H
 
+#include <stdlib.h>
+
 void base64_encode_block(unsigned char out[4], const unsigned char in[3],
 		int len);
 int base64_decode_block(unsigned char out[3], const unsigned char in[4]);

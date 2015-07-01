@@ -15,6 +15,6 @@ const unsigned int ERROR_CRYPT_MISSING_KEY = 0x23;
 
 const unsigned int ERROR_BASE64_MISSING_BUFFER = 0x24;
 
-const unsigned char *ERROR_CRYPT
+const unsigned char *ERROR_CRYPT;
 
 #endif /* ERROR_CODES_H_ */

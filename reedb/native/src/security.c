@@ -1,18 +1,22 @@
+#include "heads/security.h"
+
+#include <sodium.h>
+#include <sodium/core.h>
+#include <sodium/crypto_secretbox.h>
+#include <sodium/randombytes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sodium.h>
 #include <string.h>
-#include <stdbool.h>
 
-// Internal (aka static) link to a base64 encoder.
-#include "base64.h"
-#include "error_codes.h"
+#include "heads/base64.h"
+#include "heads/error_codes.h"
 
-#include "security.h"
 /**
  * Global variable and constants definition here
  */
 #define TARGET_CIPHER AES256_NACL
+
 bool has_been_init = true;
 
 /**
@@ -190,17 +194,18 @@ int testingEncryption(void)
 
 }
 
-int main(void)
-{
-	if (sodium_init() == -1)
-	{
-		fputs("Sodium Init Failed!\n", stderr);
-		return 1;
-	}
-
-	testingEncryption();
-
-	exit(0);
+//int main(void)
+//{
+//	if (sodium_init() == -1)
+//	{
+//		fputs("Sodium Init Failed!\n", stderr);
+//		return 1;
+//	}
+//
+//	testingEncryption();
+//
+//	exit(0);
+//}
 
 //	int err;
 //
@@ -224,7 +229,7 @@ int main(void)
 //	if (err) fputs("An error has occured!", stderr);
 //
 //	return 0;
-}
+//}
 
 //#define MESSAGE ((const unsigned char *) "{'header':{'name':'Master', 'tags':['awesome', 'bdsm'],
 //urls:['www.google.de']}, 'body':{'1::872372837':{'passphrase':'abcdefghijklmnop'}}}\0")
