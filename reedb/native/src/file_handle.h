@@ -29,10 +29,10 @@ struct reefile_t
 	// This holds a tiger hash of the meta_name
 	char *file_dump_name;
 
-	byte *head;
+	char *head;
 	unsigned int headSize;
 
-	byte *body;
+	char *body;
 	unsigned int bodySize;
 };
 

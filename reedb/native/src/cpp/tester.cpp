@@ -77,8 +77,6 @@ int main(int argc, char* argv[])
 	raw_datafile_t *rdf = (struct raw_datafile_t*) malloc(
 			sizeof(struct raw_datafile_t));
 
-	cout << "Step 1" << endl;
-
 	//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
 	//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
 	char *b =
@@ -116,11 +114,13 @@ int main(int argc, char* argv[])
 			sizeof(struct ree_ccontext_t));
 	// An empty context means that an IV needs to be created!
 
-	cout << "Two more mallocs." << endl;
-
 	rcry_setCryptoContext(my_file->context);
 
 	cout << "Just set context! YAY!" << endl;
+
+	rcry_encryptInContext((string*) &rdf->header, (string*) &my_file->head);
+
+//	rcry_encryptInContext(rdf->header, my_file->head);
 
 //	rcry_setCryptoContext(myFile->context);
 
