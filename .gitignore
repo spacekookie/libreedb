@@ -20,6 +20,8 @@ build/
 /_yardoc/
 /doc/
 /rdoc/
+/.metadata/
+/RemoteSystemsTempFiles/
 
 ## Environment normalisation:
 /.bundle/
@@ -37,3 +39,5 @@ build/
 # Sublime stuff
 .sublime-workspace
 .idea/
+/.metadata/
+/Debug/
