@@ -30,3 +30,8 @@
 
 # Debug files
 *.dSYM/
+
+# Custom ignores to make the repo nicer
+.directory
+Debug/
+*.kate-swp
