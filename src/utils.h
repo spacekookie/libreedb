@@ -8,7 +8,8 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
-typedef enum ree_err_t {
+typedef enum ree_err_t
+{
 	FAILURE = -1, // To be used when cause of error not known.
 	SUCCESS = 0, // When something went according to plan
 	BIG_SUCCESS = 0, //
@@ -26,6 +27,10 @@ typedef enum ree_err_t {
 
 /** Some constants to use everywhere */
 static const unsigned int MIN_PASSLENGTH = 4;
+
+static const char *ERR_CORE_NOT_INIT =
+		"Core module not initiated: Vault can not operate without core. Aborting!\n";
+
 static const char *ERR_INIT_MSG =
 		"Can't change this parameter! Reedb was already initialised.\n";
 

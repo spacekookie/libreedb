@@ -12,8 +12,8 @@
 #include "core.h"
 #include "utils.h"
 
-int main(void) {
-
+int main(void)
+{
 	ree_err_t rtn;
 
 	struct reedb_c *container;
@@ -23,12 +23,16 @@ int main(void) {
 	rtn = rdb_set_path("/etc/reedb/");
 
 	rtn = reedb_init(&container);
-	if (rtn != BIG_SUCCESS) {
+	if (rtn != BIG_SUCCESS)
+	{
 		fputs("An error occurred when initialising Reedb!\n", stderr);
-	} else {
+	}
+	else
+	{
 		printf("Reedb was initialised successfully!\n");
 	}
 
 	free(container);
+	printf("The reedb container was now successfully freed \n");
 	return 0;
 }

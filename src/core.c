@@ -40,13 +40,16 @@ int __OS__ = 5;
 int __OVERRIDE__ = 6;
 //TODO: Add user functions here
 
-ree_err_t rdb_set_passlength(unsigned int length) {
-	if (was_init) {
+ree_err_t rdb_set_passlength(unsigned int length)
+{
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
 
-	if (length <= MIN_PASSLENGTH) {
+	if (length <= MIN_PASSLENGTH)
+	{
 		fputs("Can not set minimal passphrase length lower than 4", stderr);
 		return -1;
 	}
@@ -55,8 +58,10 @@ ree_err_t rdb_set_passlength(unsigned int length) {
 	return 0;
 }
 
-ree_err_t rdb_set_usrcode(void *funct) {
-	if (was_init) {
+ree_err_t rdb_set_usrcode(void *funct)
+{
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
@@ -64,9 +69,11 @@ ree_err_t rdb_set_usrcode(void *funct) {
 	return 0;
 }
 
-ree_err_t rdb_set_daemon(bool daemon) {
+ree_err_t rdb_set_daemon(bool daemon)
+{
 	printf("Length: %d\n", tmp_passlength);
-	if (was_init) {
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
@@ -75,8 +82,10 @@ ree_err_t rdb_set_daemon(bool daemon) {
 	return 0;
 }
 
-ree_err_t rdb_set_verbose(bool verbose) {
-	if (was_init) {
+ree_err_t rdb_set_verbose(bool verbose)
+{
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
@@ -86,8 +95,10 @@ ree_err_t rdb_set_verbose(bool verbose) {
 	return 0;
 }
 
-ree_err_t rdb_set_path(char *path) {
-	if (was_init) {
+ree_err_t rdb_set_path(char *path)
+{
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
@@ -98,8 +109,10 @@ ree_err_t rdb_set_path(char *path) {
 }
 ;
 
-ree_err_t rdb_set_os(ree_os man_os) {
-	if (was_init) {
+ree_err_t rdb_set_os(ree_os man_os)
+{
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
@@ -108,8 +121,10 @@ ree_err_t rdb_set_os(ree_os man_os) {
 	return 0;
 }
 
-ree_err_t rdb_set_override(bool override) {
-	if (was_init) {
+ree_err_t rdb_set_override(bool override)
+{
+	if (was_init)
+	{
 		fputs(ERR_INIT_MSG, stderr);
 		return ALREADY_INIT;
 	}
@@ -118,50 +133,64 @@ ree_err_t rdb_set_override(bool override) {
 	return 0;
 }
 
-ree_err_t reedb_init(reedb_c *(*container)) {
+ree_err_t reedb_init(reedb_c *(*container))
+{
 
-	if ((*container) == NULL) {
+	if ((*container) == NULL)
+	{
 		return MISSING_CONTAINER;
 	}
 
 	(*container) = calloc(sizeof(reedb_c), 1);
-	if ((*container) == NULL) {
+	if ((*container) == NULL)
+	{
 		return MALLOC_FAILED;
 	}
 
-	if (settings[__PASSLENGTH__]) {
+	if (settings[__PASSLENGTH__])
+	{
 		(*container)->passlength = tmp_passlength;
-	} else {
+	}
+	else
+	{
 		return MISSING_PARAMS;
 	}
 
 	// TODO: Check that user code is present here
 
-	if (settings[__OS__]) {
+	if (settings[__OS__])
+	{
 		(*container)->os = tmp_os;
-	} else {
+	}
+	else
+	{
 		// TODO: PARSE OS HERE
 
-		if (false) {
+		if (false)
+		{
 			return OS_PARSE_FAILED;
 		}
 	}
 
-	if (settings[__DAEMON__]) {
+	if (settings[__DAEMON__])
+	{
 		(*container)->daemon = tmp_daemon;
 	}
 
-	if (settings[__PATH__]) {
+	if (settings[__PATH__])
+	{
 		(*container)->path = tmp_path;
 	}
 
-	if (settings[__VERBOSE__]) {
+	if (settings[__VERBOSE__])
+	{
 		(*container)->verbose = tmp_verbose;
 	}
 
 	//TODO: Check if a lock exists
 	bool locked = false;
-	if (locked && !tmp_override) {
+	if (locked && !tmp_override)
+	{
 		return ZOMBIE_INSTANCE;
 	}
 
@@ -171,8 +200,10 @@ ree_err_t reedb_init(reedb_c *(*container)) {
 	return 0;
 }
 
-ree_err_t reedb_terminate(char *reason) {
-	if (!was_init) {
+ree_err_t reedb_terminate(char *reason)
+{
+	if (!was_init)
+	{
 		printf(ERR_NOT_INIT, "__CORE__");
 		printf("\n");
 		return NOT_INITIALISED;
@@ -181,6 +212,7 @@ ree_err_t reedb_terminate(char *reason) {
 }
 
 /** Returns if this module was successfully initialised */
-bool reedb_isActive() {
+bool reedb_isActive()
+{
 	return was_init;
 }

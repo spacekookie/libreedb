@@ -11,25 +11,31 @@
 #include <stdbool.h>
 #include "vault.h"
 
-typedef struct ree_datanode {
+typedef struct ree_datanode ree_datanode;
+struct rdb_datanode
+{
 	char **name;
-	rdb_datanode *child;
+	ree_datanode *child;
 	void *field;
-} rdb_datanode;
+};
 
-typedef struct ree_datafile {
-	ree_vault *vault;
+typedef struct ree_datafile ree_datafile;
+struct ree_datafile
+{
+	struct ree_vault *vault;
 	char **name;
 	unsigned int version;
 	ree_datanode *head, *body;
-} ree_datafile;
+};
 
-typedef enum ree_imode_t {
+typedef enum ree_imode_t
+{
 	HARD, SOFT
 } ree_imode_t;
 
 /** Creates a new reedb datafile */
-ree_err_t rdb_file_create(ree_datafile **file, char *name, ree_vault *vault);
+ree_err_t rdb_file_create(ree_datafile **file, char *name,
+		struct ree_vault *vault);
 
 ree_err_t rdb_file_insert(ree_datafile **file, ree_datanode *node,
 		ree_imode_t mode);

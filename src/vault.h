@@ -28,20 +28,21 @@
 #include "utils.h"
 #include "core.h"
 #include "crypto/token.h"
+#include "datafile.h"
 
-typedef struct ree_vault {
+typedef struct ree_vault
+{
 	ree_uuid *uuid;
 	char **name, **path;
 	size_t entry_count;
-
-
+	ree_datafile **entries;
 } ree_vault;
 
 /** Initialise the vault module with an existing Reedb container */
 ree_err_t rdb_vault_init(reedb_c *(*container));
 
-/** Returns a list of */
-ree_err_t rdb_vault_list();
+/** Returns a list of available vaults. Uses the same struct as internal workings with the entries field nulled out. */
+ree_err_t rdb_vault_list(ree_vault **list);
 
 ree_err_t rdb_vault_scope(ree_uuid **uuid, char *name, char *path);
 
@@ -54,7 +55,7 @@ ree_err_t rdb_vault_authenticate(ree_token *token, ree_uuid *uuid);
 
 ree_err_t rdb_vault_headers(ree_uuid *uuid, ree_token *token, char *search);
 
-ree_err_t rdb_vault_headers(ree_uuid *uuid, ree_token *token);
+// ree_err_t rdb_vault_headers(ree_uuid *uuid, ree_token *token);
 
 ree_err_t rdb_vault_file(ree_uuid *uuid, ree_token *token);
 
