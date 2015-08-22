@@ -6,13 +6,6 @@
  */
 
 #include <stdlib.h>
-#include <gdsl.h>
-
-int main(void)
-{
-
-	return 0;
-}
 
 //
 //int main(void)

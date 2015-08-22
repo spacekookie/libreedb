@@ -25,4 +25,5 @@ CPP_DEPS :=
 SUBDIRS := \
 src \
 src/crypto \
+src/gdsl \
 
