@@ -7,6 +7,12 @@
 
 #include <stdlib.h>
 
+int main(void)
+{
+	main_two();
+	return 0;
+}
+
 //
 //int main(void)
 //{

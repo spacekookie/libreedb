@@ -76,7 +76,7 @@ my_struct_key(gdsl_element_t e)
 	return s->string;
 }
 
-int main(void)
+int main_two(void)
 {
 	int choice;
 	gdsl_hash_t ht;
