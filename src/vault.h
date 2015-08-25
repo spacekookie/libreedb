@@ -25,10 +25,10 @@
 #define SRC_VAULT_H_
 
 #include <stdbool.h>
-#include "utils.h"
 #include "core.h"
 #include "crypto/token.h"
 #include "datafile.h"
+#include "defs.h"
 #include "ree_vault.h"
 
 /** Initialise the vault module with an existing Reedb container */

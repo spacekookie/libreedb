@@ -204,10 +204,13 @@ ree_err_t reedb_init(reedb_c *(*container))
 	/* This is used by other modules to guarantee the existence of the core module */
 	(*container)->active = true;
 
+	/* Then set the init field to true */
+	was_init = true;
+
 	return 0;
 }
 
-ree_err_t reedb_terminate(char *reason)
+ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 {
 	if (!was_init)
 	{
@@ -221,13 +224,17 @@ ree_err_t reedb_terminate(char *reason)
 	// TODO: Test if this actually works!
 	for(count = 0; count < 5; count++)
 	{
-		ree_vault tmp = active_vaults[count];
-
-		if(tmp.uuid == NULL)
+		if(active_vaults[count].uuid == NULL)
 		{
 			rdb_vault_close(active_vaults[count].uuid, NULL);
 		}
 	}
+
+	was_init = false;
+
+	free((*container));
+	(*container) = NULL;
+	printf("Reedb is now shut down. Do not use your container pointer anymore!\n");
 	return 0;
 }
 
@@ -240,4 +247,9 @@ bool reedb_isActive()
 ree_vault *get_active_vaults()
 {
 	return active_vaults;
+}
+
+unsigned int get_active_count()
+{
+	return 5;
 }

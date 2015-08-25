@@ -8,7 +8,7 @@
 #ifndef SRC_UUID_H_
 #define SRC_UUID_H_
 
-#include "utils.h"
+#include "defs.h"
 
 typedef enum {
 	TYPE1, /* Type with MAC Address */

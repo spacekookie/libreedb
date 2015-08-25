@@ -32,7 +32,8 @@
  */
 
 #include <stdbool.h>
-#include "utils.h"
+
+#include "defs.h"
 
 typedef enum ree_os {
 	LINUX = 0xE1, /* Linux systems */
@@ -81,7 +82,7 @@ ree_err_t rdb_set_override(bool override);
 ree_err_t reedb_init(reedb_c *(*container));
 
 /** Terminate the current Reedb instance and */
-ree_err_t reedb_terminate(char *reason);
+ree_err_t reedb_terminate(reedb_c *(*container), char *reason);
 
 bool reedb_isActive();
 
