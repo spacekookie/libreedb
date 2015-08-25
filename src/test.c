@@ -6,10 +6,14 @@
  */
 
 #include <stdlib.h>
+#include "core.h"
+#include "vault.h"
 
 int main(void)
 {
-	main_two();
+	reedb_c *container;
+	reedb_init(container);
+
 	return 0;
 }
 

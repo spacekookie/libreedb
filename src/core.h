@@ -51,6 +51,9 @@ typedef struct reedb_c {
 	bool daemon; //
 	char *path;
 	ree_os os;
+
+	/* Store scoped vaults */
+	char *scoped;
 } reedb_c;
 
 /** Sets the minimum passphrase length for Reedb */

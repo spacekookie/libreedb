@@ -18,6 +18,8 @@
 #include <malloc.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "ree_vault.h"
 
 /* Permanent state variables */
 static bool was_init = false;
@@ -30,6 +32,8 @@ static unsigned int tmp_passlength;
 static char *tmp_path;
 static ree_os tmp_os;
 static int settings[6];
+
+static ree_vault *active_vaults;
 
 int __PASSLENGTH__ = 0;
 int __USRCODE__ = 1;
@@ -194,6 +198,9 @@ ree_err_t reedb_init(reedb_c *(*container))
 		return ZOMBIE_INSTANCE;
 	}
 
+	/*  */
+	active_vaults = calloc(sizeof(ree_vault), 5);
+
 	/* This is used by other modules to guarantee the existence of the core module */
 	(*container)->active = true;
 
@@ -208,6 +215,19 @@ ree_err_t reedb_terminate(char *reason)
 		printf("\n");
 		return NOT_INITIALISED;
 	}
+
+	int count;
+
+	// TODO: Test if this actually works!
+	for(count = 0; count < 5; count++)
+	{
+		ree_vault tmp = active_vaults[count];
+
+		if(tmp.uuid == NULL)
+		{
+			rdb_vault_close(active_vaults[count].uuid, NULL);
+		}
+	}
 	return 0;
 }
 
@@ -215,4 +235,9 @@ ree_err_t reedb_terminate(char *reason)
 bool reedb_isActive()
 {
 	return was_init;
+}
+
+ree_vault *get_active_vaults()
+{
+	return active_vaults;
 }
