@@ -33,7 +33,7 @@ static char *tmp_path;
 static ree_os tmp_os;
 static int settings[6];
 
-static ree_vault *active_vaults;
+static ree_vault **active_vaults[];
 
 int __PASSLENGTH__ = 0;
 int __USRCODE__ = 1;
@@ -198,11 +198,20 @@ ree_err_t reedb_init(reedb_c *(*container))
 		return ZOMBIE_INSTANCE;
 	}
 
-	/*  */
-	active_vaults = calloc(sizeof(ree_vault), 5);
-
 	/* This is used by other modules to guarantee the existence of the core module */
 	(*container)->active = true;
+
+	/**
+	 *
+	 * { :key => :value, :data => {  } }
+	 *
+	 * active_vaults
+	 * {'abc' => { name, path, data => {  } }}
+	 *
+	 */
+
+	/** */
+	//	(*active_vaults[]) = malloc(sizeof(*active_vaults) * 5);
 
 	/* Then set the init field to true */
 	was_init = true;
@@ -222,13 +231,7 @@ ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 	int count;
 
 	// TODO: Test if this actually works!
-	for(count = 0; count < 5; count++)
-	{
-		if(active_vaults[count].uuid == NULL)
-		{
-			rdb_vault_close(active_vaults[count].uuid, NULL);
-		}
-	}
+
 
 	was_init = false;
 
@@ -242,11 +245,6 @@ ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 bool reedb_isActive()
 {
 	return was_init;
-}
-
-ree_vault *get_active_vaults()
-{
-	return active_vaults;
 }
 
 unsigned int get_active_count()

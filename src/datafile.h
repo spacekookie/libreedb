@@ -12,24 +12,21 @@
 #include "vault.h"
 
 typedef struct ree_datanode ree_datanode;
-struct rdb_datanode
-{
+struct rdb_datanode {
 	char **name;
 	ree_datanode *child;
 	void *field;
 };
 
 typedef struct ree_datafile ree_datafile;
-struct ree_datafile
-{
+struct ree_datafile {
 	struct ree_vault *vault;
 	char **name;
 	unsigned int version;
 	ree_datanode *head, *body;
 };
 
-typedef enum ree_imode_t
-{
+typedef enum ree_imode_t {
 	HARD, SOFT
 } ree_imode_t;
 

@@ -20,12 +20,11 @@ ree_err_t search_active_vaults(char *name, char *path) {
 	return FALSE;
 }
 
-ree_vault *get_active_vault(ree_uuid *uuid) {
+void get_active_vault(ree_uuid uuid) {
 	int count;
 
 	for (count = 0; count < get_active_count(); count++) {
-		if (get_active_vaults()[count].uuid == uuid) {
-		}
+		// get_active_vaults()[5];
 	}
 
 }

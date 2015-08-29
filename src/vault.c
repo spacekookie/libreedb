@@ -48,7 +48,7 @@ ree_err_t rdb_vault_create(ree_token **token, ree_uuid **uuid, char *name,
 
 	/** Checks if the vault already exists in the active vault set */
 	int count;
-	ree_vault *active = get_active_vaults();
+//	ree_vault *active = get_active_vaults();
 
 
 }

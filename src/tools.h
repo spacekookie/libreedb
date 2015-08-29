@@ -11,8 +11,8 @@
 #include "defs.h"
 #include "uuid.h"
 
-ree_err_t search_active_vaults(ree_uuid *uuid);
+ree_err_t search_active_vaults(ree_uuid uuid);
 
-ree_err_t get_actiuve_vault(ree_uuid *uuid);
+ree_err_t get_active_vault(ree_uuid uuid);
 
 #endif /* SRC_TOOLS_H_ */
