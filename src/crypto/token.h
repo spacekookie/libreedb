@@ -12,8 +12,7 @@
 #include <stdlib.h>
 
 typedef struct ree_token {
-	unsigned char *contents;
-	size_t length;
+	unsigned char[128] contents;
 } ree_token;
 
 ree_err_t urdb_generate_token(ree_uuid *id, char *mac);

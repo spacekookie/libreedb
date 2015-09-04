@@ -9,36 +9,67 @@
 #define SRC_DATAFILE_H_
 
 #include <stdbool.h>
-#include "vault.h"
+#include "defs.h"
 
-typedef struct ree_datanode ree_datanode;
-struct rdb_datanode {
-	char **name;
-	ree_datanode *child;
-	void *field;
-};
+/** Defines the type of data that should be */
+typedef enum rdb_data_t
+{
+	string, integer, boolean;
+} rdb_data_t;
 
-typedef struct ree_datafile ree_datafile;
-struct ree_datafile {
-	struct ree_vault *vault;
-	char **name;
-	unsigned int version;
-	ree_datanode *head, *body;
-};
+/*
+ * This struct can hold generic data. It carries a type
+ * and size to determine as what data type and field size
+ * it should be read.
+*/
+typedef struct rdb_gendata
+{
+	rdb_data_t 	type;
+	size_t			size;
 
-typedef enum ree_imode_t {
-	HARD, SOFT
-} ree_imode_t;
+	union 
+	{
+		int 		*iptr;
+		char		*cptr;
+		bool 		*bptr;
+	}
 
-/** Creates a new reedb datafile */
-ree_err_t rdb_file_create(ree_datafile **file, char *name,
-		struct ree_vault *vault);
+} rdb_gendata;
 
-ree_err_t rdb_file_insert(ree_datafile **file, ree_datanode *node,
-		ree_imode_t mode);
+typedef struct ree_file
+{
+	char 			*name,
+	hmap 			*head,
+	hmap 			*body,
+	size_t 		body_size;
 
-ree_err_t rdb_file_sync(ree_datafile *file, ree_imode_t mode);
+	// head 			: [ field : string ] => [ value : rdb_gendata ]
+	// body 			:	Array [ HashMap [ field_name : string ] => [ rdb_gendata* ] ]
+} ree_file;
 
-ree_err_t rdb_file_close(ree_datafile *file);
+/** Creates a new file with a name */
+ree_err_t rdb_create_file(ree_file **file, char *name);
+
+/** Needs to be called before a transaction to prevent race conditions */
+ree_err_t rdb_lock_file(ree_file **file);
+
+/** Needs to be called again after a transaction */
+ree_err_t rdb_unlock_file(ree_file **file);
+
+ree_err_t rdb_insert_data(ree_file *file, rdb_gendata *version, size_t version_size);
+
+ree_err_t rdb_delete_data(ree_file *file, rdb_gendata *field);
+
+ree_err_t rdb_update_header(ree_file *file, ...);
+
+ree_err_t rdb_get_header(ree_file *file);
+
+ree_err_t rdb_read_file(ree_file *file, bool versioning);
+
+ree_err_t sync(ree_file *file, char mode);
+
+ree_err_t close(ree_file *file);
+
+ree_err_t rdb_remove_file(ree_file *file);
 
 #endif /* SRC_DATAFILE_H_ */

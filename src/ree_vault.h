@@ -13,16 +13,32 @@
 #ifndef SRC_REE_VAULT_H_
 #define SRC_REE_VAULT_H_
 
-/**
- * Container for a vault. Has a UUID, name and path for file ops,
- * entry count and a list of entries as well as some lists (heaps) for
- * header indexing.
- */
-typedef struct {
-	ree_uuid *uuid;
-	char *name, *path;
-	size_t entry_count;
-	struct ree_datafile **entries;
+typedef struct ree_vault
+{
+	/* Some metadata for the vault */
+	char[32]		id,
+	size_t			size,
+	char				*name,
+	char 				*path,
+
+	time_t			created,
+	time_t			modified,
+
+	/* Some crypto nonsense */
+	htable			*tokens,
+
+	/* Now the actual information */
+	hmap				*files,
+	hmap 				*tags,
+
+	// id 				: string uuid, fixed length
+	// size			:	size_t, 		 fixed length
+	// datafiles	:	[ name : string ] => [ file : *datafile ], both pointers?
+
+	// tags			:	[ tag_name : string ] => 
+	// 									( [ value : string ] : [ file_name : string ] )
+
+	// tokens		:	hashtable [token : string]
 } ree_vault;
 
 ree_err_t rdb_create_vault(char *name, char *path);
