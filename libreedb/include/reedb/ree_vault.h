@@ -16,20 +16,20 @@
 typedef struct ree_vault
 {
 	/* Some metadata for the vault */
-	char[32]		id,
-	size_t			size,
-	char				*name,
-	char 				*path,
+	char		id[32];
+	size_t			size;
+	char				*name;
+	char 				*path;
 
-	time_t			created,
-	time_t			modified,
+	time_t			created;
+	time_t			modified;
 
 	/* Some crypto nonsense */
-	htable			*tokens,
+//	htable			*tokens;
 
 	/* Now the actual information */
-	hmap				*files,
-	hmap 				*tags,
+//	hmap				*files;
+//	hmap 				*tags;
 
 	// id 				: string uuid, fixed length
 	// size			:	size_t, 		 fixed length
