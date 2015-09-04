@@ -7,12 +7,12 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include "vault.h"
-#include "core.h"
-#include "datafile.h"
-#include "crypto/token.h"
-#include "defs.h"
-#include "ree_vault.h"
+#include "reedb/vault.h"
+#include "reedb/core.h"
+#include "reedb/datafile.h"
+#include "reedb/crypto/token.h"
+#include "reedb/defs.h"
+#include "reedb/ree_vault.h"
 
 static bool active = false;
 

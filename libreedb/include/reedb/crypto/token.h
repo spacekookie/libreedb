@@ -8,7 +8,7 @@
 #ifndef SRC_TOKEN_H_
 #define SRC_TOKEN_H_
 
-#include "../uuid.h"
+#include "reedb/uuid.h"
 #include <stdlib.h>
 
 typedef struct ree_token {
