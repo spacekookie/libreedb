@@ -35,3 +35,4 @@
 .directory
 Debug/
 *.kate-swp
+.metadata/
