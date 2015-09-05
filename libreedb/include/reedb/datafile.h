@@ -9,12 +9,12 @@
 #define SRC_DATAFILE_H_
 
 #include <stdbool.h>
-#include "defs.h"
+#include "reedb/defs.h"
 
 /** Defines the type of data that should be */
 typedef enum rdb_data_t
 {
-	string, integer, boolean;
+	string, integer, boolean
 } rdb_data_t;
 
 /*
@@ -32,15 +32,15 @@ typedef struct rdb_gendata
 		int 		*iptr;
 		char		*cptr;
 		bool 		*bptr;
-	}
+	};
 
 } rdb_gendata;
 
 typedef struct ree_file
 {
-	char 			*name,
-	hmap 			*head,
-	hmap 			*body,
+	char 			*name;
+//	hmap 			*head;
+//	hmap 			*body;
 	size_t 		body_size;
 
 	// head 			: [ field : string ] => [ value : rdb_gendata ]

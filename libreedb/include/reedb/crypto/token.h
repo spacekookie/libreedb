@@ -8,11 +8,11 @@
 #ifndef SRC_TOKEN_H_
 #define SRC_TOKEN_H_
 
-#include "../uuid.h"
+#include "reedb/uuid.h"
 #include <stdlib.h>
 
 typedef struct ree_token {
-	unsigned char[128] contents;
+	unsigned char contents[128];
 } ree_token;
 
 ree_err_t urdb_generate_token(ree_uuid *id, char *mac);

@@ -13,13 +13,13 @@
  */
 
 /* Internal requirements in Reedb */
-#include "core.h"
+#include "reedb/core.h"
 
 #include <malloc.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "ree_vault.h"
+#include "reedb/ree_vault.h"
 
 /* Permanent state variables */
 static bool was_init = false;

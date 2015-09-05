@@ -7,8 +7,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "core.h"
-#include "vault.h"
+#include "reedb/core.h"
+#include "reedb/vault.h"
 
 int main(void) {
 
