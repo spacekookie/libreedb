@@ -6,6 +6,7 @@ Makefile
 
 # Build Folders
 build/
+bin/
 
 # Object files
 *.o
