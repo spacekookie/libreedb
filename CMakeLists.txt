@@ -8,4 +8,4 @@ add_executable (reedbd-http
 	reedbd-http/test.c)
 
 target_link_libraries(reedbd-http
-	libreedb)
+	reedb)

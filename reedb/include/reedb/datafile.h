@@ -25,13 +25,13 @@ typedef enum rdb_data_t
 typedef struct rdb_gendata
 {
 	rdb_data_t 	type;
-	size_t			size;
+	size_t			size; // > 1 means it's an array.
 
 	union 
 	{
-		int 		*iptr;
-		char		*cptr;
-		bool 		*bptr;
+		int 			*iptr;
+		char			*cptr;
+		bool 			*bptr;
 	};
 
 } rdb_gendata;
