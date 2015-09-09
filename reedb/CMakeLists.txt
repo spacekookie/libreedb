@@ -1,9 +1,18 @@
 
 add_library (reedb
+	# Crypto stuff
 	src/crypto/token.c
+
+	# Utilities
+	src/utils/hashmap.c
+
+	# Public interface
 	src/core.c
 	src/uuid.c
-	src/vault.c)
+	src/vault.c
+
+	# Core stuff
+)
 
 target_include_directories (reedb PUBLIC "include")
 target_include_directories (reedb PRIVATE "src")

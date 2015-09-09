@@ -10,7 +10,34 @@
 #include "reedb/core.h"
 #include "reedb/vault.h"
 
+#include "reedb/utils/hashmap.h"
+
+
+#define KEY_MAX_LENGTH (256)
+#define KEY_PREFIX ("somekey")
+#define KEY_COUNT (1024*1024)
+
+typedef struct data_struct_s
+{
+    char key_string[KEY_MAX_LENGTH];
+    char awesome[64];
+    int number;
+} data_struct_t;
+
 int main(void) {
+
+  int index = 0;
+  int error;
+  map_t mymap;
+  char key_string[KEY_MAX_LENGTH];
+  mymap = hashmap_new();
+  
+  data_struct_t* value = malloc(sizeof(data_struct_t));
+  snprintf(value->key_string, KEY_MAX_LENGTH, "%s%d", KEY_PREFIX, index);
+  
+	value->number = 1337;
+	value->awesome = "This is awesome!";
+	error = hashmap_put(mymap, value->key_string, value);
 
 	ree_err_t rtn;
 	reedb_c *container;
