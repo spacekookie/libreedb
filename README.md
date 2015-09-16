@@ -9,7 +9,9 @@ Reedb
 
 :lock: Reedb is a file-based database that allows you to build applications that handle user data securely – with whatever language you want.
 
-It does so by creating vaults where datafiles are encrypted before being written and never cached for longer than needed to perform operations. It uses libgcrypt (which also powers software like GPG) and nested keys to even allow for multi-user access to vaults.
+It does so by creating vaults where datafiles are encrypted before being written to disk and never cached for longer than needed to perform operations. It uses libgcrypt (which also powers software like GPG) and nested keys to even allow for multi-user access to vaults.
+
+The issue tracker has migrated to the [Lonely Robot Redmine](https://bugs.lonelyrobot.io/projects/reedb)
 
 How to use
 ----------
