@@ -1,192 +1,77 @@
+// http://www.hp.com/go/judy/          Copyright 2002 Hewlett -Packard Co                       Page 4 of 5
+// Sample program to show how to use Judy as a collision
+// handler within a Hash table.
+//
+//      cc -DHASHSIZE=256 hash.c ..
+#include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <stdbool.h>
+#define JUDYERROR_SAMPLE 1     // use default Judy error handler
 #include <Judy.h>
+// Needed for timing routines
+#include <sys/time.h>
+// Start of timing routines ========================================
+struct timeval TBeg, TEnd;
+#define STARTTm  gettimeofday(&TBeg, NULL)
+#define ENDTm    gettimeofday(&TEnd, NULL)
+#define DeltaUSec \
+	(  ((double)TEnd.tv_sec * 1000000.0 + (double)TEnd.tv_usec) \
+	- ((double)TBeg.tv_sec * 1000000.0 + (double)TBeg.tv_usec) )
 
-#define MAXLINE 128
-
-/* Define an ENUM that we will use to distinguish data types */
-enum rdb_data_t { integer, string, boolean } rdb_data_t;
-
-/* Define our struct that holds a type, size and generic memory field */
-typedef struct rdb_gendata {
-
-	enum rdb_data_t type;
-	size_t					size;
-	union value
-	{
-	   int					*iptr;
-	   char					*sptr;
-	   bool					*bptr;
-	} value;
-} rdb_gendata;
-
-uint8_t   Index[MAXLINE];               // string to insert
-
-/* Little helper function that creates our
- *  base Judy Array to work with.
- */
-void createStructure(Pvoid_t **judy_array)
+// End of timing routines   ========================================
+// Define Hash table size if not in compile line ===================
+// Set HASHSIZE 1  for straight Judy
+#ifndef HASHSIZE
+#define HASHSIZE (1 << 8)     // hash table size 256
+#endif
+// Seed for pseudo-random counter ==================================
+#define INITN          123456          // first Index to store
+static uint32_t                // Placed here for INLINE possibility
+Random(uint32_t Seed)  // produce 2^32 -1 numbers by different counting
 {
-	/* After this point the judy collection can be used */
-	(*judy_array) = (PWord_t)NULL;
-	printf("Created a nice judy array!\n");
-
-}
-
-void add_entry(Pvoid_t *judy_array, char *name, char *data)
-{
-	printf("Inserting value '%s'=>'%s' into a judy array!\n", name, data);
-	JSLI(data, judy_array, name);
-}
-
-int main()
-{
-		Pvoid_t		*judy_array;
-		createStructure(&judy_array);
-
-		// rdb_gendata *data = malloc(sizeof(struct rdb_gendata));
-		// data->type = string;
-
-		char *s_type = malloc(sizeof(char) * 9);
-		s_type = "Triumph!";
-		//data->value.sptr = s_type;
-
-		/* Sanity check */
-		printf("Sanity check: %s\n", s_type);
-
-		add_entry(judy_array, "Reedb", s_type);
-
-		// rdb_gendata *retrieved = malloc(sizeof(struct rdb_gendata));
-
-		// char *d_type;
-		// JSLF(s_type, judy_array, "\0");
-		JSLG(s_type, judy_array, "Reedb");
-		// JudySLGet(judy_array, d_type, "Reedb");
-
-		printf("Get was successful...somewhat: %s\n", (s_type == NULL) ? "false" : "true");
-
-		printf("Word of the day: %s\n", s_type);
-		// printf("Other Word of the day: %s\n", &retrieved_tw->value.sptr);
-
-    Pvoid_t   PJArray = (PWord_t)NULL;  // Judy array.
-    PWord_t   PValue;                   // Judy array element.
-    Word_t    Bytes;                    // size of JudySL array.
-
-    int terminator = 0;
-
-    while ( terminator <= 5 )
-    {
-    	terminator++;
-    	fgets(Index, MAXLINE, stdin);
-      JSLI(PValue, PJArray, Index);   // store string into array
-      if (PValue == PJERR)            // if out of memory?
-      {                               // so do something
-	      printf("Malloc failed -- Buy more RAM!\n");
-	      exit(1);
-      }
-      ++(*PValue);                    // count instances of string
+    if ((int32_t)Seed < 0)
+    { 
+    	Seed += Seed; Seed ^= 16611; 
+    } else { 
+    	Seed += Seed;
     }
-    Index[0] = '\0';                    // start with smallest string.
-    JSLF(PValue, PJArray, Index);       // get first string
 
-    printf("-------------\n"); 					// Print a little line for privacy
-    
-    while (PValue != NULL)
-    {
-        while ((*PValue)--)             // print duplicates
-            printf("%s", Index);
-        JSLN(PValue, PJArray, Index);   // get next string
-    }
-    JSLFA(Bytes, PJArray);              // free array
-
-    fprintf(stderr, "The JudySL array used %lu bytes of memory\n", Bytes);
-    return (0);
+    return(Seed);
 }
-
-
-/*#include <stdio.h>
-#include <string.h>
-#include <stdbool.h> 
-
-
- 
-int main(void)
+// Hash Table ======================================================
+Pvoid_t JArray[HASHSIZE] = { NULL }; // Declare static hash table
+int main(int argc, char *argv[])
 {
-	struct rdb_gendata data;
-	int a = 5;
-	data.value.iptr = &a;
-
-	printf("data: %i\n", *data.value.iptr);
-
-   return 0;
+    Word_t Count;
+    Word_t Index;
+    Word_t *PValue;
+    Word_t NumIndexes = 10000;  // default first parameter
+    if (argc > 1) NumIndexes = strtoul(argv[1], NULL, 0);
+    //      Load up the CPU cache for small measurements:
+    for (Count = 0; Count < HASHSIZE; Count++) JArray[Count] = NULL;
+    printf("Begin storing %lu random numbers in a Judy scalable hash array\n",
+    NumIndexes);
+    Index = INITN;
+    STARTTm;
+    for (Count = 0; Count < NumIndexes; Count++)
+    {
+        Index = Random(Index);
+        JLI(PValue, JArray[Index % HASHSIZE], Index/HASHSIZE);
+        // http://www.hp.com/go/judy/          Copyright 2002 Hewlett -Packard Co                       Page 5 of 5
+        *PValue += 1; // bump count of duplicate Indexes
+    }
+    ENDTm;
+    printf("Insertion of %lu indexes took %6.3f microseconds per index\n", NumIndexes, DeltaUSec/NumIndexes);
+    Index = INITN;  // start the same number sequence over
+    STARTTm;
+    for (Count = 0; Count < NumIndexes; Count++)
+    {
+        Index = Random(Index);
+        JLG(PValue, JArray[Index % HASHSIZE], Index/HASHSIZE);
+        if (*PValue != 1)
+        printf("%lu dups of %lun", *PValue - 1, Index);
+    }
+    ENDTm;
+    printf("Retrieval of %lu indexes took %6.3f microseconds per index\n", NumIndexes, DeltaUSec/NumIndexes);
+    return(0);
 }
-*/
-// /*
-//  * test.c
-//  *
-//  *  Created on: 5 Aug 2015
-//  *      Author: spacekookie
-//  */
-
-// #include <stdlib.h>
-// #include <stdio.h>
-// #include "reedb/core.h"
-// #include "reedb/vault.h"
-
-// #include "reedb/utils/hashmap.h"
-
-
-// #define KEY_MAX_LENGTH (256)
-// #define KEY_PREFIX ("somekey")
-// #define KEY_COUNT (1024*1024)
-
-// typedef struct data_struct_s
-// {
-//     char key_string[KEY_MAX_LENGTH];
-//     char awesome[64];
-//     int number;
-// } data_struct_t;
-
-// int main(void) {
-
-//   int index = 0;
-//   int error;
-//   map_t mymap;
-//   char key_string[KEY_MAX_LENGTH];
-//   mymap = hashmap_new();
-  
-//   data_struct_t* value = malloc(sizeof(data_struct_t));
-//   snprintf(value->key_string, KEY_MAX_LENGTH, "%s%d", KEY_PREFIX, index);
-  
-// 	value->number = 1337;
-// 	value->awesome = "This is awesome!";
-// 	error = hashmap_put(mymap, value->key_string, value);
-
-// 	ree_err_t rtn;
-// 	reedb_c *container;
-// 	rtn = rdb_set_passlength(16);
-// 	rtn = rdb_set_verbose(true);
-// 	rtn = rdb_set_path("/etc/reedb/");
-
-// 	rtn = reedb_init(&container);
-// 	if (rtn != HUGE_SUCCESS) {
-// 		fputs("An error occurred when initialising Reedb!\n", stderr);
-// 	} else {
-// 		printf("Reedb was initialised successfully!\n");
-// 	}
-// 	reedb_init(&container);
-
-// 	/** DO STUFF WITH LIB **/
-// 	rdb_vault_init(&container);
-
-// 	ree_token *token;
-// 	ree_uuid *uuid;
-
-// 	rdb_vault_create(&token, &uuid, "default", "~/Desktop",
-// 			"megapassphrase123");
-
-// 	/** NO LONGER DO STUFF WITH LIB **/
-// 	reedb_terminate(&container, "Science");
-
-// 	return 0;
-// }
