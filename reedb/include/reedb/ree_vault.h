@@ -1,46 +1,53 @@
 /*
- * ree_vault.h
+ * (c) 2014 Lonely Robot.
  *
- *  Created on: 25 Aug 2015
- *      Author: spacekookie
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 3 which accompanies this distribution, and is available at
+ *
+ * http://www.gnu.org/licenses/lgpl-3.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ *
+ * Author: Katharina 'spacekookie' Sabel
+ *
  */
+
+#ifndef SRC_REE_VAULT_H_
+#define SRC_REE_VAULT_H_
 
 #include <stdbool.h>
 #include "crypto/token.h"
 #include "datafile.h"
 #include "defs.h"
 
-#ifndef SRC_REE_VAULT_H_
-#define SRC_REE_VAULT_H_
-
 typedef struct ree_vault
 {
 	/* Some metadata for the vault */
-	char		id[32];
-	size_t			size;
-	char				*name;
-	char 				*path;
+	char				id[32]; 								// UUID string
+	size_t			size;										// number of files
+	char				*name;									// User defined name
+	char 				*path;									// Path on FS
 
-	time_t			created;
-	time_t			modified;
+	time_t			created;								// Date created
+	time_t			modified;								// Date last modified
 
-	/* Some crypto nonsense */
-//	htable			*tokens;
+	/* Some crypto nonsense :) */
+	map_t				*keystore;							// Map of files -> crypt-keys or regions -> crypt-keys
+	map_t 			*tokens;								// Allowed access tokens
 
-	/* Now the actual information */
-//	hmap				*files;
-//	hmap 				*tags;
+	/* Maps for data storage */
+	map_t				*tags;									// Tags ordered by category (key)
+	map_t				*files;									// Datafiles ordered by their name (key)
 
-	// id 				: string uuid, fixed length
-	// size			:	size_t, 		 fixed length
-	// datafiles	:	[ name : string ] => [ file : *datafile ], both pointers?
-
-	// tags			:	[ tag_name : string ] => 
-	// 									( [ value : string ] : [ file_name : string ] )
-
-	// tokens		:	hashtable [token : string]
 } ree_vault;
 
 ree_err_t rdb_create_vault(char *name, char *path);
+
+ree_err_t rdb_get_headers();
 
 #endif /* SRC_REE_VAULT_H_ */

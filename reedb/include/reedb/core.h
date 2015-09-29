@@ -1,47 +1,42 @@
 /*
- * core.h
- *
- *  Created on: 5 Aug 2015
- *      Author: spacekookie
- */
-
-#ifndef SRC_CORE_H_
-#define SRC_CORE_H_
-
-/*
- * (C) Copyright 2014-2015 Lonely Robot.
+ * This file is part of Reedb
+ * (c) Lonely Robot
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 3 which accompanies this distribution, and is available at
+ *
  * http://www.gnu.org/licenses/lgpl-3.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- */
-
-/*
+ *
+ *
+ * Author: Katharina 'spacekookie' Sabel
+ *
  * This header file contains handles to interact with the Reedb core module.
  * The core module is responsible for starting and terminating running Reedb
  * instances as well as checking that all other modules are loaded and
  * running correctly.
  *
- * @author: Katharina 'spacekookie' Sabel <sabel.katharina@gmail.com>
  */
 
-#include <stdbool.h>
+#ifndef SRC_CORE_H_
+#define SRC_CORE_H_
 
+#include <stdbool.h>
 #include "defs.h"
 
+/** Define what OS Reedb is running on */
 typedef enum ree_os {
-	LINUX = 0xE1, /* Linux systems */
-	OSX = 0xE2, /* Mac OS X */
-	WINDOWS = 0xE3, /* Windows */
-	ANDROID = 0xE4, /* Mobile: Android */
-	IOS = 0xE5, /* Mobile: iOS */
-	BSD = 0xE6, /* BSD systems */
+	LINUX 		= 0xE1, // Most Linux distributions
+	OSX 			= 0xE2, // Mac OS X
+	WINDOWS 	= 0xE3, // Windows
+	ANDROID 	= 0xE4, // Mobile: Android
+	IOS 			= 0xE5, // Mobile: iOS
+	BSD 			= 0xE6, // (Free|Open)BSD
 } ree_os;
 
 /** Main Reedb container that gets passed around modules */

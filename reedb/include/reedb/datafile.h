@@ -1,8 +1,20 @@
 /*
- * datafile.h
+ * (c) 2014 Lonely Robot.
  *
- *  Created on: 20 Aug 2015
- *      Author: spacekookie
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 3 which accompanies this distribution, and is available at
+ *
+ * http://www.gnu.org/licenses/lgpl-3.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ *
+ * Author: Katharina 'spacekookie' Sabel
+ *
  */
 
 #ifndef SRC_DATAFILE_H_
@@ -36,15 +48,24 @@ typedef struct rdb_gendata
 
 } rdb_gendata;
 
+/** Defines the file header which is passed out to users */
+typedef struct ree_file_h
+{
+	char			*name;
+	char			*category;
+	map_t			*tags;
+} ree_file_h;
+
+/** Definition of the actual datafile struct. Not exposed to user */
 typedef struct ree_file
 {
-	char 			*name;
-//	hmap 			*head;
-//	hmap 			*body;
-	size_t 		body_size;
+	/* Some metadata (again) */
+	char 					*name;					// String name. Is hashed for the filesystem name
+	ree_file_h		*header;				// Pointer to header struct. Used for indexing
+	size_t 				body_size;			// Size of the body map (revision numbers)
 
-	// head 			: [ field : string ] => [ value : rdb_gendata ]
-	// body 			:	Array [ HashMap [ field_name : string ] => [ rdb_gendata* ] ]
+	/* Actual datastorage (contains 25% more crypto than the competition) */
+	map_t					*body;					// Nested body maps for revisions and data
 } ree_file;
 
 /** Creates a new file with a name */
