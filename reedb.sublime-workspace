@@ -1,0 +1,493 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"boo",
+				"boolean"
+			],
+			[
+				"rdb_",
+				"rdb_gendata"
+			],
+			[
+				"retri",
+				"retrieved"
+			],
+			[
+				"print",
+				"printf	printf …"
+			],
+			[
+				"retrie",
+				"retrieved_tw"
+			],
+			[
+				"crea",
+				"createStructure"
+			],
+			[
+				"judy",
+				"judy_array"
+			],
+			[
+				"send",
+				"send_camera_trigger"
+			],
+			[
+				"data",
+				"ree_datafile"
+			],
+			[
+				"ree_",
+				"ree_uuid"
+			],
+			[
+				"ree",
+				"ree_file"
+			],
+			[
+				"rd",
+				"rdb_data_t"
+			],
+			[
+				"success",
+				"successfully"
+			],
+			[
+				"gph",
+				"gphoto_cmd"
+			],
+			[
+				"camer",
+				"camera_port"
+			],
+			[
+				"cam",
+				"cam_port"
+			],
+			[
+				"camera",
+				"camera_port"
+			],
+			[
+				"front",
+				"front_port"
+			],
+			[
+				"seria",
+				"Serial_front"
+			],
+			[
+				"serial",
+				"serial_id"
+			],
+			[
+				"seri",
+				"serial_id"
+			],
+			[
+				"SCREN",
+				"SCREEN_HEIGHT"
+			],
+			[
+				"SCREE",
+				"SCREEN_WIDTH"
+			],
+			[
+				"CMAKE_M",
+				"CMAKE_MODULE_PATH"
+			],
+			[
+				"cmake_mi",
+				"CMAKE_MINIMUM_REQUIRED_VERSION"
+			],
+			[
+				"red",
+				"redshift_gtk"
+			],
+			[
+				"settings",
+				"settings_dialog"
+			]
+		]
+	},
+	"build_system": "Packages/Python/Python.sublime-build",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C++ Single File.sublime-build",
+				"Run"
+			]
+		],
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 407.0,
+		"last_filter": "insta",
+		"selected_items":
+		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"run",
+				"Build With: C++ Single File - Run"
+			],
+			[
+				"SSC",
+				"Set Syntax: C"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"ss cmake",
+				"Set Syntax: CMake"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"markdown",
+				"Set Syntax: Markdown"
+			],
+			[
+				"python",
+				"Set Syntax: Python"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"SS C",
+				"Set Syntax: C"
+			]
+		],
+		"width": 568.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/CMakeLists.txt",
+		"/home/spacekookie/Documents/Work/FFWI/repos/droid/src/mastercontrol.rb",
+		"/tmp/xa-JaLJrn/README.txt",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/tests/judy_hash.c",
+		"/home/spacekookie/Documents/Code/personal/kivy.py",
+		"/home/spacekookie/Documents/Work/FFWI/repos/forklifts/boundingbox/boundingboxworker.cpp",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/src/utils",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/include/reedb/utils/hashmap.h",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/src/utils/hashmap.c",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/CMakeLists.txt",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/include/reedb/datafile.h",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/src/core.c",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/src/utils/hashmap.h",
+		"/home/spacekookie/Documents/Code/lonelyrobot/reedb_workspace/reedb/reedb/include/reedb/defs.h",
+		"/mnt/remote/droid/src/test.rb",
+		"/mnt/remote/droid/src/config.yml",
+		"/mnt/remote/droid/src/config.json",
+		"/home/spacekookie/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/spacekookie/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/spacekookie/Documents/Work/FFWI/repos/test.rb",
+		"/home/spacekookie/Documents/Work/FFWI/repos/droid/tests/forking/child_parent_pipe.rb",
+		"/home/spacekookie/Documents/Work/FFWI/repos/forklifts/knockout/knockoutworker.cpp",
+		"/home/spacekookie/Documents/code/projects/lonelyrobot/LRGE/cmake/FindSDL2.cmake",
+		"/home/spacekookie/Documents/code/projects/lonelyrobot/LRGE/CMakeLists.txt",
+		"/home/spacekookie/Documents/code/projects/lonelyrobot/LRGE/Lesson0/CMakeLists.txt",
+		"/home/spacekookie/Documents/code/projects/my_website/content/blog/001-lonelyrobot.md",
+		"/home/spacekookie/Documents/code/projects/my_website/nest/templates/home.html",
+		"/home/spacekookie/Documents/code/projects/my_website/nest/templates/article.html",
+		"/home/spacekookie/Documents/code/projects/my_website/nest/templates/tag.html",
+		"/home/spacekookie/Documents/code/projects/my_website/publishconf.py",
+		"/home/spacekookie/Documents/code/projects/my_website/content/blog/000-newdawn.md",
+		"/home/spacekookie/Documents/code/projects/my_website/content/blog/hello-world.md",
+		"/home/spacekookie/Documents/code/projects/my_website/content/blog/a-little-peak-down-the-road.md",
+		"/home/spacekookie/Documents/code/projects/my_website/content/pages/home.md",
+		"/home/spacekookie/Documents/code/projects/my_website/nest/templates/category.html",
+		"/home/spacekookie/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/spacekookie/Documents/work/Lonely Robot/Self Description.txt",
+		"/home/spacekookie/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/spacekookie/Documents/code/projects/lonelyrobot/reedb/src/main.c",
+		"/home/spacekookie/Documents/code/projects/redshift/src/redshift-gtk/redshift-gtk.py",
+		"/home/spacekookie/Documents/c-base/museum/Sicherheitshinweise2.md",
+		"/home/spacekookie/Documents/c-base/museum/Sicherheitshinweise.md",
+		"/home/spacekookie/Documents/code/projects/exp/reedb/src/core.h",
+		"/home/spacekookie/Applications/eclipse-cpp/eclipse-cpp.desktop",
+		"/home/spacekookie/Applications/eclipse-java/smartgit.desktop",
+		"/home/spacekookie/Documents/code/projects/reedb/src/CMakeLists.txt",
+		"/home/spacekookie/Documents/code/projects/reedb/lib/CMakeLists.txt",
+		"/home/spacekookie/Documents/code/projects/reedb/CMakeLists.txt",
+		"/home/spacekookie/Documents/code/projects/reedb/lib/private/core.c",
+		"/home/spacekookie/Documents/code/projects/reedb/README.md",
+		"/home/spacekookie/Applications/smartgit/smartgit.desktop"
+	],
+	"find":
+	{
+		"height": 79.0
+	},
+	"find_in_files":
+	{
+		"height": 231.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			",",
+			"Foobar",
+			"-",
+			"|",
+			"processing",
+			"\"1",
+			"| ",
+			"\"1",
+			"|",
+			"\"1",
+			"\"",
+			"|",
+			",",
+			"=",
+			",",
+			"=>{",
+			"{",
+			"15:",
+			"|",
+			"/",
+			"[folder",
+			":",
+			",",
+			"camera",
+			",",
+			":",
+			" ",
+			"b",
+			"generate(",
+			"{},",
+			"d",
+			"IO_ERROR",
+			"=cpthook.sh",
+			",",
+			"@@",
+			"class_variable_set",
+			"@config",
+			" config",
+			"config",
+			"extern",
+			"__HASHMAP_H__",
+			"libr",
+			"int ",
+			"int",
+			" ",
+			"@rs.shooting_type",
+			"MasterControl",
+			"config",
+			"./cpthook",
+			"config",
+			"spritify_done",
+			"img",
+			"#",
+			"},",
+			"		\"",
+			":",
+			"//",
+			"#",
+			",",
+			"{",
+			"l",
+			"gui",
+			"Qgui",
+			"supposing image specified not found",
+			":",
+			"test",
+			"#include <config.h>",
+			"KEY_PRESS_",
+			"KEY_PRESS_SURFACE_DEFAULT",
+			", ",
+			"}\n",
+			"		//Draw the texture\n",
+			"LRGE",
+			"DISQUS_SITENAME",
+			"ml-",
+			"page.",
+			"//\"",
+			"255",
+			"show_settings_cb",
+			"info_dialog",
+			"show_info_cb",
+			"{}",
+			"ate",
+			"def",
+			"		-",
+			"\n",
+			". ",
+			"REE_ERR_ALREADY_INIT",
+			"int rdb",
+			"int",
+			"cpp",
+			"smartgit/bin/",
+			"/*",
+			"reedb_terminate",
+			"and",
+			"font"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"#include \"config.h\""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"incremental_find":
+	{
+		"height": 36.0
+	},
+	"input":
+	{
+		"height": 93.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 222.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"replace":
+	{
+		"height": 68.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 360.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
