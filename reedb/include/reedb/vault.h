@@ -10,9 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- */
-
-/*
+ *
  * This header file contains handles to interact with the Reedb vaults module.
  * It is dependant on information from the core and uses some utility functions from
  * hidden modules in the background. The vaults module handles all file insertion
@@ -41,8 +39,7 @@ ree_err_t rdb_vault_scope(ree_uuid **uuid, char *name, char *path);
 
 ree_err_t rdb_vault_unscope(ree_uuid *uuid);
 
-ree_err_t rdb_vault_create(ree_token **token, ree_uuid **uuid, char *name,
-		char *path, char *passphrase);
+ree_err_t rdb_vault_create(ree_token **token, ree_uuid **uuid, char *name, char *path, char *passphrase);
 
 ree_err_t rdb_vault_authenticate(ree_token *token, ree_uuid *uuid);
 
