@@ -27,6 +27,7 @@
 
 /* Includes so we can work properly */
 #include "reedb/utils.h"
+#include "reedb/datafile.h"
 
 typedef enum rdb_cryflgs_t
 {
@@ -41,6 +42,15 @@ typedef enum rdb_cryflgs_t
 
 } rdb_cryflgs_t;
 
-ree_err_t init_rdb_crypto(int flags[]);
+ree_err_t init_rdb_crypto(enum rdb_cryflgs_t flags[]);
+
+ree_err_t rdb_crycontext_switch(rdb_datafile *file, rdb_cryflgs_t flags[]);
+
+ree_err_t rdb_encrypt();
+
+ree_err_t rdb_decryt();
+
+ree_err_t rdb_dump_key(char *scope);
+
 
 #endif
