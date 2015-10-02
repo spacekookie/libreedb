@@ -23,34 +23,50 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
+/** enum error codes used throughout Reedb **/
 typedef enum ree_err_t
 {
-	/** BOOLEAN STATES */
-	TRUE,
-	FALSE,
+	/* BOOLEAN STATES */
+	TRUE, FALSE,									// Have boolean values in a standard function return
 
-	FAILURE = -1, // To be used when cause of error not known.
-	SUCCESS = 0,// When something went according to plan
-	HUGE_SUCCESS = 0,// Little Portal easter egg :)
-	MISSING_PARAMS = 0xA0,
-	MISSING_USRCODE = 0xA1,
-	MISSING_CONTAINER = 0xA2,
-	MALLOC_FAILED = 0xA3,
-	ALREADY_INIT = 0xA4,
-	OS_PARSE_FAILED = 0xA5,
-	ZOMBIE_INSTANCE = 0xA6,
-	INVALID_PATH = 0xA7,
-	SHORT_PASSPHRASE = 0xA8,
-	NOT_INITIALISED = 0xA9,
+	/* General purpose error codes */
+	FAILURE = -1, 								// To be used when cause of error not known.
+	SUCCESS = 0,									// When something went according to plan.
+	HUGE_SUCCESS = 0,							// Little Portal easter egg :)
+	MISSING_PARAMS,								// No parameters were provided.
+	MISSING_USRCODE,							// No user function pointer was provided. Means Reedb
+																// will not do anything after being init and thus fails.
+	MISSING_CONTAINER,						// Called init without providing a container struct
+	MALLOC_FAILED,								// Is returned when program failed to malloc.
+																// Basically means there isn't enough RAM left.
+	ALREADY_INIT,									// Reedb has already been initialised in the
+																// pre-defined scope.
+	
+	OS_PARSE_FAILED,							// Reedb failed to detect the user OS
+	ZOMBIE_INSTANCE,							// 
+	INVALID_PATH,									// Path provided for config is invalid.
+	SHORT_PASSPHRASE,							// Passphrase violates security standards
+	NOT_INITIALISED,							// Tried to use Reedb without having initialised it first
 
 	/* Vault error returns */
-	VAULT_ALREADY_SCOPED = 0xAA,
-	VAULT_NOT_SCOPED = 0xAB,
-	VAULT_ALREADY_LOADED = 0xAC,
-	VAULT_NOT_LOADED = 0xAD,
-	VAULT_DOESNT_EXIST = 0xAF,
+	VAULT_ALREADY_SCOPED,					// Tried to scope a vault that was already in config
+	VAULT_NOT_SCOPED,							// Tried to operate on vault that wasn't scope before
+	VAULT_ALREADY_LOADED,					// Tried to load a vault that has already been loaded.
+	VAULT_NOT_LOADED,							// Tried to operate on vault that isn't loaded yet.
+	VAULT_DOESNT_EXIST,						// Tried to load vault that doesn't physically exist
+																// anymore. This indicates a broken config!
+	VAULT_ALREADY_EXISTS,					// Tried to create a vault that already exists on the FS.
 
-	/* */
+	/* Crypto error returns */
+	CRYPTO_INVALID_KEY,						// Returns when a crypto operation failed because the
+																// wrong block cypher was applied.
+	CRYPTO_MISSING_KEY,						// 
+	CRYPTO_CORRUPT_KEY,						// 
+	CRYPTO_WRONG_BLOCKSIZE,				// 
+	CRYPTO_INVALID_CONTEXT,				// 
+	CRYPTO_WRONG_CONTEXT,					// 
+	CRYPTO_MISSING_CRYRAM,				// 
+	CRYPTO_UNKNOWN_FAILURE,				// 
 
 }ree_err_t;
 
