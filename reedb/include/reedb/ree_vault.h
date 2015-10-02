@@ -20,7 +20,10 @@
 #ifndef SRC_REE_VAULT_H_
 #define SRC_REE_VAULT_H_
 
+// System imports
 #include <stdbool.h>
+
+// Internal imports
 #include "crypto/token.h"
 #include "datafile.h"
 #include "defs.h"

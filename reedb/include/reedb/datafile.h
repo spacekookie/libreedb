@@ -21,7 +21,7 @@
 #define SRC_DATAFILE_H_
 
 #include <stdbool.h>
-#include "reedb/defs.h"
+#include "defs.h"
 
 /** Defines the type of data that should be */
 typedef enum rdb_data_t
