@@ -7,7 +7,7 @@ Reedb
 [![Test coverage](https://img.shields.io/coveralls/SpiderOak/crypton.svg?style=flat)](https://coveralls.io/r/SpiderOak/crypton?branch=master)
  -->
 
-:lock: Reedb is a file-based database that allows you to build applications that handle user data securely – with whatever language you want.
+:lock: Reedb is a document oriented database that allows you to build applications that handle user data securely – with whatever language you want.
 
 It does so by creating vaults where datafiles are encrypted before being written to disk and never cached for longer than needed to perform operations. It uses libgcrypt (which also powers software like GPG) and nested keys to even allow for multi-user access to vaults.
 
