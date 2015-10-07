@@ -12,6 +12,7 @@ add_library (reedb
 	src/vault.c
 
 	# Core stuff
+	src/datafile.c
 )
 
 target_include_directories (reedb PUBLIC "include")

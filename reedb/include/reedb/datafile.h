@@ -1,5 +1,5 @@
 /*
- * (c) 2014 Lonely Robot.
+ * (c) 2015 Lonely Robot.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -21,7 +21,9 @@
 #define SRC_DATAFILE_H_
 
 #include <stdbool.h>
-#include "defs.h"
+#include <stdlib.h>
+#include "reedb/utils/hashmap.h"
+#include "reedb/defs.h"
 
 /** Defines the type of data that should be */
 typedef enum rdb_data_t
@@ -62,7 +64,8 @@ typedef struct ree_file
 	/* Some metadata (again) */
 	char 					*name;					// String name. Is hashed for the filesystem name
 	ree_file_h		*header;				// Pointer to header struct. Used for indexing
-	size_t 				body_size;			// Size of the body map (revision numbers)
+	size_t 				bsize;					// Size of the body map (revision numbers)
+	size_t				rsize;					// The amount of revisions that CAN be stored
 
 	/* Actual datastorage (contains 25% more crypto than the competition) */
 	map_t					*body;					// Nested body maps for revisions and data

@@ -24,6 +24,7 @@
 #include <stdbool.h>
 
 // Internal imports
+#include "utils/hashmap.h"
 #include "crypto/token.h"
 #include "datafile.h"
 #include "defs.h"
