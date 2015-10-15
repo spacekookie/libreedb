@@ -47,7 +47,6 @@ typedef struct rdb_gendata
 		char			*cptr;
 		bool 			*bptr;
 	} v;
-
 } rdb_gendata;
 
 /** Defines the file header which is passed out to users */
@@ -68,21 +67,25 @@ typedef struct ree_file
 	size_t				rsize;					// The amount of revisions that CAN be stored
 
 	/* Actual datastorage (contains 25% more crypto than the competition) */
-	map_t					*body;					// Nested body maps for revisions and data
+	map_t					**body;					// Nested body maps for revisions and data
+	map_t					*locks;					// Stores locks on specific versions.
 } ree_file;
 
 /** Creates a new file with a name */
 ree_err_t rdb_create_file(ree_file **file, char *name);
 
 /** Needs to be called before a transaction to prevent race conditions */
-ree_err_t rdb_lock_file(ree_file **file);
+ree_err_t rdb_lock_file(ree_file *file);
 
 /** Needs to be called again after a transaction */
-ree_err_t rdb_unlock_file(ree_file **file);
+ree_err_t rdb_unlock_file(ree_file *file);
 
-ree_err_t rdb_insert_data(ree_file *file, rdb_gendata *version, size_t version_size);
+ree_err_t rdb_insert_data(ree_file *file, char *field, rdb_gendata *data);
 
-ree_err_t rdb_delete_data(ree_file *file, rdb_gendata *field);
+ree_err_t rdb_delete_data(ree_file *file, char *field);
+
+/** Needs to be called to unlock a revision again and finalize the changes */
+ree_err_t rdb_finalize_version(ree_file *file);
 
 ree_err_t rdb_update_header(ree_file *file, ...);
 
@@ -90,6 +93,9 @@ ree_err_t rdb_get_header(ree_file *file);
 
 ree_err_t rdb_read_file(ree_file *file, bool versioning);
 
+/** Needs to be called to sync in-memory file with disk-file. Will dump
+ * encrypted data to disk. Blocking operation until file lock is not present
+ */
 ree_err_t sync(ree_file *file, char mode);
 
 ree_err_t close(ree_file *file);

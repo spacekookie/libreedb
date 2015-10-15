@@ -57,16 +57,21 @@ typedef enum ree_err_t
 																// anymore. This indicates a broken config!
 	VAULT_ALREADY_EXISTS,					// Tried to create a vault that already exists on the FS.
 
+	/* File specific failures */
+	FILE_INSERT_FAILED,						// A generic failure return when a file can't accept new data
+	FILE_LOCK_TIMEOUT,						// Inserting into a file timed-out because of a lock
+
 	/* Crypto error returns */
 	CRYPTO_INVALID_KEY,						// Returns when a crypto operation failed because the
 																// wrong block cypher was applied.
-	CRYPTO_MISSING_KEY,						// 
-	CRYPTO_CORRUPT_KEY,						// 
+	CRYPTO_MISSING_KEY,						// Key is NULL for some bizzare reason (This is not good)
+	CRYPTO_CORRUPT_KEY,						// Key is corrupt for some more bizzare reason (This is even worse)
 	CRYPTO_WRONG_BLOCKSIZE,				// 
-	CRYPTO_INVALID_CONTEXT,				// 
-	CRYPTO_WRONG_CONTEXT,					// 
-	CRYPTO_MISSING_CRYRAM,				// 
-	CRYPTO_UNKNOWN_FAILURE,				// 
+	CRYPTO_INVALID_CONTEXT,				// For some reason the crypto context is invalid.
+	CRYPTO_WRONG_CONTEXT,					// Crypto context is invalid. Hints to someone trying to access files
+																// they do not have access to via some weird hack!
+	CRYPTO_MISSING_CRYRAM,				// We ran out of secure memory and can't allocate more in this session
+	CRYPTO_UNKNOWN_FAILURE,				// A generic crypto failure.
 
 }ree_err_t;
 

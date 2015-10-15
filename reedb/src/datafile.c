@@ -23,27 +23,34 @@
 /* Things we need to run properly */
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "reedb/utils/hashmap.h"
 #include "reedb/defs.h"
 
+static size_t START_REV_SIZE = 3;
 
 /** Creates a new file with a name */
 ree_err_t rdb_create_file(ree_file **file, char *name)
 {
-	/** Malloc memory for the actual ree_file struct */
+	/* Malloc memory for the actual ree_file struct */
 	(*file) = malloc(sizeof(ree_file));
 	if((*file) == NULL)	return MALLOC_FAILED;
 
-	/** Malloc memory for the file header struct */
+	/* Malloc memory for the file header struct */
 	ree_file_h *header = malloc(sizeof(ree_file_h));
 	if(header == NULL)	return MALLOC_FAILED;
 
-	/** Fill in the data we already have for the file */
+	/* Malloc memory for the revisions array */
+	map_t *revisions = calloc(START_REV_SIZE, sizeof(map_t*));
+	if(revisions == NULL) return MALLOC_FAILED;
+
+	/* Fill in the data we already have for the file */
 	(*file)->name = name;
 	(*file)->header = header;
+	(*file)->body = &revisions;
 	(*file)->bsize = 0;
 
-	/** Return SUCCESS because everything went swell :) */
+	/* Return SUCCESS because everything went swell :) */
 	return SUCCESS;
 }
 
@@ -59,15 +66,34 @@ ree_err_t rdb_unlock_file(ree_file **file)
 	return SUCCESS;
 }
 
-ree_err_t rdb_insert_data(ree_file *file, rdb_gendata *version, size_t version_size)
+/**
+ * Inserts new data into a datafile. Will create a new version
+ */
+ree_err_t rdb_insert_data(ree_file *file, char *field, rdb_gendata *data);
 {
-	/* Check if we need to increase our revision space */
+	/** Check if we need to increase our revision space */
 	if(file->bsize >= file->rsize)
 	{
 		file->rsize *= 2;
-		map_t *revs = malloc()
+		map_t *new_revs = malloc(sizeof(map_t*) * file->rsize);
+
+		/* Check again that the malloc was successful */
+		if(new_revs == NULL) return MALLOC_FAILED;
+
+		/** Copy over data, free old array and replace the pointer in the struct */
+		memcpy(file->body, new_revs, file->bsize);
+		free(file->body);
+		file->body = new_revs;
 	}
-	return SUCCESS;
+
+	/* Do the hashmap insertion */
+	int res = hashmap_put(file->body[file->bsize], field, data);
+
+	/* Return our success */
+	if(res == MAP_OK) return SUCCESS;
+
+	/* If something went wrong we return an insert failure */
+	else return FILE_INSERT_FAILED;
 }
 
 ree_err_t rdb_delete_data(ree_file *file, rdb_gendata *field)
