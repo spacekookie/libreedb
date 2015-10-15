@@ -24,6 +24,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
+/* Internal Dependencies */ 
 #include "reedb/utils/hashmap.h"
 #include "reedb/defs.h"
 
@@ -103,10 +106,14 @@ ree_err_t rdb_delete_data(ree_file *file, char *field)
 
 ree_err_t rdb_finalize_version(ree_file *file)
 {
-	/* Increment the revision version number*/
-	file->bsize++;
+	if(file->body[file->bsize] == NULL)
+	{
+		if(RDB_DEBUG) printf("Trying to finalise an empty version for %s. Aborting!", file->name);
+		return FILE_EMPTY_VERSION;
+	}
 
-	/* Do we need to make more changes here? */
+	/* Now just increment the revision version number*/
+	file->bsize++;
 	return SUCCESS;
 }
 
@@ -120,7 +127,7 @@ ree_err_t rdb_get_header(ree_file *file)
 	return SUCCESS;
 }
 
-ree_err_t rdb_read_file(ree_file *file, bool versioning)
+ree_err_t rdb_read_file(ree_file *file, bool rev_a)
 {
 	return SUCCESS;
 }

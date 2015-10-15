@@ -18,10 +18,15 @@
  *      Author: spacekookie
  */
 
+// For *some* bizzare reason this needs to go on the outside o.o
 #include "uuid.h"
 
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
+
+/* This field will allow is to get interactive debugging from everything */
+#define RDB_DEBUG false
+
 
 /** enum error codes used throughout Reedb **/
 typedef enum ree_err_t
@@ -60,7 +65,8 @@ typedef enum ree_err_t
 	/* File specific failures */
 	FILE_INSERT_FAILED,						// A generic failure return when a file can't accept new data
 	FILE_LOCK_TIMEOUT,						// Inserting into a file timed-out because of a lock
-	FILE_RM_FAILED,
+	FILE_RM_FAILED,								// Tried to remove a field from a version that doesn't exist.
+	FILE_EMPTY_VERSION,						// Tried to finalise an empty version. Bad [boy|girl]!
 
 	/* Crypto error returns */
 	CRYPTO_INVALID_KEY,						// Returns when a crypto operation failed because the
