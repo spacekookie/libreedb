@@ -60,6 +60,7 @@ typedef enum ree_err_t
 	/* File specific failures */
 	FILE_INSERT_FAILED,						// A generic failure return when a file can't accept new data
 	FILE_LOCK_TIMEOUT,						// Inserting into a file timed-out because of a lock
+	FILE_RM_FAILED,
 
 	/* Crypto error returns */
 	CRYPTO_INVALID_KEY,						// Returns when a crypto operation failed because the

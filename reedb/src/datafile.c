@@ -55,21 +55,18 @@ ree_err_t rdb_create_file(ree_file **file, char *name)
 }
 
 /** Needs to be called before a transaction to prevent race conditions */
-ree_err_t rdb_lock_file(ree_file **file)
+ree_err_t rdb_lock_file(ree_file *file)
 {
 	return SUCCESS;
 }
 
 /** Needs to be called again after a transaction */
-ree_err_t rdb_unlock_file(ree_file **file)
+ree_err_t rdb_unlock_file(ree_file *file)
 {
 	return SUCCESS;
 }
 
-/**
- * Inserts new data into a datafile. Will create a new version
- */
-ree_err_t rdb_insert_data(ree_file *file, char *field, rdb_gendata *data);
+ree_err_t rdb_insert_data(ree_file *file, char *field, rdb_gendata *data)
 {
 	/** Check if we need to increase our revision space */
 	if(file->bsize >= file->rsize)
@@ -92,12 +89,24 @@ ree_err_t rdb_insert_data(ree_file *file, char *field, rdb_gendata *data);
 	/* Return our success */
 	if(res == MAP_OK) return SUCCESS;
 
-	/* If something went wrong we return an insert failure */
+	/* Otherwise return an insertion failure */
 	else return FILE_INSERT_FAILED;
 }
 
-ree_err_t rdb_delete_data(ree_file *file, rdb_gendata *field)
+ree_err_t rdb_delete_data(ree_file *file, char *field)
 {
+	int res = hashmap_remove(file->body[file->bsize], field);
+
+	if(res == MAP_OK) return SUCCESS;
+	else 							return FILE_RM_FAILED;
+}
+
+ree_err_t rdb_finalize_version(ree_file *file)
+{
+	/* Increment the revision version number*/
+	file->bsize++;
+
+	/* Do we need to make more changes here? */
 	return SUCCESS;
 }
 
