@@ -36,15 +36,20 @@ typedef enum ree_os {
 	WINDOWS 	= 0xE3, // Windows
 	ANDROID 	= 0xE4, // Mobile: Android
 	IOS 			= 0xE5, // Mobile: iOS
-	BSD 			= 0xE6, // (Free|Open)BSD
+	BSD 			= 0xE6, // BSD
 } ree_os;
+
+typedef enum ree_distro {
+	FEDORA,
+	DEBIAN
+} ree_distro;
 
 /** Main Reedb container that gets passed around modules */
 typedef struct reedb_c {
 	bool active;
-	unsigned int passlength; //
-	bool verbose; //
-	bool daemon; //
+	unsigned int passlength;
+	bool verbose;
+	bool daemon;
 	char *path;
 	ree_os os;
 

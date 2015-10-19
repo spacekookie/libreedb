@@ -32,25 +32,27 @@
 typedef struct ree_vault
 {
 	/* Some metadata for the vault */
-	char				id[32]; 								// UUID string
-	size_t			size;										// number of files
-	char				*name;									// User defined name
-	char 				*path;									// Path on FS
+	char				id[32]; 					// UUID string
+	size_t			size;							// number of files
+	char				*name;						// User defined name
+	char 				*path;						// Path on FS
 
-	time_t			created;								// Date created
-	time_t			modified;								// Date last modified
+	time_t			created;					// Date created
+	time_t			modified;					// Date last modified
 
 	/* Some crypto nonsense :) */
-	map_t				*keystore;							// Map of files -> crypt-keys or regions -> crypt-keys
-	map_t 			*tokens;								// Allowed access tokens
+	map_t				*keystore;				// Map of files -> crypt-keys or regions -> crypt-keys
+	map_t 			*tokens;					// Allowed access tokens
 
 	/* Maps for data storage */
-	map_t				*tags;									// Tags ordered by category (key)
-	map_t				*files;									// Datafiles ordered by their name (key)
+	map_t				*tags;						// Tags ordered by category (key)
+	map_t				*files;						// Datafiles ordered by their name (key)
 
 } ree_vault;
 
 ree_err_t rdb_create_vault(char *name, char *path);
+
+ree_err_t rdb_unlock_vault(ree_vault *vault, char *passphrase, ...);
 
 ree_err_t rdb_get_headers();
 

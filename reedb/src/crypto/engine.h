@@ -22,35 +22,39 @@
  *
  */
 
-#ifndef SRC_CRYPTO_ENGINE_H_
-#define SRC_CRYPTO_ENGINE_H_
-
 /* Includes so we can work properly */
 #include "reedb/utils.h"
 #include "reedb/datafile.h"
 
+typedef enum rdb_crytarget_t
+{
+	FILE,							// Indicates that a datafile struct is present
+	STRING,						// Indicates that it's a simple string encryption.
+	BSTRING, 					// Bytestrings because C!
+}
+
 typedef enum rdb_cryflgs_t
 {
-	RIJDAEL,
-	TWOFISH,
-	SERPENT,
+	/* Listing ciphers by name just because AES can change! */
+	RIJDAEL,					// The default
+	TWOFISH,					// Schneier says 'hi'
+	SERPENT,					// Second place in AES contest
+	RSA,							// Not currently implemented. Uses asymmetric RSA encryption
 
-	CRC,
-	CTR,
-	BLOCK_DUMP,
-	STREAM_DUMP,
-
+	CBC,							// Default mode of operation
+	CRT,							// Good for stream dumps
+	BLOCK_DUMP,				// Indicates that crypto should dump one block at a time
+	STREAM_DUMP,			// Makes crypto behave like a stream cipher
 } rdb_cryflgs_t;
 
 ree_err_t init_rdb_crypto(enum rdb_cryflgs_t flags[]);
 
 ree_err_t rdb_crycontext_switch(rdb_datafile *file, rdb_cryflgs_t flags[]);
 
-ree_err_t rdb_encrypt();
+ree_err_t rdb_encrypt(rdb_crytarget_t *type, void *data);
 
-ree_err_t rdb_decryt();
+ree_err_t rdb_decryt(rdb_crytarget_t *type, void *data);
 
 ree_err_t rdb_dump_key(char *scope);
-
 
 #endif

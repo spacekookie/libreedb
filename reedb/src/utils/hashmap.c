@@ -152,11 +152,9 @@ unsigned long crc32(const unsigned char *s, unsigned int len)
   
   crc32val = 0;
   for (i = 0;  i < len;  i ++)
-    {
-      crc32val =
-	crc32_tab[(crc32val ^ s[i]) & 0xff] ^
-	  (crc32val >> 8);
-    }
+  {
+		crc32val = crc32_tab[(crc32val ^ s[i]) & 0xff] ^ (crc32val >> 8);
+	}
   return crc32val;
 }
 
