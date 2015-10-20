@@ -22,18 +22,23 @@
  *
  */
 
-/* Includes so we can work properly */
-#include "reedb/utils.h"
-#include "reedb/datafile.h"
+/* Public definitions  */
+#include "reedb/defs.h"
 
-typedef enum rdb_crytarget_t
+/* Internal data storage */
+#include "datafile.h"
+
+#ifndef SRC_DATAFILE_H_
+#define SRC_DATAFILE_H_
+
+typedef enum crytarget_t
 {
 	FILE,							// Indicates that a datafile struct is present
 	STRING,						// Indicates that it's a simple string encryption.
 	BSTRING, 					// Bytestrings because C!
-}
+} crytarget_t;
 
-typedef enum rdb_cryflgs_t
+typedef enum cryflgs_t
 {
 	/* Listing ciphers by name just because AES can change! */
 	RIJDAEL,					// The default
@@ -45,15 +50,23 @@ typedef enum rdb_cryflgs_t
 	CRT,							// Good for stream dumps
 	BLOCK_DUMP,				// Indicates that crypto should dump one block at a time
 	STREAM_DUMP,			// Makes crypto behave like a stream cipher
-} rdb_cryflgs_t;
+} cryflgs_t;
 
-ree_err_t init_rdb_crypto(enum rdb_cryflgs_t flags[]);
+/** The crypto context struct that is attached to a datafile */
+typedef struct cry_context
+{
+	unsigned char			*block_key;
+	unsigned char			*mac;
+	unsigned long			nonce;
+} cry_context;
 
-ree_err_t rdb_crycontext_switch(rdb_datafile *file, rdb_cryflgs_t flags[]);
+ree_err_t init_rdb_crypto(enum cryflgs_t flags[]);
 
-ree_err_t rdb_encrypt(rdb_crytarget_t *type, void *data);
+ree_err_t rdb_crycontext_switch(datafile *file, cryflgs_t flags[]);
 
-ree_err_t rdb_decryt(rdb_crytarget_t *type, void *data);
+ree_err_t rdb_encrypt(crytarget_t *type, void *data);
+
+ree_err_t rdb_decryt(crytarget_t *type, void *data);
 
 ree_err_t rdb_dump_key(char *scope);
 

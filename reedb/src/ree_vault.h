@@ -31,6 +31,7 @@
 #include "reedb/utils/hashmap.h"
 #include "reedb/crypto/token.h"
 #include "reedb/defs.h"
+#include "datafile.h"
 
 typedef struct vault
 {
