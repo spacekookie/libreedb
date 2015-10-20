@@ -16,6 +16,7 @@
  * -------------------------------------------
  *
  */
+ 
 #include <stdbool.h>
 #include <stdio.h>
 #include "reedb/vault.h"

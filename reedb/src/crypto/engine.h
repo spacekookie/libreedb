@@ -1,7 +1,14 @@
-/*
- * (C) Copyright 2014-2015 Lonely Robot.
+/* reedb - crypto/engine.h
  *
- * All rights reserved. This program and the accompanying materials
+ * This header defines the API for the generic crypto engine interface.
+ * It is built to handle multiple block ciphers without having to change
+ * key storage or message authentication in the backend. Switching cipher
+ * is as simple as calling a function!
+ *
+ * (c) 2015 					Lonely Robot.
+ * Authors:						Katharina 'spacekookie' Sabel
+ *
+ * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 3 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-3.html
@@ -11,14 +18,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- * 
- * Author: Katharina 'spacekookie' Sabel
- *
- * Core header of the encryption engine. It can be given a type and
- * then handle whatever crypto implementation the user wants or is 
- * required by a vault to function properly. Please refer to the 
- * API docs and the Reedb manual to see what crypto implementation 
- * flags are available in what combination with other operand flags.
+ * -------------------------------------------
  *
  */
 
@@ -28,8 +28,8 @@
 /* Internal data storage */
 #include "datafile.h"
 
-#ifndef SRC_DATAFILE_H_
-#define SRC_DATAFILE_H_
+#ifndef SRC_CRYENGINE_H_
+#define SRC_CRYENGINE_H_
 
 typedef enum crytarget_t
 {
