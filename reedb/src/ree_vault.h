@@ -1,4 +1,4 @@
-/* reedbd-http - main.c
+/* reedb - ree_vault.h
  * 
  * This file is the entry point to the Reedb HTTP(s) extention.
  * It is statically compiled against Reedb and adds functions for
@@ -19,7 +19,6 @@
  *
  * -------------------------------------------
  *
- * Initialisation of reedbd-http is done automatically (mostly).
  */
 
 #ifndef SRC_REE_VAULT_H_

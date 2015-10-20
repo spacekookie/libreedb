@@ -1,7 +1,14 @@
-/*
- * (C) Copyright 2014-2015 Lonely Robot.
+/* reedb - vault.h
  *
- * All rights reserved. This program and the accompanying materials
+ * This header file contains handles to interact with the Reedb vaults module.
+ * It is dependant on information from the core and uses some utility functions from
+ * hidden modules in the background. The vaults module handles all file insertion
+ * and deletion operations on Reevaults.
+ *
+ * (c) 2015 					Lonely Robot.
+ * Authors:						Katharina 'spacekookie' Sabel
+ *
+ * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 3 which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl-3.html
@@ -11,12 +18,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- * This header file contains handles to interact with the Reedb vaults module.
- * It is dependant on information from the core and uses some utility functions from
- * hidden modules in the background. The vaults module handles all file insertion
- * and deletion operations on Reevaults.
+ * -------------------------------------------
  *
- * @author: Katharina 'spacekookie' Sabel <sabel.katharina@gmail.com>
  */
 
 #ifndef SRC_VAULT_H_

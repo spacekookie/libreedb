@@ -26,11 +26,11 @@
 #include "reedb/vault.h"
 #include <stdio.h>
 
-#define RDB_DEBUG false
 
 int main(int argc, char *args)
 {
 // Use debugging
+#define RDB_DEBUG true
 
 	/* Initialise Reedb container instance */
 	reedb_c *rdb;

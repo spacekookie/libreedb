@@ -1,4 +1,4 @@
-/* reedbd-http - core.c
+/* reedb - core.c
  *
  * (c) 2015 					Lonely Robot.
  * Authors:						Katharina 'spacekookie' Sabel
