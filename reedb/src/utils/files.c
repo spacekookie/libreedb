@@ -23,7 +23,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-/* Concat a bunch of strings to a path. */
+/* Concat a bunch of strings to a path. 
+ * Returns a pointer to a heap string 
+ */
 char *rdb_concat_path(int count, ...)
 {
 	va_list valist;
@@ -48,7 +50,8 @@ char *rdb_concat_path(int count, ...)
 	for (i = 0; i < count; i++) 
 	{ 
 		strcpy(path, va_arg(valist, int));
-	}		
+	}	
+	return path;	
 }
 
 /* Expand a path to an absolute path */

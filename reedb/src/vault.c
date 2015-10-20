@@ -30,6 +30,7 @@
 #include "reedb/defs.h"
 
 /* Data storage */
+#include "utils/files.h"
 #include "ree_vault.h"
 #include "datafile.h"
 
@@ -84,7 +85,7 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 	}
 
 	/* Malloc a struct */
-	vault *vault = malloc(sizeof(vault) * 1);
+	vault *vault = malloc(sizeof(struct vault));
 	if(vault == NULL)		return MALLOC_FAILED;
 
 	/* Vault directory tree
@@ -102,38 +103,35 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 	int folder;
 
 	/** Check that the path is valid (doesn't already exist) */
-	folder = mkdir(path, 0755); 
-	if(folder != 0) return VAULT_CREATE_FAILED;
-
+	folder = mkdir(rdb_concat_path(path, name), 0755); 
+	if(folder != 0)
+	{
+		if(RDB_DEBUG) printf("Creating the path %s failed!\n", path);
+		return VAULT_CREATE_FAILED;
+	}
 	/** Check that the path is valid (doesn't already exist) */
 	folder = mkdir("%s", 0755);
-	if(folder == -1)
+	if(folder != 0)
 	{
 		char msg[] = "The path provided was not empty! Code %d\n", folder;
 		if(RDB_DEBUG) fputs(msg, stderr);
 		return VAULT_CREATE_FAILED;
 	}
 
-	// char keystore[strlen(path) + strlen("keystore")] = path;
-	// folder = mkdir(keystore, 0755); 
-	// if(folder != 0) goto param_failure;
+	char *keystore = rdb_concat_path(2, path, "keystore");
+	folder = mkdir(keystore, 0755);
+	if(folder != 0) goto param_failure;
+	free(keystore);
 
-	// char datastore[strlen(path) + 9] = "%sdatastore", path;
-	// folder = mkdir(datastore, 0755); 
-	// if(folder != 0) goto param_failure;
+	char *datastore = rdb_concat_path(2, path, "datastore");
+	folder = mkdir(datastore, 0755);
+	if(folder != 0) goto param_failure;
+	free(datastore);
 
-	// char parity[strlen(path) + 6] = "%sparity", path;
-	// folder = mkdir(parity, 0755); 
-	// if(folder != 0) goto param_failure;
-
-	// /** Check that the path is valid (doesn't already exist) */
-	// folder = mkdir(path, 0755); 
-	// if(folder == -1)
-	// {
-	// 	char msg[] = "The path provided was not empty! Code %d\n", folder;
-	// 	if(RDB_DEBUG) fputs(msg, stderr);
-	// 	goto param_failure;
-	// }
+	char *parity = rdb_concat_path(2, path, "parity");
+	folder = mkdir(parity, 0755);
+	if(folder != 0) goto param_failure;
+	free(parity);
 
 	/* Dump the core config */
 	// JSON_dmp("{}", "%s/config.json", path);
