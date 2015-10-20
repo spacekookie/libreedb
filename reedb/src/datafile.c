@@ -21,8 +21,8 @@
 
 /* System dependencies */
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 /* 'Public' dependencies */ 
@@ -32,7 +32,7 @@
 static size_t START_REV_SIZE = 3;
 
 /** Creates a new file with a name */
-ree_err_t rdb_create_file(datafile **file, char *name)
+ree_err_t create_file(datafile **file, char *name)
 {
 	/* Malloc memory for the actual datafile struct */
 	(*file) = malloc(sizeof(datafile));
@@ -57,24 +57,24 @@ ree_err_t rdb_create_file(datafile **file, char *name)
 }
 
 /** Needs to be called before a transaction to prevent race conditions */
-ree_err_t rdb_lock_file(datafile *file)
+ree_err_t lock_file(datafile *file)
 {
 	return SUCCESS;
 }
 
 /** Needs to be called again after a transaction */
-ree_err_t rdb_unlock_file(datafile *file)
+ree_err_t unlock_file(datafile *file)
 {
 	return SUCCESS;
 }
 
-ree_err_t rdb_insert_data(datafile *file, char *field, gen_data *data)
+ree_err_t insert_data(datafile *file, char *field, gen_data *data)
 {
 	/** Check if we need to increase our revision space */
 	if(file->bsize >= file->rsize)
 	{
 		file->rsize *= 2;
-		map_t *new_revs = malloc(sizeof(map_t*) * file->rsize);
+		map_t **new_revs = malloc(sizeof(map_t*) * file->rsize);
 
 		/* Check again that the malloc was successful */
 		if(new_revs == NULL) return MALLOC_FAILED;
@@ -86,7 +86,8 @@ ree_err_t rdb_insert_data(datafile *file, char *field, gen_data *data)
 	}
 
 	/* Do the hashmap insertion */
-	int res = hashmap_put(file->body[file->bsize], field, data);
+	int index = file->bsize;
+	int res = hashmap_put(file->body[index], field, data);
 
 	/* Return our success */
 	if(res == MAP_OK) return SUCCESS;
@@ -95,7 +96,7 @@ ree_err_t rdb_insert_data(datafile *file, char *field, gen_data *data)
 	else return FILE_INSERT_FAILED;
 }
 
-ree_err_t rdb_delete_data(datafile *file, char *field)
+ree_err_t delete_data(datafile *file, char *field)
 {
 	int res = hashmap_remove(file->body[file->bsize], field);
 
@@ -103,7 +104,7 @@ ree_err_t rdb_delete_data(datafile *file, char *field)
 	else 							return FILE_RM_FAILED;
 }
 
-ree_err_t rdb_finalize_version(datafile *file)
+ree_err_t finalize_version(datafile *file)
 {
 	if(file->body[file->bsize] == NULL)
 	{
@@ -116,12 +117,12 @@ ree_err_t rdb_finalize_version(datafile *file)
 	return SUCCESS;
 }
 
-ree_err_t rdb_update_header(datafile *file, ...)
+ree_err_t update_header(datafile *file, ...)
 {
 	return SUCCESS;
 }
 
-ree_err_t rdb_get_header(datafile *file, datafile_h **headreq)
+ree_err_t get_header(datafile *file, datafile_h **headreq)
 {
 	/* Get our header and check for it's validity */
 	datafile_h *point = file->header;
@@ -135,14 +136,14 @@ ree_err_t rdb_get_header(datafile *file, datafile_h **headreq)
 	return SUCCESS;
 }
 
-ree_err_t rdb_read_file(datafile *file, bool rev_a)
+ree_err_t read_file(datafile *file, bool rev_a)
 {
 	return SUCCESS;
 }
 
 ree_err_t sync(datafile *file, char mode)
 {
-	if(charcmp(mode, 'q') == 0)
+	if(mode == 'c')
 	{
 
 	} else {
@@ -163,7 +164,7 @@ ree_err_t close(datafile *file)
 	return SUCCESS;
 }
 
-ree_err_t rdb_remove_file(datafile *file)
+ree_err_t remove_file(datafile *file)
 {
 	return SUCCESS;
 }

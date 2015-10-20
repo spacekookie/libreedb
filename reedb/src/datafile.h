@@ -20,8 +20,10 @@
 #ifndef SRC_DATAFILE_H_
 #define SRC_DATAFILE_H_
 
+/* System requirements */
 #include <stdbool.h>
 #include <stdlib.h>
+
 #include "reedb/utils/hashmap.h"
 #include "reedb/defs.h"
 
@@ -67,34 +69,33 @@ typedef struct datafile {
 } datafile;
 
 /** Creates a new file with a name */
-ree_err_t rdb_create_file(datafile **file, char *name);
+ree_err_t create_file(datafile **file, char *name);
 
 /** Needs to be called before a transaction to prevent race conditions */
-ree_err_t rdb_lock_file(datafile *file);
+ree_err_t lock_file(datafile *file);
 
 /** Needs to be called again after a transaction */
-ree_err_t rdb_unlock_file(datafile *file);
+ree_err_t unlock_file(datafile *file);
 
-ree_err_t rdb_insert_data(datafile *file, char *field, gen_data *data);
+ree_err_t insert_data(datafile *file, char *field, gen_data *data);
 
-ree_err_t rdb_delete_data(datafile *file, char *field);
+ree_err_t delete_data(datafile *file, char *field);
 
 /** Needs to be called to unlock a revision again and finalize the changes */
-ree_err_t rdb_finalize_version(datafile *file);
+ree_err_t finalize_version(datafile *file);
 
-ree_err_t rdb_update_header(datafile *file, ...);
+ree_err_t update_header(datafile *file, ...);
 
-ree_err_t rdb_get_header(datafile *file, datafile_h **headreq);
+ree_err_t get_header(datafile *file, datafile_h **headreq);
 
-ree_err_t rdb_read_file(datafile *file, bool versioning);
+ree_err_t read_file(datafile *file, bool versioning);
 
 /** Needs to be called to sync in-memory file with disk-file. Will dump
- * encrypted data to disk. Blocking operation until file lock is not present
- */
+ * 	encrypted data to disk. Blocking operation until file lock is not present */
 ree_err_t sync(datafile *file, char mode);
 
 ree_err_t close(datafile *file);
 
-ree_err_t rdb_remove_file(datafile *file);
+ree_err_t remove_file(datafile *file);
 
 #endif /* SRC_DATAFILE_H_ */

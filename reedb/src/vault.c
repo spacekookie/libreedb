@@ -16,18 +16,24 @@
  * -------------------------------------------
  *
  */
- 
+
+/* System requirements */ 
+#include <sys/types.h> 
+#include <sys/stat.h> 
 #include <stdbool.h>
 #include <stdio.h>
+
+/* Internal requirements */
+#include "reedb/crypto/token.h"
 #include "reedb/vault.h"
 #include "reedb/core.h"
-#include "reedb/crypto/token.h"
 #include "reedb/defs.h"
 
-// Internals
+/* Data storage */
 #include "ree_vault.h"
 #include "datafile.h"
 
+/* Holds vault module state */
 static bool active = false;
 
 /** Initialise the vault module with an existing Reedb container */
@@ -57,40 +63,122 @@ ree_err_t rdb_vault_unscope(ree_uuid *uuid) {
 
 }
 
-ree_err_t rdb_vault_create(ree_token **token, ree_uuid **uuid, char *name,
-		char *path, char *passphrase) {
+ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, char *path, char *passphrase)
+{
+	if(name == NULL)
+	{
+		if(RDB_DEBUG) fputs("Name provided was NULL!\n", stderr);
+		return VAULT_CREATE_FAILED;
+	}
 
-	/** Checks if the vault already exists in the active vault set */
-	int count;
-//	ree_vault *active = get_active_vaults();
+	if(path == NULL)
+	{
+		if(RDB_DEBUG) fputs("Path provided was NULL!\n", stderr);
+		return VAULT_CREATE_FAILED;
+	}
 
+	if(passphrase == NULL)
+	{
+		if(RDB_DEBUG) fputs("Passphrase provided was empty!\n", stderr);
+		return VAULT_CREATE_FAILED;
+	}
+
+	/* Malloc a struct */
+	vault *vault = malloc(sizeof(vault) * 1);
+	if(vault == NULL)		return MALLOC_FAILED;
+
+	/* Vault directory tree
+	 * 
+	 * vault
+	 * ├── config.json
+	 * ├── zones.json
+	 * ├── keystore
+	 * │  	 └── user keys
+	 * ├── datastore
+	 * │  	 └── data files
+	 * └── parity
+	 *			 └── parity checksums
+	 */
+	int folder;
+
+	/** Check that the path is valid (doesn't already exist) */
+	folder = mkdir(path, 0755); 
+	if(folder != 0) return VAULT_CREATE_FAILED;
+
+	/** Check that the path is valid (doesn't already exist) */
+	folder = mkdir("%s", 0755);
+	if(folder == -1)
+	{
+		char msg[] = "The path provided was not empty! Code %d\n", folder;
+		if(RDB_DEBUG) fputs(msg, stderr);
+		return VAULT_CREATE_FAILED;
+	}
+
+	// char keystore[strlen(path) + strlen("keystore")] = path;
+	// folder = mkdir(keystore, 0755); 
+	// if(folder != 0) goto param_failure;
+
+	// char datastore[strlen(path) + 9] = "%sdatastore", path;
+	// folder = mkdir(datastore, 0755); 
+	// if(folder != 0) goto param_failure;
+
+	// char parity[strlen(path) + 6] = "%sparity", path;
+	// folder = mkdir(parity, 0755); 
+	// if(folder != 0) goto param_failure;
+
+	// /** Check that the path is valid (doesn't already exist) */
+	// folder = mkdir(path, 0755); 
+	// if(folder == -1)
+	// {
+	// 	char msg[] = "The path provided was not empty! Code %d\n", folder;
+	// 	if(RDB_DEBUG) fputs(msg, stderr);
+	// 	goto param_failure;
+	// }
+
+	/* Dump the core config */
+	// JSON_dmp("{}", "%s/config.json", path);
+
+	return SUCCESS;
+
+	/** This label is used to GOTO it during parameter init failures */
+param_failure:
+
+	//TODO: Find a way to do this with fputs (I want it on stderr, not stdout)!
+	printf("Invalid parameters --- name: %s, path: %s, passphrase: %s ---", &name, &path, &passphrase);
+	return VAULT_CREATE_FAILED;
+}
+
+ree_err_t rdb_vault_authenticate(ree_token *token, ree_uuid *uuid)
+{
 
 }
 
-ree_err_t rdb_vault_authenticate(ree_token *token, ree_uuid *uuid) {
+ree_err_t rdb_vault_headers(ree_uuid *uuid, ree_token *token, char *search)
+{
 
 }
 
-ree_err_t rdb_vault_headers(ree_uuid *uuid, ree_token *token, char *search) {
+ree_err_t rdb_vault_file(ree_uuid *uuid, ree_token *token)
+{
 
 }
 
-ree_err_t rdb_vault_file(ree_uuid *uuid, ree_token *token) {
+ree_err_t rdb_vault_insert(ree_uuid *uuid, ree_token *token, char *data)
+{
 
 }
 
-ree_err_t rdb_vault_insert(ree_uuid *uuid, ree_token *token, char *data) {
+ree_err_t rdb_vault_delete(ree_uuid *uuid, ree_token *token, char *file)
+{
 
 }
 
-ree_err_t rdb_vault_delete(ree_uuid *uuid, ree_token *token, char *file) {
+ree_err_t rdb_vault_close(ree_uuid *uuid, ree_token *token)
+{
 
 }
 
-ree_err_t rdb_vault_close(ree_uuid *uuid, ree_token *token) {
-
-}
-
-bool vault_isActive() {
+bool vault_isActive()
+{
 
 }
