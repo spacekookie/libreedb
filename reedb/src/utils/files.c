@@ -20,8 +20,24 @@
  *
  */
 
+#include "reedb/utils/files.h"
 #include <stdarg.h>
 #include <string.h>
+
+char *rdb_concat_path_simple(char *path, char *name)
+{
+	int path_len = strlen(path);
+	int name_len = strlen(name);
+
+	char *string = malloc(	sizeof(char) + 
+													(sizeof(char) * path_len) + 
+													(sizeof(char) * name_len)
+												);
+	strcpy(string, path);
+	strcat(string, name);
+	strcat(string, "/");
+	return string;
+}
 
 /* Concat a bunch of strings to a path. 
  * Returns a pointer to a heap string 
@@ -38,10 +54,10 @@ char *rdb_concat_path(int count, ...)
 	/* Get the total string length */
 	for (i = 0; i < count; i++) 
 	{ 
-		char *string = va_arg(valist, int);
+		char *string = va_arg(valist, char*);
 
 		/* Check that we are really only dealing with strings here */
-		length += strlen(va_arg(valist, int));
+		length += strlen(va_arg(valist, char*));
 	}	
 
 	char *path = malloc(sizeof(char) * length);
@@ -49,7 +65,7 @@ char *rdb_concat_path(int count, ...)
 	/* Get the total string length */
 	for (i = 0; i < count; i++) 
 	{ 
-		strcpy(path, va_arg(valist, int));
+		strcpy(path, va_arg(valist, char*));
 	}	
 	return path;	
 }
