@@ -26,8 +26,7 @@
 #include "reedb/defs.h"
 
 /** Defines the type of data that should be */
-typedef enum rdb_data_t
-{
+typedef enum rdb_data_t {
 	string, integer, boolean
 } rdb_data_t;
 
@@ -36,13 +35,11 @@ typedef enum rdb_data_t
  * and size to determine as what data type and field size
  * it should be read.
 */
-typedef struct rdb_gendata
-{
+typedef struct rdb_gendata {
 	rdb_data_t 	type;
 	size_t			size; // > 1 means it's an array.
 
-	union v
-	{
+	union v {
 		int 			*iptr;
 		char			*cptr;
 		bool 			*bptr;
@@ -50,16 +47,14 @@ typedef struct rdb_gendata
 } rdb_gendata;
 
 /** Defines the file header which is passed out to users */
-typedef struct ree_file_h
-{
+typedef struct ree_file_h {
 	char			*name;
 	char			*category;
 	map_t			*tags;
 } ree_file_h;
 
 /** Definition of the actual datafile struct. Not exposed to user */
-typedef struct ree_file
-{
+typedef struct ree_file {
 	/* Some metadata (again) */
 	char 					*name;					// String name. Is hashed for the filesystem name
 	ree_file_h		*header;				// Pointer to header struct. Used for indexing

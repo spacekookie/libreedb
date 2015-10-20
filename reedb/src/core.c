@@ -42,7 +42,6 @@ int __VERBOSE__ = 3;
 int __PATH__ = 4;
 int __OS__ = 5;
 int __OVERRIDE__ = 6;
-//TODO: Add user functions here
 
 ree_err_t rdb_set_passlength(unsigned int length)
 {
@@ -54,7 +53,8 @@ ree_err_t rdb_set_passlength(unsigned int length)
 
 	if (length <= MIN_PASSLENGTH)
 	{
-		fputs("Can not set minimal passphrase length lower than 4", stderr);
+		char error[] = "Can not set minimal passphrase length lower than %d", MIN_PASSLENGTH;
+		fputs(error, stderr);
 		return -1;
 	}
 	tmp_passlength = length;
@@ -176,20 +176,10 @@ ree_err_t reedb_init(reedb_c *(*container))
 		}
 	}
 
-	if (settings[__DAEMON__])
-	{
-		(*container)->daemon = tmp_daemon;
-	}
-
-	if (settings[__PATH__])
-	{
-		(*container)->path = tmp_path;
-	}
-
-	if (settings[__VERBOSE__])
-	{
-		(*container)->verbose = tmp_verbose;
-	}
+	/* Get secondary settings here */
+	if (settings[__DAEMON__])			(*container)->daemon = tmp_daemon;
+	if (settings[__PATH__])				(*container)->path = tmp_path;
+	if (settings[__VERBOSE__])		(*container)->verbose = tmp_verbose;
 
 	//TODO: Check if a lock exists
 	bool locked = false;

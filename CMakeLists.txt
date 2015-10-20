@@ -5,8 +5,8 @@ project(reedb)
 add_subdirectory(reedb)
 
 add_executable(reedbd-http 
-								reedbd-http/test.c)
+								reedbd-http/main.c)
 
 target_link_libraries(reedbd-http
 	reedb
-	Judy)
+	microhttpd)
