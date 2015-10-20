@@ -29,11 +29,11 @@
 #include <stdbool.h>
 
 // Internal imports
-#include "utils/hashmap.h"
-#include "crypto/token.h"
-#include "defs.h"
+#include "reedb/utils/hashmap.h"
+#include "reedb/crypto/token.h"
+#include "reedb/defs.h"
 
-typedef struct ree_vault
+typedef struct vault
 {
 	/* Some metadata for the vault */
 	char				id[32]; 					// UUID string
@@ -51,13 +51,12 @@ typedef struct ree_vault
 	/* Maps for data storage */
 	map_t				*tags;						// Tags ordered by category (key)
 	map_t				*files;						// Datafiles ordered by their name (key)
-
-} ree_vault;
+} vault;
 
 ree_err_t rdb_create_vault(char *name, char *path);
 
-ree_err_t rdb_unlock_vault(ree_vault *vault, char *passphrase, ...);
+ree_err_t rdb_unlock_vault(vault *vault, char *passphrase, ...);
 
-ree_err_t rdb_get_headers();
+ree_err_t rdb_get_headers(vault *vault);
 
 #endif /* SRC_REE_VAULT_H_ */

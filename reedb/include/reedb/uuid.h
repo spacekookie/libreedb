@@ -20,7 +20,7 @@
 
 #include "defs.h"
 
-typedef enum {
+typedef enum ree_uuid_t {
 	TYPE1, /* Type with MAC Address */
 	TYPE2, /* Cryptographically random UUID */
 	TYPE3, /* Globally sequential ID */

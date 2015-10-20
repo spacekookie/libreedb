@@ -11,10 +11,11 @@
 #include "reedb/core.h"
 #include "reedb/crypto/token.h"
 #include "reedb/defs.h"
-#include "reedb/ree_vault.h"
 
+// Internals
+#include "ree_vault.h"
 #include "datafile.h"
- 
+
 static bool active = false;
 
 /** Initialise the vault module with an existing Reedb container */

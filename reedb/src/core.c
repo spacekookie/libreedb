@@ -19,7 +19,6 @@
 
 /* Internal requirements in Reedb */
 #include "reedb/core.h"
-#include "reedb/ree_vault.h"
 
 /* Make sure that the error codes are all present */
 #include "reedb/defs.h"
@@ -40,7 +39,7 @@ static char *tmp_path;
 static ree_os tmp_os;
 static int settings[6];
 
-static ree_vault **active_vaults[];
+// static vault **active_vaults[];
 
 int __PASSLENGTH__ 	= 0;
 int __USRCODE__ 		= 1;
