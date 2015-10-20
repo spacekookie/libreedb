@@ -30,7 +30,7 @@
 #include "reedb/defs.h"
 
 /* Data storage */
-#include "utils/files.h"
+#include "reedb/utils/files.h"
 #include "ree_vault.h"
 #include "datafile.h"
 
@@ -103,12 +103,13 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 	int folder;
 
 	/** Check that the path is valid (doesn't already exist) */
-	folder = mkdir(rdb_concat_path(path, name), 0755); 
+	folder = mkdir(path, 0755);
 	if(folder != 0)
 	{
 		if(RDB_DEBUG) printf("Creating the path %s failed!\n", path);
 		return VAULT_CREATE_FAILED;
 	}
+
 	/** Check that the path is valid (doesn't already exist) */
 	folder = mkdir("%s", 0755);
 	if(folder != 0)
@@ -118,20 +119,20 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 		return VAULT_CREATE_FAILED;
 	}
 
-	char *keystore = rdb_concat_path(2, path, "keystore");
-	folder = mkdir(keystore, 0755);
-	if(folder != 0) goto param_failure;
-	free(keystore);
+	// char *keystore = rdb_concat_path(2, path, "keystore");
+	// folder = mkdir(keystore, 0755);
+	// if(folder != 0) goto param_failure;
+	// free(keystore);
 
-	char *datastore = rdb_concat_path(2, path, "datastore");
-	folder = mkdir(datastore, 0755);
-	if(folder != 0) goto param_failure;
-	free(datastore);
+	// char *datastore = rdb_concat_path(2, path, "datastore");
+	// folder = mkdir(datastore, 0755);
+	// if(folder != 0) goto param_failure;
+	// free(datastore);
 
-	char *parity = rdb_concat_path(2, path, "parity");
-	folder = mkdir(parity, 0755);
-	if(folder != 0) goto param_failure;
-	free(parity);
+	// char *parity = rdb_concat_path(2, path, "parity");
+	// folder = mkdir(parity, 0755);
+	// if(folder != 0) goto param_failure;
+	// free(parity);
 
 	/* Dump the core config */
 	// JSON_dmp("{}", "%s/config.json", path);

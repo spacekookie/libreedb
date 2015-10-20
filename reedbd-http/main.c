@@ -22,8 +22,9 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-#include "reedb/core.h"
+#include "reedb/utils/files.h"
 #include "reedb/vault.h"
+#include "reedb/core.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -33,31 +34,39 @@ int main(int argc, char *args)
 // Use debugging
 // #define RDB_DEBUG true
 
+	char path[] = "/home/spacekookie/";
+	char name[] = "default";
+
+	char *combined = rdb_concat_path_simple(path, name);
+
+	printf("The combined path: %s", combined);
+	free(combined);
+
 	/* Initialise Reedb container instance */
-	reedb_c *rdb;
-	ree_err_t error;
+	// reedb_c *rdb;
+	// ree_err_t error;
 
-	rdb_set_passlength(12);
-	rdb_set_os(LINUX);
+	// rdb_set_passlength(12);
+	// rdb_set_os(LINUX);
 
-	/* Call the init */
-	error = reedb_init(&rdb);
-	printf("Returning with code: %d\n", error);
+	// /* Call the init */
+	// error = reedb_init(&rdb);
+	// printf("Init returning with code: %d\n", error);
 
-	/* Init vault module */
-	rdb_vault_init(&rdb);
+	// /* Init vault module */
+	// rdb_vault_init(&rdb);
 
-	ree_token 	*token;
-	ree_uuid		*uuid;
-	error = rdb_vault_create(&token, &uuid, "default", "/home/spacekookie/default/", "super_password");
-	if(error != 0)
-	{
-		printf("Create vault returned with code %d\n", error);
-	}
+	// ree_token 	*token;
+	// ree_uuid		*uuid;
+	// error = rdb_vault_create(&token, &uuid, "default", "/home/spacekookie/default/", "super_password");
+	// if(error != 0)
+	// {
+	// 	printf("Create vault returned with code %d\n", error);
+	// }
 
-	/* Terminate our instance. Frees up all sensitive information from memory */
-	error = reedb_terminate(&rdb, "Program ran out of lines of code");
+	// /* Terminate our instance. Frees up all sensitive information from memory */
+	// error = reedb_terminate(&rdb, "Program ran out of lines of code");
 	
-	printf("Returning with code: %d\n", error);
+	// printf("Returning with code: %d\n", error);
 	return 0;
 }
