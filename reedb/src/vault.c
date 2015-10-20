@@ -9,11 +9,12 @@
 #include <stdio.h>
 #include "reedb/vault.h"
 #include "reedb/core.h"
-#include "reedb/datafile.h"
 #include "reedb/crypto/token.h"
 #include "reedb/defs.h"
 #include "reedb/ree_vault.h"
 
+#include "datafile.h"
+ 
 static bool active = false;
 
 /** Initialise the vault module with an existing Reedb container */
@@ -31,7 +32,7 @@ ree_err_t rdb_vault_init(reedb_c *(*container)) {
  *  Returns a list of available vaults. Uses the same struct
  * as internal workings with the entries field nulled out.
  */
-ree_err_t rdb_vault_list(ree_vault **list) {
+ree_err_t rdb_vault_list(rdb_vault **list) {
 	return SUCCESS;
 }
 

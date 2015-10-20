@@ -23,19 +23,26 @@
  */
 
 #include "reedb/core.h"
+#include "reedb/vault.h"
+#include <stdio.h>
+
+#define RDB_DEBUG false
 
 int main(int argc, char *args)
 {
+// Use debugging
+
 	/* Initialise Reedb container instance */
 	reedb_c *rdb;
+	ree_err_t error;
 
-	/* Init reedb with specific settings */
 	rdb_set_passlength(12);
 	rdb_set_os(LINUX);
-	// rdb_set_verbose(true);
-	reedb_init(&rdb);
+
+	/* Call the init */
+	error = reedb_init(&rdb);
 
 	/* Terminate our instance. Frees up all sensitive information from memory */
-	reedb_terminate(rdb, "Program ran out of lines of code");
-	return 0;
+	error = reedb_terminate(&rdb, "Program ran out of lines of code");
+	return error;
 }

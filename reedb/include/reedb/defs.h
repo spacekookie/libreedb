@@ -24,9 +24,7 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
-/* This field will allow is to get interactive debugging from everything */
-#define RDB_DEBUG false
-
+#define RDB_DEBUG true
 
 /** enum error codes used throughout Reedb **/
 typedef enum ree_err_t
@@ -67,6 +65,7 @@ typedef enum ree_err_t
 	FILE_LOCK_TIMEOUT,						// Inserting into a file timed-out because of a lock
 	FILE_RM_FAILED,								// Tried to remove a field from a version that doesn't exist.
 	FILE_EMPTY_VERSION,						// Tried to finalise an empty version. Bad [boy|girl]!
+	FILE_BAD_HEADER,							// Means that the header of a fileis somehow damaged
 
 	/* Crypto error returns */
 	CRYPTO_INVALID_KEY,						// Returns when a crypto operation failed because the

@@ -25,15 +25,23 @@
 #include <stdbool.h>
 #include "core.h"
 #include "crypto/token.h"
-#include "datafile.h"
 #include "defs.h"
-#include "ree_vault.h"
+
+/* A very simple struct to hold information
+ * about vaults to the outside!
+ */
+typedef struct rdb_vault
+{
+	char 			*name;
+	char			*path;
+	size_t		size;
+} rdb_vault;
 
 /** Initialise the vault module with an existing Reedb container */
 ree_err_t rdb_vault_init(reedb_c *(*container));
 
 ///** Returns a list of available vaults. Uses the same struct as internal workings with the entries field nulled out. */
-ree_err_t rdb_vault_list(ree_vault **list);
+ree_err_t rdb_vault_list(rdb_vault **list);
 
 ree_err_t rdb_vault_scope(ree_uuid **uuid, char *name, char *path);
 

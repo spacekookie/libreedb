@@ -84,7 +84,7 @@ ree_err_t rdb_finalize_version(ree_file *file);
 
 ree_err_t rdb_update_header(ree_file *file, ...);
 
-ree_err_t rdb_get_header(ree_file *file);
+ree_err_t rdb_get_header(ree_file *file, ree_file_h **headreq);
 
 ree_err_t rdb_read_file(ree_file *file, bool versioning);
 

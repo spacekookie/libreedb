@@ -1,11 +1,16 @@
-/*
- * This file is part of Reedb
- * (c) Lonely Robot
+/* reedbd-http - core.h
  *
- * All rights reserved. This program and the accompanying materials
+ * This header file contains handles to interact with the Reedb core module.
+ * The core module is responsible for starting and terminating running Reedb
+ * instances as well as checking that all other modules are loaded and
+ * running correctly.
+ *
+ * (c) 2015 					Lonely Robot.
+ * Authors:						Katharina 'spacekookie' Sabel
+ *
+ * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 3 which accompanies this distribution, and is available at
- *
  * http://www.gnu.org/licenses/lgpl-3.html
  *
  * This library is distributed in the hope that it will be useful,
@@ -13,13 +18,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- *
- * Author: Katharina 'spacekookie' Sabel
- *
- * This header file contains handles to interact with the Reedb core module.
- * The core module is responsible for starting and terminating running Reedb
- * instances as well as checking that all other modules are loaded and
- * running correctly.
+ * -------------------------------------------
  *
  */
 
@@ -65,9 +64,6 @@ ree_err_t rdb_set_usrcode(void *funct);
 
 /** Make Reedb run in daemon mode. This detaches all logging to file and makes the runtime more autonomous. */
 ree_err_t rdb_set_daemon(bool daemon);
-
-/** Enable verbose debugging either to log or to STDOUT/ STDERR */
-ree_err_t rdb_set_verbose(bool verbose);
 
 /** Set the operational path of Reedb. This is automatically set by default */
 ree_err_t rdb_set_path(char *path);

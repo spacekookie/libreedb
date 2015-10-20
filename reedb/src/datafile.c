@@ -18,7 +18,7 @@
  */
 
 /* Include the definitions */
-#include "reedb/datafile.h"
+#include "datafile.h"
 
 /* Things we need to run properly */
 #include <stdbool.h>
@@ -122,8 +122,17 @@ ree_err_t rdb_update_header(ree_file *file, ...)
 	return SUCCESS;
 }
 
-ree_err_t rdb_get_header(ree_file *file)
+ree_err_t rdb_get_header(ree_file *file, ree_file_h **headreq)
 {
+	/* Get our header and check for it's validity */
+	ree_file_h *point = file->header;
+
+	if(	point == NULL 			|| 
+			point->name == NULL || 
+			point->category == NULL )	return FILE_BAD_HEADER;
+
+	/* Then write out the pointer and return success */
+	(*headreq) = point;
 	return SUCCESS;
 }
 
@@ -134,6 +143,19 @@ ree_err_t rdb_read_file(ree_file *file, bool rev_a)
 
 ree_err_t sync(ree_file *file, char mode)
 {
+	if(charcmp(mode, 'q') == 0)
+	{
+
+	} else {
+		if(RDB_DEBUG)
+		{
+			char msg[] = "Mode %c is not supported or known to Reedb!", mode;
+			fputs(msg, stderr);
+		}
+		return FAILURE;
+	}
+
+
 	return SUCCESS;
 }
 
