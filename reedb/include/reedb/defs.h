@@ -52,6 +52,7 @@ typedef enum ree_err_t
 	NOT_INITIALISED,							// Tried to use Reedb without having initialised it first
 
 	/* Vault error returns */
+	VAULT_CREATE_FAILED,					// Something went wrong when creating a new vault.
 	VAULT_ALREADY_SCOPED,					// Tried to scope a vault that was already in config
 	VAULT_NOT_SCOPED,							// Tried to operate on vault that wasn't scope before
 	VAULT_ALREADY_LOADED,					// Tried to load a vault that has already been loaded.

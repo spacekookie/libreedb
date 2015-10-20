@@ -7,6 +7,7 @@ add_library (reedb
 
 	# Utilities
 	src/utils/hashmap.c
+	src/utils/files.c
 
 	# Public interface
 	src/core.c
@@ -17,6 +18,9 @@ add_library (reedb
 	src/datafile.c
 	src/ree_vault.c
 )
+
+target_link_libraries(reedb
+	gcrypt)
 
 target_include_directories (reedb PUBLIC "include")
 target_include_directories (reedb PRIVATE "src")
