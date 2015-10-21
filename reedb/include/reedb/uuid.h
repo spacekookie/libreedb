@@ -31,6 +31,6 @@ typedef struct ree_uuid {
 	char *field;
 } ree_uuid;
 
-ree_err_t urdb_generate_uuid(ree_uuid_t type);
+ree_err_t rdb_generate_uuid(ree_uuid_t type);
 
 #endif /* SRC_UUID_H_ */
