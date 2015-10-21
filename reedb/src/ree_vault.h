@@ -1,8 +1,8 @@
 /* reedb - ree_vault.h
  * 
- * This file is the entry point to the Reedb HTTP(s) extention.
- * It is statically compiled against Reedb and adds functions for
- * web applications and usability without using the C bound API.
+ * This file contains functions that actually run on an internal
+ * vault struct. They are partially called by the vaults interface
+ * and partially by smaller files such as the crypto engine.
  *
  * (c) 2015 					Lonely Robot.
  * Authors:						Katharina 'spacekookie' Sabel
@@ -53,10 +53,22 @@ typedef struct vault
 	map_t				*files;						// Datafiles ordered by their name (key)
 } vault;
 
-ree_err_t rdb_create_vault(char *name, char *path);
+/* Create a new vault (DEPRECIATED)! */
+ree_err_t rdb_create_vault(vault *(*vault), ree_uuid *(*uuid), char *name, char *path, char *passphrase);
 
-ree_err_t rdb_unlock_vault(vault *vault, char *passphrase, ...);
+/* Unlock a vault and get a token */
+ree_err_t rdb_unlock_vault(vault *vault, char *passphrase, ree_token *(*token));
 
+/* Lock a vault again */
+ree_err_t rdb_lock_vault(vault *vault, ree_token *token);
+
+/* Dump a vault from memory (more than just lock it!) */
+ree_err_t rdb_dump_vault(vault *next, vault *vault);
+
+/* Get the headers off a vault */
 ree_err_t rdb_get_headers(vault *vault);
 
-#endif /* SRC_REE_VAULT_H_ */
+/* The search request is just handed through from the interface */
+ree_err_t rdb_search_headers(vault *vault, char *search);
+
+#endif
