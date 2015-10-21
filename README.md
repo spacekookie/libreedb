@@ -11,7 +11,7 @@ Reedb
 
 It does so by creating vaults where datafiles are encrypted before being written to disk and never cached for longer than needed to perform operations. It uses libgcrypt (which also powers software like GPG) and nested keys to even allow for multi-user access to vaults.
 
-The issue tracker has migrated to the [Lonely Robot Redmine](https://bugs.lonelyrobot.io/projects/reedb)
+The issue tracker has migrated to the [Lonely Robot Redmine](https://bugs.lonelyrobot.io/projects/reedb/issues)
 
 How to use
 ----------
