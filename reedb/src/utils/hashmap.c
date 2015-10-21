@@ -45,10 +45,7 @@ map_t hashmap_new() {
 		return NULL;
 }
 
-/* The implementation here was originally done by Gary S. Brown.  I have
-   borrowed the tables directly, and made some minor changes to the
-   crc32-function (including changing the interface). //ylo */
-
+	/* Some minor changes were made on the CRC lookup table */
   /* ============================================================= */
   /*  COPYRIGHT (C) 1986 Gary S. Brown.  You may use this program, or       */
   /*  code or tables extracted from it, as desired without restriction.     */
