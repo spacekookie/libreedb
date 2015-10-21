@@ -29,15 +29,16 @@
 #include <string.h>
 #include <stdio.h>
 
-int iteration(char *array)
+int iteration(char *item, char *data)
 {
 	printf("YES! ");
-	printf("Also: %s\n", array);
+	printf("Also: %s\n", data);
 	return 0;
 }
 
 int main(int argc, char *args)
 {
+
 // Use debugging
 #define RDB_DEBUG true
 
@@ -55,10 +56,10 @@ int main(int argc, char *args)
 	char *four = malloc(sizeof(char) * 8);
 	four = "DDDDDDD";
 
-	hashmap_put(testmap, "one", one);
-	hashmap_put(testmap, "two", two);
-	hashmap_put(testmap, "three", three);
-	hashmap_put(testmap, "four", four);
+	hashmap_put(testmap, "123", one);
+	hashmap_put(testmap, "456", two);
+	hashmap_put(testmap, "789", three);
+	hashmap_put(testmap, "012", four);
 
 	hashmap_iterate(testmap, iteration, one);
 

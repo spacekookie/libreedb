@@ -18,8 +18,8 @@
  */
 
 /* System requirements */ 
-#include <sys/types.h> 
-#include <sys/stat.h> 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -64,18 +64,21 @@ ree_err_t rdb_vault_init(reedb_c *(*cont)) {
 	}
 }
 
-int clear_vaults()
-{
-	printf("Yo!\n");
-	return 0;
-}
-
 ree_err_t rdb_vault_terminate(unsigned int mode)
 {
 	if(active)
 	{
-		// hashmap_iterate(vaults, clear_vaults(), NULL);
+		vault *start;
+		hashmap_get_one(vaults, start, 0);
+		
+		/** 
+		 * Will be called for every vaults in the vaults interface. The function
+		 * locks out all access to the vault, finishes all transactions in
+		 * progress and then dumps the datastructure from memory.
+		 */
+		hashmap_iterate(vaults, rdb_dump_vault, start);
 
+		/* Then free the actual hashmap */
 		hashmap_free(vaults);
 		return SUCCESS;
 
@@ -120,80 +123,59 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 		return VAULT_CREATE_FAILED;
 	}
 
-	/* Malloc a vault struct */
-	vault *vault = malloc(sizeof(struct vault));
-	if(vault == NULL)			return MALLOC_FAILED;
-
-	/* Vault directory tree
-	 * 
-	 * vault
-	 * ├── config.json
-	 * ├── zones.json
-	 * ├── keystore
-	 * │  	 └── user keys
-	 * ├── datastore
-	 * │  	 └── data files
-	 * └── parity
-	 *			 └── parity checksums
-	 */
-	int folder;
-
-	char *master = rdb_concat_path_simple(path, name);
-
-	folder = mkdir(master, 0755);
-	if(folder != 0)
+	(*uuid) = rdb_generate_uuid(TYPE1);
+	if((*uuid) == NULL)
 	{
-		if(RDB_DEBUG) printf("The path provided was not empty! Code %d\n", folder);
 		return VAULT_CREATE_FAILED;
 	}
 
-	/* Create the keystore directory */
-	char *keystore = rdb_concat_path_simple(master, "keystore");
-	folder = mkdir(keystore, 0700);
-	if(folder != 0) goto param_failure;
-	free(keystore);
+	int toksuccess = rdb_tokens_create((*token), 0);
+	if(toksuccess != 0)
+	{
+		return VAULT_CREATE_FAILED;
+	}
 
-	/* Create the keystore directory */
-	char *datastore = rdb_concat_path_simple(master, "datastore");
-	folder = mkdir(datastore, 0755);
-	if(folder != 0) goto param_failure;
-	free(datastore);
-
-	/* Create the keystore directory */
-	char *parity = rdb_concat_path_simple(master, "parity");
-	folder = mkdir(parity, 0755);
-	if(folder != 0) goto param_failure;
-	free(parity);
-
-	/* Clean up after ourselves */
-	free(master);
-
-	rdb_vault *pvault = malloc(sizeof(rdb_vault));
-	pvault->name = name;
-	pvault->path = path;
-	pvault->size = 0;
+	/* Handle the public vault struct */
+	rdb_vault *pub_vault = malloc(sizeof(rdb_vault));
+	pub_vault->name = name;
+	pub_vault->path = path;
+	pub_vault->size = 0;
 
 	/* Put it into the hashmap */
-	rdb_vault *cvault;
-	hashmap_get(container->scoped, name, cvault);
+	rdb_vault *ch_vault;
+	hashmap_get(container->scoped, name, ch_vault);
 
-	if(cvault != NULL)
+	if(ch_vault != NULL)
 	{
-		if(cvault->name == pvault->name && cvault->path == pvault->path)
+		if(ch_vault->name == pub_vault->name && ch_vault->path == pub_vault->path)
 		{
 			if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
-			free(cvault);
+			free(ch_vault);
 			return VAULT_ALREADY_SCOPED;
 		}
 	} else {
-		hashmap_put(container->scoped, name, pvault);
+		hashmap_put(container->scoped, name, pub_vault);
 	}
 
+	/* Now actually create that internal vault struct */
+	vault *vault;
+	int success = rdb_create_vault(&vault, (*uuid), name, path, passphrase);
 
+	/* Store it in the static hashmap */
+	rdb_vault *ch_vault = NULL;
+	hashmap_get(vaults, name, ch_vault);
 
-	return SUCCESS;
+	if(ch_vault->name == vault->name && ch_vault->path == vault->path)
+	{
+		if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
+		free(ch_vault);
+		return VAULT_ALREADY_SCOPED;
+	}
 
-	/** Error handling label */
+	hashmap_put(vaults, name, vault);
+	return success;
+
+/** Error handling label */
 param_failure:
 	printf("Error code %d! Invalid parameters --- name: %s, path: %s, passphrase: %s ---\n",
 								 folder, name, path, passphrase);
