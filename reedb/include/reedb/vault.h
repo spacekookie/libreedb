@@ -33,6 +33,9 @@
 /* Initialise the vault module with an existing Reedb container */
 ree_err_t rdb_vault_init(reedb_c *(*container));
 
+/* Called just before reedb closes shop or can be called by user */
+ree_err_t rdb_vault_terminate(unsigned int mode);
+
 /* Returns a list of available vaults. Uses the same struct as internal workings with the entries field nulled out. */
 ree_err_t rdb_vault_list(rdb_vault **list);
 
