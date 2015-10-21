@@ -30,16 +30,6 @@
 #include "crypto/token.h"
 #include "defs.h"
 
-/* A very simple struct to hold information
- * about vaults to the outside!
- */
-typedef struct rdb_vault
-{
-	char 			*name;
-	char			*path;
-	size_t		size;
-} rdb_vault;
-
 /* Initialise the vault module with an existing Reedb container */
 ree_err_t rdb_vault_init(reedb_c *(*container));
 
