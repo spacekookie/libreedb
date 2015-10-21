@@ -25,25 +25,34 @@
 
 /* Internal requirements */
 #include "reedb/crypto/token.h"
+#include "reedb/utils/hashmap.h"
 #include "reedb/vault.h"
 #include "reedb/core.h"
 #include "reedb/defs.h"
 
 /* Data storage */
-#include "reedb/utils/files.h"
+#include "utils/files.h"
 #include "ree_vault.h"
 #include "datafile.h"
 
 /* Holds vault module state */
 static bool active = false;
 
+/* Holds a static instance of a container for *reasons* */
+static struct reedb_c *container;
+
+/* Information about active vaults */
+static unsigned int v_count;
+static struct map_t *vaults;
+
 /** Initialise the vault module with an existing Reedb container */
-ree_err_t rdb_vault_init(reedb_c *(*container)) {
-	if (!(*container)->active) {
+ree_err_t rdb_vault_init(reedb_c *(*cont)) {
+	if (!(*cont)->active) {
 		fputs(ERR_CORE_NOT_INIT, stderr);
 		return NOT_INITIALISED;
 	}
 
+	container = (*cont);
 	active = true;
 	return SUCCESS;
 }
@@ -84,9 +93,9 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 		return VAULT_CREATE_FAILED;
 	}
 
-	/* Malloc a struct */
+	/* Malloc a vault struct */
 	vault *vault = malloc(sizeof(struct vault));
-	if(vault == NULL)		return MALLOC_FAILED;
+	if(vault == NULL)			return MALLOC_FAILED;
 
 	/* Vault directory tree
 	 * 
@@ -102,48 +111,65 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 	 */
 	int folder;
 
-	/** Check that the path is valid (doesn't already exist) */
-	folder = mkdir(path, 0755);
+	char *master = rdb_concat_path_simple(path, name);
+
+	folder = mkdir(master, 0755);
 	if(folder != 0)
 	{
-		if(RDB_DEBUG) printf("Creating the path %s failed!\n", path);
+		if(RDB_DEBUG) printf("The path provided was not empty! Code %d\n", folder);
 		return VAULT_CREATE_FAILED;
 	}
 
-	/** Check that the path is valid (doesn't already exist) */
-	folder = mkdir("%s", 0755);
-	if(folder != 0)
+	/* Create the keystore directory */
+	char *keystore = rdb_concat_path_simple(master, "keystore");
+	folder = mkdir(keystore, 0700);
+	if(folder != 0) goto param_failure;
+	free(keystore);
+
+	/* Create the keystore directory */
+	char *datastore = rdb_concat_path_simple(master, "datastore");
+	folder = mkdir(datastore, 0755);
+	if(folder != 0) goto param_failure;
+	free(datastore);
+
+	/* Create the keystore directory */
+	char *parity = rdb_concat_path_simple(master, "parity");
+	folder = mkdir(parity, 0755);
+	if(folder != 0) goto param_failure;
+	free(parity);
+
+	/* Clean up after ourselves */
+	free(master);
+
+	rdb_vault *pvault = malloc(sizeof(rdb_vault));
+	pvault->name = name;
+	pvault->path = path;
+	pvault->size = 0;
+
+	/* Put it into the hashmap */
+	rdb_vault *cvault;
+	hashmap_get(container->scoped, name, cvault)
+
+	if(cvault != NULL)
 	{
-		char msg[] = "The path provided was not empty! Code %d\n", folder;
-		if(RDB_DEBUG) fputs(msg, stderr);
-		return VAULT_CREATE_FAILED;
+		if(cvault->name == pvault->name && cvault->path == pvault->path)
+		{
+			if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
+			free(cvault);
+			return VAULT_ALREADY_SCOPED;
+		}
+	} else {
+		hashmap_put(container->scoped, name, pvault);
 	}
 
-	// char *keystore = rdb_concat_path(2, path, "keystore");
-	// folder = mkdir(keystore, 0755);
-	// if(folder != 0) goto param_failure;
-	// free(keystore);
 
-	// char *datastore = rdb_concat_path(2, path, "datastore");
-	// folder = mkdir(datastore, 0755);
-	// if(folder != 0) goto param_failure;
-	// free(datastore);
-
-	// char *parity = rdb_concat_path(2, path, "parity");
-	// folder = mkdir(parity, 0755);
-	// if(folder != 0) goto param_failure;
-	// free(parity);
-
-	/* Dump the core config */
-	// JSON_dmp("{}", "%s/config.json", path);
 
 	return SUCCESS;
 
-	/** This label is used to GOTO it during parameter init failures */
+	/** Error handling label */
 param_failure:
-
-	//TODO: Find a way to do this with fputs (I want it on stderr, not stdout)!
-	printf("Invalid parameters --- name: %s, path: %s, passphrase: %s ---", &name, &path, &passphrase);
+	printf("Error code %d! Invalid parameters --- name: %s, path: %s, passphrase: %s ---\n",
+								 folder, name, path, passphrase);
 	return VAULT_CREATE_FAILED;
 }
 

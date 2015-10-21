@@ -26,7 +26,20 @@
 #define SRC_CORE_H_
 
 #include <stdbool.h>
+#include <stdlib.h>
+
 #include "defs.h"
+#include "reedb/utils/hashmap.h"
+
+/* A very simple struct to hold information
+ * about vaults to the outside!
+ */
+typedef struct rdb_vault
+{
+	char 			*name;
+	char			*path;
+	size_t		size;
+} rdb_vault;
 
 /** Define what OS Reedb is running on */
 typedef enum ree_os {
@@ -38,6 +51,7 @@ typedef enum ree_os {
 	BSD 			= 0xE6, // BSD
 } ree_os;
 
+/* Field for distribution specific settings. Unsed so far. */
 typedef enum ree_distro {
 	FEDORA,
 	DEBIAN
@@ -45,15 +59,14 @@ typedef enum ree_distro {
 
 /** Main Reedb container that gets passed around modules */
 typedef struct reedb_c {
-	bool active;
-	unsigned int passlength;
-	bool verbose;
-	bool daemon;
-	char *path;
-	ree_os os;
+	bool 					active;
+	unsigned int 	passlength;
+	bool 					daemon;
+	char 					*path;
+	ree_os 				os;
 
 	/* Store scoped vaults */
-	char *scoped;
+	map_t					*scoped;
 } reedb_c;
 
 /** Sets the minimum passphrase length for Reedb */
