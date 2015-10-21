@@ -20,9 +20,12 @@
  *
  */
 
-#include "reedb/utils/files.h"
+#include "files.h"
+
+/* System requirements */
 #include <stdarg.h>
 #include <string.h>
+#include <malloc.h>
 
 char *rdb_concat_path_simple(char *path, char *name)
 {
@@ -34,8 +37,11 @@ char *rdb_concat_path_simple(char *path, char *name)
 													(sizeof(char) * name_len)
 												);
 	strcpy(string, path);
+
+	/* Add a slash to the end if one is needed */
+	if(path[strlen(path) - 1] != '/') strcat(string, "/");
 	strcat(string, name);
-	strcat(string, "/");
+
 	return string;
 }
 
