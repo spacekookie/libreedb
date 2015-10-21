@@ -24,8 +24,8 @@
 #include <stdio.h>
 
 /* Internal requirements */
-#include "reedb/crypto/token.h"
 #include "reedb/utils/hashmap.h"
+#include "reedb/crypto/token.h"
 #include "reedb/vault.h"
 #include "reedb/core.h"
 #include "reedb/defs.h"
@@ -42,8 +42,7 @@ static bool active = false;
 static struct reedb_c *container;
 
 /* Information about active vaults */
-static unsigned int v_count;
-static struct map_t *vaults;
+static map_t *vaults = NULL;
 
 /** Initialise the vault module with an existing Reedb container */
 ree_err_t rdb_vault_init(reedb_c *(*cont)) {
@@ -52,9 +51,37 @@ ree_err_t rdb_vault_init(reedb_c *(*cont)) {
 		return NOT_INITIALISED;
 	}
 
+	if(!active)
+	{
 	container = (*cont);
+	vaults = hashmap_new();
+
 	active = true;
 	return SUCCESS;
+	} else {
+		if(RDB_DEBUG) fputs("Module is already init!", stderr);
+		return FAILURE;
+	}
+}
+
+int clear_vaults()
+{
+	printf("Yo!\n");
+	return 0;
+}
+
+ree_err_t rdb_vault_terminate(unsigned int mode)
+{
+	if(active)
+	{
+		// hashmap_iterate(vaults, clear_vaults(), NULL);
+
+		hashmap_free(vaults);
+		return SUCCESS;
+
+	} else {
+		return FAILURE;
+	}
 }
 
 /*
@@ -148,7 +175,7 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 
 	/* Put it into the hashmap */
 	rdb_vault *cvault;
-	hashmap_get(container->scoped, name, cvault)
+	hashmap_get(container->scoped, name, cvault);
 
 	if(cvault != NULL)
 	{
@@ -205,5 +232,5 @@ ree_err_t rdb_vault_close(ree_uuid *uuid, ree_token *token)
 
 bool vault_isActive()
 {
-
+	return active;
 }

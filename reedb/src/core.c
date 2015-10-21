@@ -21,6 +21,7 @@
 #include "reedb/core.h"
 
 /* Make sure that the error codes are all present */
+#include "reedb/utils/hashmap.h"
 #include "reedb/defs.h"
 
 #include <malloc.h>
@@ -186,6 +187,7 @@ ree_err_t reedb_init(reedb_c *(*container))
 
 	/* This is used by other modules to guarantee the existence of the core module */
 	(*container)->active = true;
+	(*container)->scoped = hashmap_new();
 
 	/**
 	 *
@@ -218,8 +220,13 @@ ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 		return NOT_INITIALISED;
 	}
 
+	/** Check if the vault module is active and terminate it */
+	if(rdb_vault_isActive()) rdb_vault_terminate();
+
 	int count;
 	was_init = false;
+
+	/* Iterate over the scoped vaults here and free their memory */
 
 	free((*container));
 	(*container) = NULL;
