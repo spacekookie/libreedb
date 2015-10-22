@@ -31,8 +31,7 @@
 
 int iteration(char *item, char *data)
 {
-	printf("YES! ");
-	printf("Also: %s\n", data);
+	printf("Handling value %s\n", data);
 	return 0;
 }
 
@@ -60,8 +59,6 @@ int main(int argc, char *args)
 	hashmap_put(testmap, "456", two);
 	hashmap_put(testmap, "789", three);
 	hashmap_put(testmap, "012", four);
-
-	printf("We malloced a bunch of shit\n");
 
 	char *start;
 	hashmap_get_one(testmap, &start, 0);
