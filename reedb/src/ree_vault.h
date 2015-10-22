@@ -36,7 +36,7 @@
 typedef struct vault
 {
 	/* Some metadata for the vault */
-	char				id[32]; 					// UUID string
+	const char	id[32]; 					// UUID string
 	size_t			size;							// number of files
 	char				*name;						// User defined name
 	char 				*path;						// Path on FS
@@ -54,7 +54,7 @@ typedef struct vault
 } vault;
 
 /* Create a new vault (DEPRECIATED)! */
-ree_err_t rdb_create_vault(vault *(*vault), ree_uuid *(*uuid), char *name, char *path, char *passphrase);
+ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, char *passphrase);
 
 /* Unlock a vault and get a token */
 ree_err_t rdb_unlock_vault(vault *vault, char *passphrase, ree_token *(*token));

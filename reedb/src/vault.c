@@ -1,4 +1,6 @@
 /* reedb - vault.c
+ * 
+ * Implementation of the vault interface.
  *
  * (c) 2015 					Lonely Robot.
  * Authors:						Katharina 'spacekookie' Sabel
@@ -18,8 +20,6 @@
  */
 
 /* System requirements */ 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -95,15 +95,15 @@ ree_err_t rdb_vault_list(rdb_vault **list) {
 	return SUCCESS;
 }
 
-ree_err_t rdb_vault_scope(ree_uuid **uuid, char *name, char *path) {
+ree_err_t rdb_vault_scope(char **uuid, char *name, char *path) {
 
 }
 
-ree_err_t rdb_vault_unscope(ree_uuid *uuid) {
+ree_err_t rdb_vault_unscope(char *uuid) {
 
 }
 
-ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, char *path, char *passphrase)
+ree_err_t rdb_vault_create(ree_token *(*token), char *(*uuid), char *name, char *path, char *passphrase)
 {
 	if(name == NULL)
 	{
@@ -123,15 +123,18 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 		return VAULT_CREATE_FAILED;
 	}
 
-	(*uuid) = rdb_generate_uuid(TYPE1);
-	if((*uuid) == NULL)
+	//TODO: Change TYPE from config
+	int uuidsucess = rdb_generate_uuid((*uuid), TYPE1);
+	if(uuidsucess != 0)
 	{
+		printf("UUID Create returned %d\n", uuidsucess);
 		return VAULT_CREATE_FAILED;
 	}
 
 	int toksuccess = rdb_tokens_create((*token), 0);
 	if(toksuccess != 0)
 	{
+		printf("Token Create returned %d\n", toksuccess);
 		return VAULT_CREATE_FAILED;
 	}
 
@@ -162,7 +165,7 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 	int success = rdb_create_vault(&vault, (*uuid), name, path, passphrase);
 
 	/* Store it in the static hashmap */
-	rdb_vault *ch_vault = NULL;
+	ch_vault = NULL;
 	hashmap_get(vaults, name, ch_vault);
 
 	if(ch_vault->name == vault->name && ch_vault->path == vault->path)
@@ -174,45 +177,39 @@ ree_err_t rdb_vault_create(ree_token *(*token), ree_uuid *(*uuid), char *name, c
 
 	hashmap_put(vaults, name, vault);
 	return success;
-
-/** Error handling label */
-param_failure:
-	printf("Error code %d! Invalid parameters --- name: %s, path: %s, passphrase: %s ---\n",
-								 folder, name, path, passphrase);
-	return VAULT_CREATE_FAILED;
 }
 
-ree_err_t rdb_vault_authenticate(ree_token *token, ree_uuid *uuid)
+ree_err_t rdb_vault_authenticate(ree_token *token, char *uuid)
 {
 
 }
 
-ree_err_t rdb_vault_headers(ree_uuid *uuid, ree_token *token, char *search)
+ree_err_t rdb_vault_headers(char *uuid, ree_token *token, char *search)
 {
 
 }
 
-ree_err_t rdb_vault_file(ree_uuid *uuid, ree_token *token)
+ree_err_t rdb_vault_file(char *uuid, ree_token *token)
 {
 
 }
 
-ree_err_t rdb_vault_insert(ree_uuid *uuid, ree_token *token, char *data)
+ree_err_t rdb_vault_insert(char *uuid, ree_token *token, char *data)
 {
 
 }
 
-ree_err_t rdb_vault_delete(ree_uuid *uuid, ree_token *token, char *file)
+ree_err_t rdb_vault_delete(char *uuid, ree_token *token, char *file)
 {
 
 }
 
-ree_err_t rdb_vault_close(ree_uuid *uuid, ree_token *token)
+ree_err_t rdb_vault_close(char *uuid, ree_token *token)
 {
 
 }
 
-bool vault_isActive()
+bool rdb_vault_isActive()
 {
 	return active;
 }

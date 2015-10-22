@@ -1,6 +1,9 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "ree_vault.h"
 
-void create_folder_structure(char *name, char *path)
+ree_err_t create_folder_structure(char *name, char *path)
 {
 	int folder;
 	char *new_name = rdb_concat_path_simple(name, ".reevault");
@@ -35,38 +38,43 @@ void create_folder_structure(char *name, char *path)
 
 	/* Clean up after ourselves */
 	free(master);
+	return SUCCESS;
+
+
+/** Error handling label */
+param_failure:
+	printf("Folder create error code %d, invalid parameters. Name: %s, Path: %s", 
+		folder, name, path);
+	return VAULT_CREATE_FAILED;
 }
 
-ree_err_t rdb_create_vault(vault *(*vault), ree_uuid *(*uuid), char *name, char *path, char *passphrase)
+ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, char *passphrase)
 {
-	/* Create the vault folders */
-	create_folder_structure(name, path);
+	/* Create the vault folders and report errors upstairs */
+	int fdscss = create_folder_structure(name, path);
+	if(fdscss != 0)		return fdscss;
 
 	/* Malloc a vault struct */
 	(*vault) = malloc(sizeof(struct vault));
 	if((*vault) == NULL) return MALLOC_FAILED;
 
-	(*vault)->id = 
+	/* Let's start with some metadata */
+	(*vault)->id;
+	(*vault)->size = 0;
+	(*vault)->name = name;
+	(*vault)->path = path;
+	// (*vault)->created = Time.now
+	// (*vault)->modified = Time.now
+
+	/* Make some room for the crypto storage */
+	(*vault)->keystore = hashmap_new();
+	(*vault)->tokens = hashmap_new();
+
+	/* Then alloc the actual datastorage */
+	(*vault)->tags = hashmap_new();
+	(*vault)->files = hashmap_new();
+
+	/* Next up let's expand our key */
 
 	return SUCCESS;
 }
-
-// typedef struct vault
-// {
-// 	/* Some metadata for the vault */
-// 	char				id[32]; 					// UUID string
-// 	size_t			size;							// number of files
-// 	char				*name;						// User defined name
-// 	char 				*path;						// Path on FS
-
-// 	time_t			created;					// Date created
-// 	time_t			modified;					// Date last modified
-
-// 	/* Some crypto nonsense :) */
-// 	map_t				*keystore;				// Map of files -> crypt-keys or regions -> crypt-keys
-// 	map_t 			*tokens;					// Allowed access tokens
-
-// 	/* Maps for data storage */
-// 	map_t				*tags;						// Tags ordered by category (key)
-// 	map_t				*files;						// Datafiles ordered by their name (key)
-// } vault;
