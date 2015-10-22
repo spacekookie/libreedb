@@ -61,7 +61,10 @@ int main(int argc, char *args)
 	hashmap_put(testmap, "789", three);
 	hashmap_put(testmap, "012", four);
 
-	hashmap_iterate(testmap, iteration, one);
+	char *start;
+	hashmap_get_one(testmap, start, 0);
+
+	hashmap_iterate(testmap, iteration, start);
 
 	/* Initialise Reedb container instance */
 	// reedb_c *rdb;
