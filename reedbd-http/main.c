@@ -61,8 +61,12 @@ int main(int argc, char *args)
 	hashmap_put(testmap, "789", three);
 	hashmap_put(testmap, "012", four);
 
+	printf("We malloced a bunch of shit\n");
+
 	char *start;
-	hashmap_get_one(testmap, start, 0);
+	hashmap_get_one(testmap, &start, 0);
+
+	printf("We got some random element: %s\n", start);
 
 	hashmap_iterate(testmap, iteration, start);
 

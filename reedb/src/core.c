@@ -17,13 +17,15 @@
  *
  */
 
-/* Internal requirements in Reedb */
+/* Interface requirements in Reedb */
 #include "reedb/core.h"
+ #include "reedb/vault.h"
 
-/* Make sure that the error codes are all present */
+/* Utilities & More */
 #include "reedb/utils/hashmap.h"
 #include "reedb/defs.h"
 
+/* System libs */
 #include <malloc.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -221,7 +223,7 @@ ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 	}
 
 	/** Check if the vault module is active and terminate it */
-	if(rdb_vault_isActive()) rdb_vault_terminate();
+	if(rdb_vault_isActive()) rdb_vault_terminate(0);
 
 	int count;
 	was_init = false;

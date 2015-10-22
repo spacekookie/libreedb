@@ -310,6 +310,48 @@ int hashmap_get(map_t in, char* key, any_t *arg){
 }
 
 /*
+ * Get a random element from the hashmap
+ */
+int hashmap_get_one(map_t in, any_t *arg, int remove){
+	int i;
+	hashmap_map* m;
+
+	printf("Step 1\n");
+	
+	/* Cast the hashmap */
+	m = (hashmap_map *) in;
+
+	printf("Step 2\n");
+
+	/* On empty hashmap return immediately */
+	if (hashmap_length(m) <= 0) return MAP_MISSING;
+
+	printf("Step 3\n");
+
+	/* Linear probing */
+	for(i = 0; i< m->table_size; i++)
+	{
+		printf("Step 4\n");
+
+		if(m->data[i].in_use != 0)
+		{
+			printf("Step 5 %s\n", m->data[i].data);
+			*arg = (m->data[i].data);
+			printf("Step 6\n");
+			// if (remove) 
+			// {
+			// 	m->data[i].in_use = 0;
+			// 	m->size--;
+			// }
+			return MAP_OK;
+		}
+	}
+
+
+	return MAP_OK;
+}
+
+/*
  * Iterate the function parameter over each element in the hashmap.  The
  * additional any_t argument is passed to the function as its first
  * argument and the hashmap element is the second.
