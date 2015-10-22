@@ -58,7 +58,7 @@ int main(int argc, char *args)
 	hashmap_put(testmap, "123", one);
 	hashmap_put(testmap, "456", two);
 	hashmap_put(testmap, "789", three);
-	hashmap_put(testmap, "012", four);
+	hashmap_put(testmap, "013", four);
 
 	char *start;
 	hashmap_get_one(testmap, &start, 0);
