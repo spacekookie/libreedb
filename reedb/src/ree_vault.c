@@ -1,12 +1,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
+#include "utils/files.h"
 #include "ree_vault.h"
 
 ree_err_t create_folder_structure(char *name, char *path)
 {
 	int folder;
-	char *new_name = rdb_concat_path_simple(name, ".reevault");
+	char *new_name = rdb_concat_fname_simple(name, ".reevault");
 	char *master = rdb_concat_path_simple(path, new_name);
 	free(new_name);
 
@@ -40,7 +42,6 @@ ree_err_t create_folder_structure(char *name, char *path)
 	free(master);
 	return SUCCESS;
 
-
 /** Error handling label */
 param_failure:
 	printf("Folder create error code %d, invalid parameters. Name: %s, Path: %s", 
@@ -52,14 +53,14 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 {
 	/* Create the vault folders and report errors upstairs */
 	int fdscss = create_folder_structure(name, path);
-	if(fdscss != 0)		return fdscss;
+	if(fdscss != 0) return fdscss;
 
 	/* Malloc a vault struct */
 	(*vault) = malloc(sizeof(struct vault));
 	if((*vault) == NULL) return MALLOC_FAILED;
 
 	/* Let's start with some metadata */
-	(*vault)->id;
+	(*vault)->id = uuid;
 	(*vault)->size = 0;
 	(*vault)->name = name;
 	(*vault)->path = path;
@@ -69,12 +70,24 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	/* Make some room for the crypto storage */
 	(*vault)->keystore = hashmap_new();
 	(*vault)->tokens = hashmap_new();
-
+	
 	/* Then alloc the actual datastorage */
 	(*vault)->tags = hashmap_new();
 	(*vault)->files = hashmap_new();
 
-	/* Next up let's expand our key */
+	/* Next up let's expand our base key */
 
+
+	/* And then generate a master key */
+
+
+	/*  */
+	
+
+	return SUCCESS;
+}
+
+ree_err_t rdb_dump_vault(vault *next, vault *vault)
+{
 	return SUCCESS;
 }

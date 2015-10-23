@@ -45,6 +45,19 @@ char *rdb_concat_path_simple(char *path, char *name)
 	return string;
 }
 
+char *rdb_concat_fname_simple(char *base, char *name)
+{
+	int base_len = strlen(base);
+	int name_len = strlen(name);
+
+
+	char *string = malloc( (sizeof(char) * base_len) + 
+												 (sizeof(char) * name_len) );
+	strcpy(string, base);
+	strcat(string, name);
+	return string;
+}
+
 /* Concat a bunch of strings to a path. 
  * Returns a pointer to a heap string 
  */

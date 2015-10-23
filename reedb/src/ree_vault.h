@@ -36,7 +36,7 @@
 typedef struct vault
 {
 	/* Some metadata for the vault */
-	const char	id[32]; 					// UUID string
+	char				*id; 							// UUID string
 	size_t			size;							// number of files
 	char				*name;						// User defined name
 	char 				*path;						// Path on FS

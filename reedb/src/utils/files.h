@@ -25,7 +25,11 @@
 #ifndef SRC_FILES_UTILS_H_
 #define SRC_FILES_UTILS_H_
 
+/*  */
 char *rdb_concat_path_simple(char *path, char *directory);
+
+/* Concats something to a filename */
+char *rdb_concat_fname_simple(char *path, char *directory);
 
 /* Concat a bunch of strings to a path. */
 char *rdb_concat_path(int count, ...);

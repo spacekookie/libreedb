@@ -28,6 +28,6 @@ typedef struct ree_token {
 	time_t					created;
 } ree_token;
 
-// ree_err_t urdb_generate_token(ree_uuid *id, char *mac);
+ree_err_t rdb_tokens_create(char *(*token), unsigned int mode);
 
 #endif /* SRC_TOKEN_H_ */

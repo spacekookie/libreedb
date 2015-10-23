@@ -64,19 +64,25 @@ ree_err_t rdb_vault_init(reedb_c *(*cont)) {
 	}
 }
 
+void clean_vaults(vault *item, vault *data)
+{
+	rdb_dump_vault(item, data);
+
+}
+
 ree_err_t rdb_vault_terminate(unsigned int mode)
 {
 	if(active)
 	{
 		vault *start;
-		hashmap_get_one(vaults, start, 0);
+		hashmap_get_one(vaults, (void**)(&start), 0);
 		
 		/** 
 		 * Will be called for every vaults in the vaults interface. The function
 		 * locks out all access to the vault, finishes all transactions in
 		 * progress and then dumps the datastructure from memory.
 		 */
-		hashmap_iterate(vaults, rdb_dump_vault, start);
+		hashmap_iterate(vaults, clean_vaults, (void**)(&start));
 
 		/* Then free the actual hashmap */
 		hashmap_free(vaults);
@@ -124,7 +130,7 @@ ree_err_t rdb_vault_create(ree_token *(*token), char *(*uuid), char *name, char 
 	}
 
 	//TODO: Change TYPE from config
-	int uuidsucess = rdb_generate_uuid((*uuid), TYPE1);
+	int uuidsucess = rdb_generate_uuid(uuid, TYPE1);
 	if(uuidsucess != 0)
 	{
 		printf("UUID Create returned %d\n", uuidsucess);
@@ -146,7 +152,7 @@ ree_err_t rdb_vault_create(ree_token *(*token), char *(*uuid), char *name, char 
 
 	/* Put it into the hashmap */
 	rdb_vault *ch_vault;
-	hashmap_get(container->scoped, name, ch_vault);
+	hashmap_get(container->scoped, name, (void**)(&ch_vault));
 
 	if(ch_vault != NULL)
 	{
@@ -166,15 +172,20 @@ ree_err_t rdb_vault_create(ree_token *(*token), char *(*uuid), char *name, char 
 
 	/* Store it in the static hashmap */
 	ch_vault = NULL;
-	hashmap_get(vaults, name, ch_vault);
+	hashmap_get(vaults, name, (void**)(&ch_vault));
 
-	if(ch_vault->name == vault->name && ch_vault->path == vault->path)
+	if(ch_vault != NULL)
 	{
-		if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
-		free(ch_vault);
-		return VAULT_ALREADY_SCOPED;
+		if(ch_vault->name == vault->name && ch_vault->path == vault->path)
+		{
+			if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
+			free(ch_vault);
+			return VAULT_ALREADY_SCOPED;
+		}
+		
 	}
 
+	/* Add it to our vaults scope and exit with our status */
 	hashmap_put(vaults, name, vault);
 	return success;
 }
