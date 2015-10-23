@@ -33,7 +33,7 @@
 
 typedef enum crytarget_t
 {
-	FILE,							// Indicates that a datafile struct is present
+	FILE_P,						// Indicates that a datafile struct is present
 	STRING,						// Indicates that it's a simple string encryption.
 	BSTRING, 					// Bytestrings because C!
 } crytarget_t;
