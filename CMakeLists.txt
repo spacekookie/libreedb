@@ -9,4 +9,5 @@ add_executable(reedbd-http
 
 target_link_libraries(reedbd-http
 	reedb
-	microhttpd)
+	microhttpd
+	gcrypt)

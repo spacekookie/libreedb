@@ -3,7 +3,7 @@ add_library (reedb
 	# Crypto stuff
 	src/crypto/token.c
 	src/crypto/engine.c
-	src/crypto/tiger2.c
+	src/crypto/hashes.c
 
 	# Utilities
 	src/utils/hashmap.c
