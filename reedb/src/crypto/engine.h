@@ -60,14 +60,26 @@ typedef struct cry_context
 	unsigned long			nonce;
 } cry_context;
 
+/* Init secure memory and start the crypto backend (libgcrypt) */
 ree_err_t init_rdb_crypto(enum cryflgs_t flags[]);
 
-ree_err_t rdb_crycontext_switch(datafile *file, cryflgs_t flags[]);
+/* Switch crypto context with a bunch of flags and load keys for a zone */
+ree_err_t rcry_crycontext_switch(datafile *file, cryflgs_t flags[]);
 
-ree_err_t rdb_encrypt(crytarget_t *type, void *data);
+/* NEW: Contains 25% more crypto than the competition! */
+ree_err_t rcry_encrypt(crytarget_t *type, void *data);
 
-ree_err_t rdb_decryt(crytarget_t *type, void *data);
+/* Makes jibberish user friendly again since 2015 */
+ree_err_t rcry_decryt(crytarget_t *type, void *data);
 
+/* Generate a key from a padded passphrase or padded sub-key */
+ree_err_t rcry_keygen(char *(*key), cryflgs_t *flags);
+
+/* Dump keys from a scope from secure memory */
 ree_err_t rdb_dump_key(char *scope);
 
+/* Generates secure numbers as integers */
+ree_err_t rcry_random_secure(int *(*value), size_t size, int rcry_rnd_level);
+
+/* Signals that I'm done with writing corny comments :) */
 #endif

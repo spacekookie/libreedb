@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
+#include "crypto/hashes.h"
 #include "utils/files.h"
 #include "ree_vault.h"
 
@@ -76,13 +77,18 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	(*vault)->files = hashmap_new();
 
 	/* Next up let's expand our base key */
+	unsigned char *key_pad;
 
+	int *salt;
+	rcry_random_secure(&salt, RCRY_SALT_LENGTH, 999);
+	printf("Our salt of the day is: %d\n", (*salt));
+	rcry_hash_tiger2(passphrase, &key_pad, (*salt));
 
 	/* And then generate a master key */
-
+	unsigned char *key;
 
 	/*  */
-	
+
 
 	return SUCCESS;
 }

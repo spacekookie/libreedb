@@ -18,9 +18,12 @@
  *
  */
 
+/* Like *the* most important import ever :) */
 #include <gcrypt.h>
-#include "engine.h"
+
+/* Just some more stuff */
 #include "reedb/defs.h"
+#include "engine.h"
 
 ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
 {
@@ -29,7 +32,7 @@ ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
 	if (!gcry_check_version(GCRYPT_VERSION))
 	{
 		fputs("Reedb crypto engine error: libgcrypt version mismatch!\n", stderr);
-		exit(2);
+		return CRYPTO_FAILED_BOOT;
 	}
 
 	/* We don't want to see any warnings, e.g. because we have not yet
@@ -51,8 +54,21 @@ ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
 	if (!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P))
 	{
 		fputs("Reedb was unable to initialise the crypto engine...\n", stderr);
-		abort();
+		return CRYPTO_FAILED_BOOT;
 	}
 
+	return SUCCESS;
+}
+
+ree_err_t rcry_random_secure(int *(*value), size_t size, int rcry_rnd_level)
+{
+	// (*value) = malloc(sizeof(unsigned char) * size);
+
+	enum gcry_random_level level;
+	if(rcry_rnd_level == 0)			level = GCRY_WEAK_RANDOM;
+	if(rcry_rnd_level == 1)			level = GCRY_STRONG_RANDOM;
+	if(rcry_rnd_level == 999)		level = GCRY_VERY_STRONG_RANDOM;
+
+	(*value) = gcry_random_bytes_secure(size, level);
 	return SUCCESS;
 }

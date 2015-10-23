@@ -21,10 +21,12 @@
  *
  */
 
-#include "defs.h"
+#include "reedb/defs.h"
 
 #ifndef SRC_CRYTIGER2_H_
 #define SRC_CRYTIGER2_H_
+
+#define RCRY_SALT_LENGTH 16 						// Salt length in bytes
 
 /* Used for file hashing */
 ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *hash, unsigned int salt);

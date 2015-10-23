@@ -179,7 +179,7 @@ ree_err_t reedb_init(reedb_c *(*container))
 	if (settings[__DAEMON__])			(*container)->daemon = tmp_daemon;
 	if (settings[__PATH__])				(*container)->path = tmp_path;
 
-	//TODO: Check if a lock exists
+	// TODO: Check if a lock exists
 	bool locked = false;
 	if (locked && !tmp_override)
 	{
@@ -187,21 +187,17 @@ ree_err_t reedb_init(reedb_c *(*container))
 		return ZOMBIE_INSTANCE;
 	}
 
+	/* Now start the crypto engine (chew chew) */
+	ree_err_t crypto = init_rdb_crypto(NULL);
+	if(crypto != SUCCESS)
+	{
+		if(RDB_DEBUG) fputs("A massive error occured while initialising the crypto engine. Aborting!", stderr);
+		return crypto;
+	}
+
 	/* This is used by other modules to guarantee the existence of the core module */
 	(*container)->active = true;
 	(*container)->scoped = hashmap_new();
-
-	/**
-	 *
-	 * { :key => :value, :data => {  } }
-	 *
-	 * active_vaults
-	 * {'abc' => { name, path, data => {  } }}
-	 *
-	 */
-
-	/** */
-	//	(*active_vaults[]) = malloc(sizeof(*active_vaults) * 5);
 
 	if(RDB_DEBUG) printf("Reedb seems to have successfully initialised!\n");
 
