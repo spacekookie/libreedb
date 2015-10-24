@@ -52,6 +52,8 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 	free(message);
 	free(word);
 
+	printf("Still running\n");m
+
 	/* Loop through the binary string and make it human readable */
 	int i; 
 	for (i = 0; i < hash_length; i++, p += 2) 
