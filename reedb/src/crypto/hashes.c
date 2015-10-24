@@ -25,13 +25,19 @@
 #include "reedb/defs.h"
 
 /* Used for file hashing */
-ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned int salt)
+ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned char *salt)
 {
-	int msg_length = strlen(word);
+	/* Gather some length metadata */
+	int msg_length = strlen(word) + strlen(salt);
 	int hash_length = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
-	unsigned char *tmp = malloc(hash_length);
 
+	/* Allocate memory for our tmp hash array */
+	unsigned char *tmp = 1 + malloc(hash_length) + strlen(salt);
 	if(tmp == NULL) return MALLOC_FAILED;
+
+	/* Concat the salt and the word to our message */
+	unsigned char *message = rdb_concat_fname_simple(salt, word);
+	if(message == NULL) return MALLOC_FAILED;
 
 	/* This is needed to make the string formattable as pretty shit*/
 	(*hash) = (char *) malloc(sizeof(char) * ((hash_length * 2) + 1));
@@ -40,7 +46,11 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 	if((*hash) == NULL) return MALLOC_FAILED;
 
 	/* Call the actual hash function with our buffer */
-	gcry_md_hash_buffer(GCRY_MD_TIGER2, tmp, word, msg_length);
+	gcry_md_hash_buffer(GCRY_MD_TIGER2, tmp, message, msg_length);
+
+	/* Do a preliminary cleanup */
+	free(message);
+	free(word);
 
 	/* Loop through the binary string and make it human readable */
 	int i; 
@@ -49,7 +59,6 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 
 	/* Clean up after ourselves again */
 	free(tmp);
-	free(word); //TODO: Figure out how to actually deal with this!
 	p = NULL;
 
 	/* Return for success */
@@ -59,11 +68,17 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 /* Used for integrety checking */
 ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned int salt)
 {
-	int msg_length = strlen(word);
-	int hash_length = gcry_md_get_algo_dlen(GCRY_MD_SHA256);
-	unsigned char *tmp = malloc(hash_length);
+	/* Gather some length metadata */
+	int msg_length = strlen(word) + strlen(salt);
+	int hash_length = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
 
+	/* Allocate memory for our tmp hash array */
+	unsigned char *tmp = 1 + malloc(hash_length) + strlen(salt);
 	if(tmp == NULL) return MALLOC_FAILED;
+
+	/* Concat the salt and the word to our message */
+	unsigned char *message = rdb_concat_fname_simple(salt, word);
+	if(message == NULL) return MALLOC_FAILED;
 
 	/* This is needed to make the string formattable as pretty shit*/
 	(*hash) = (char *) malloc(sizeof(char) * ((hash_length * 2) + 1));
@@ -74,6 +89,10 @@ ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned in
 	/* Call the actual hash function with our buffer */
 	gcry_md_hash_buffer(GCRY_MD_SHA256, tmp, word, msg_length);
 
+	/* Do a preliminary cleanup */
+	free(message);
+	free(word);
+
 	/* Loop through the binary string and make it human readable */
 	int i; 
 	for (i = 0; i < hash_length; i++, p += 2) 
@@ -81,7 +100,6 @@ ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned in
 
 	/* Clean up after ourselves again */
 	free(tmp);
-	free(word); //TODO: Figure out how to actually deal with this!
 	p = NULL;
 
 	/* Return for success */

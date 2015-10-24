@@ -76,10 +76,10 @@ ree_err_t rcry_decryt(crytarget_t *type, void *data);
 ree_err_t rcry_keygen(char *(*key), cryflgs_t *flags);
 
 /* Dump keys from a scope from secure memory */
-ree_err_t rdb_dump_key(char *scope);
+ree_err_t rcry_dump_key(char *scope);
 
 /* Generates secure numbers as integers */
-ree_err_t rcry_random_secure(int *(*value), size_t size, int rcry_rnd_level);
+ree_err_t rcry_random_secure(unsigned char *(*value), size_t size, unsigned int rcry_rnd_level);
 
 /* Signals that I'm done with writing corny comments :) */
 #endif

@@ -29,12 +29,12 @@
 #define RCRY_SALT_LENGTH 16 						// Salt length in bytes
 
 /* Used for file hashing */
-ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *hash, unsigned int salt);
+ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *hash, unsigned char *salt);
 
-/* Used for integrety checking */
-ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned int salt);
+/* Used for integrity checking */
+ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned char *salt);
 
 /* Used for key padding */
-ree_err_t rcry_hash_sphinx(unsigned char *word, unsigned char *hash, unsigned int salt);
+ree_err_t rcry_hash_sphinx(unsigned char *word, unsigned char *hash, unsigned char *salt);
 
 #endif

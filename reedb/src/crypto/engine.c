@@ -60,10 +60,8 @@ ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
 	return SUCCESS;
 }
 
-ree_err_t rcry_random_secure(int *(*value), size_t size, int rcry_rnd_level)
+ree_err_t rcry_random_secure(unsigned char *(*value), size_t size, unsigned int rcry_rnd_level)
 {
-	// (*value) = malloc(sizeof(unsigned char) * size);
-
 	enum gcry_random_level level;
 	if(rcry_rnd_level == 0)			level = GCRY_WEAK_RANDOM;
 	if(rcry_rnd_level == 1)			level = GCRY_STRONG_RANDOM;
