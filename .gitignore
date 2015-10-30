@@ -1,43 +1,52 @@
-*.gem
-*.rbc
-*.sublime-workspace
-/.config
-/coverage/
-/InstalledFiles
-/pkg/
-/spec/reports/
-/test/tmp/
-/test/version_tmp/
-/tmp/
+# CMake Related
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.sublime-*
 
-## Specific to RubyMotion:
-.dat*
-.repl_history
+# Build Folders
 build/
+bin/
 
-## Documentation cache and generated files:
-/.yardoc/
-/_yardoc/
-/doc/
-/rdoc/
-/.metadata/
-/RemoteSystemsTempFiles/
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
 
-## Environment normalisation:
-/.bundle/
-/lib/bundler/man/
+# Precompiled Headers
+*.gch
+*.pch
 
-# for a library or gem, you might want to ignore these files since the code is
-# intended to run in multiple environments; otherwise, check them in:
-# Gemfile.lock
-# .ruby-version
-# .ruby-gemset
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
 
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
-.rvmrc
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
 
-# Sublime stuff
-.sublime-workspace
-.idea/
-/.metadata/
-/Debug/
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+
+# Custom ignores to make the repo nicer
+.directory
+Debug/
+*.kate-swp
+.metadata/
+.settings/
+.metadata/
+.cproject
