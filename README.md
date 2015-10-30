@@ -1,42 +1,26 @@
 Reedb
 =====
 
-:lock: Spicy ruby database that puts security first.
+<!-- ![Reedb Logo](https://)
+ [![NPM version](https://img.shields.io/npm/v/crypton-server.svg?style=flat)](https://npmjs.org/package/crypton-server)
+[![Build Status](https://img.shields.io/travis/SpiderOak/crypton.svg?style=flat)](https://travis-ci.org/SpiderOak/crypton)
+[![Test coverage](https://img.shields.io/coveralls/SpiderOak/crypton.svg?style=flat)](https://coveralls.io/r/SpiderOak/crypton?branch=master)
+ -->
 
-Maybe storage containers might be a better word. 
+:lock: Reedb is a document oriented database that allows you to build applications that handle user data securely – with whatever language you want.
 
-Reedb allows you to store sensitive user information in so called vaults in encrypted form. Vaults store information on a file-by-file basis and are easy to sync across different systems as they are just folders with a fancy name.
-Made for native application development. Using LibGCrypt in the background, can be used via C++ & Ruby bindings or via an HTTP(s) server on `localhost` to use any language and framework you want.
+It does so by creating vaults where datafiles are encrypted before being written to disk and never cached for longer than needed to perform operations. It uses libgcrypt (which also powers software like GPG) and nested keys to even allow for multi-user access to vaults.
 
-Proudly powering [Reepass] - (and others).
+The issue tracker has migrated to the [Lonely Robot Redmine](https://bugs.lonelyrobot.io/projects/reedb/issues)
 
+How to use
+----------
 
-Installation
-------------
+Reedb is primarily a library that allows you to develop applications that deal with user information **safely**. In addition to that there are binary extentions that, for example, host a simple http server and use a REST interface to interact with vaults.
 
-Reedb can be installed on a variety of ways. As it is primarilty written in Ruby it can easily be installed via Rubygems. The latest stable version is always uploaded to www.rubygems.org.
+This allows you to use vaults from multiple applications at the same time (such as a desktop GUI and a browser plugin for a password manager).
 
-`gem install reedb`
-
-To get unstable/ development versions either use the `--pre` parameter for gem or clone this repo's develop branch.
-
-`git clone -b develop https://github.com/tr-lonelyrobot/reedb.git`
-
-End-user packages as well as binary installers are provided. Check out the wiki [here] to get instructions on how to install. Please note that Reedb is both distributed as packages for different Linux distributions and self contained archives (with a Ruby interpreter and all the dependencies in it).
-For the latter version there is an updater that can be found <here> (TODO: Create updater :) )
-
-
-Usage
------
-
-At it's core Reedb provides a simple interface to store information (text, bytestreams, etc) on the filesystem in encrypted form. With that in mind it is possible to use Reedb as both a library and a daemon.
-
-As a library there is a Ruby interface and C/C++ bindings in the planning/ making and you are thus restricted to the use of either one of those languages.
-
-When developing in a different language Reedb can run on a user system as a daemon that runs a very minimal HTTPs server and provides a RESTful API to exchange information with your application.
-
-To find out how to use Reedb in either of those ways, please check the [wiki] for details.
-
+More information will be provided as the newdawn branch becomes more...complete.
 
 FAQ
 ---
