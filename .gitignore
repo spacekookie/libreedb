@@ -41,3 +41,4 @@ build/
 .idea/
 /.metadata/
 /Debug/
+.sublime-project
