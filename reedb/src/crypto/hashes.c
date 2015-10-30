@@ -49,10 +49,8 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 	gcry_md_hash_buffer(GCRY_MD_TIGER2, tmp, message, msg_length);
 
 	/* Do a preliminary cleanup */
-	free(message);
-	free(word);
-
-	printf("Still running\n");m
+	if(message) 	free(message);
+	// if(word) 			free(word);
 
 	/* Loop through the binary string and make it human readable */
 	int i; 
@@ -60,8 +58,8 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 		snprintf (p, 3, "%02x", tmp[i]);
 
 	/* Clean up after ourselves again */
-	free(tmp);
-	p = NULL;
+	// free(tmp);
+	// p = NULL;
 
 	/* Return for success */
 	return SUCCESS;
