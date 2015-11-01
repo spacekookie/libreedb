@@ -19,7 +19,10 @@
 
 /* Interface requirements in Reedb */
 #include "reedb/core.h"
- #include "reedb/vault.h"
+#include "reedb/vault.h"
+
+/* Only needed for the termination */
+#include "crypto/engine.h"
 
 /* Utilities & More */
 #include "reedb/utils/hashmap.h"
@@ -189,9 +192,9 @@ ree_err_t reedb_init(reedb_c *(*container))
 
 	/* Now start the crypto engine (chew chew) */
 	ree_err_t crypto = init_rdb_crypto(NULL);
-	if(crypto != SUCCESS)
+	if(crypto != 0)
 	{
-		if(RDB_DEBUG) fputs("A massive error occured while initialising the crypto engine. Aborting!", stderr);
+		if(RDB_DEBUG) fputs("A massive error occured while initialising the crypto engine. Aborting!\n", stderr);
 		return crypto;
 	}
 
@@ -225,6 +228,13 @@ ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 	was_init = false;
 
 	/* Iterate over the scoped vaults here and free their memory */
+
+	/* Release crypto context now */
+	// int success = term_rdb_crypto();
+	// if(success != 0)
+	// {
+	// 	//TODO: Really check for errors here. This might be important!
+	// }
 
 	free((*container));
 	(*container) = NULL;

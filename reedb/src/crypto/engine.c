@@ -38,15 +38,15 @@ ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
 	/* We don't want to see any warnings, e.g. because we have not yet
 		 parsed program options which might be used to suppress such
 		 warnings. */
-	gcry_control(GCRYCTL_SUSPEND_SECMEM_WARN);
+	// gcry_control(GCRYCTL_SUSPEND_SECMEM_WARN);
 
 	/* Allocate a pool of 32k secure memory.  This make the secure memory
 		 available and also drops privileges where needed.  */
-	gcry_control(GCRYCTL_INIT_SECMEM, 32768, 0);
+	// gcry_control(GCRYCTL_INIT_SECMEM, 32768, 0);
 
 	/* It is now okay to let Libgcrypt complain when there was/is
 		 a problem with the secure memory. */
-	gcry_control(GCRYCTL_RESUME_SECMEM_WARN);
+	// gcry_control(GCRYCTL_RESUME_SECMEM_WARN);
 
 	/* Tell Libgcrypt that initialization has completed. */
 	gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
@@ -57,6 +57,12 @@ ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
 		return CRYPTO_FAILED_BOOT;
 	}
 
+	return SUCCESS;
+}
+
+ree_err_t term_rdb_crypto()
+{
+	gcry_control(GCRYCTL_DISABLE_SECMEM, 0);
 	return SUCCESS;
 }
 

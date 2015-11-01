@@ -63,6 +63,8 @@ typedef struct cry_context
 /* Init secure memory and start the crypto backend (libgcrypt) */
 ree_err_t init_rdb_crypto(enum cryflgs_t flags[]);
 
+ree_err_t term_rdb_crypto();
+
 /* Switch crypto context with a bunch of flags and load keys for a zone */
 ree_err_t rcry_crycontext_switch(datafile *file, cryflgs_t flags[]);
 

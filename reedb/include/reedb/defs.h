@@ -69,7 +69,7 @@ typedef enum ree_err_t
 	FILE_BAD_HEADER,							// Means that the header of a file is somehow damaged
 
 	/* Crypto error returns */
-	CRYPTO_FAILED_BOOT,
+	CRYPTO_FAILED_BOOT,						// An error occured while starting the crypto engine
 	CRYPTO_INVALID_KEY,						// Returns when a crypto operation failed because the
 																// wrong block cypher was applied.
 	CRYPTO_MISSING_KEY,						// Key is NULL for some bizzare reason (This is not good)
