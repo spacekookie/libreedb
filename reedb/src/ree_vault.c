@@ -83,14 +83,10 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	
 	unsigned char *key_pad;
 	rcry_hash_tiger2(passphrase, &key_pad, salt);
-
 	printf("Our lovely key: %s\n", key_pad);
 
 	/* And then generate a master key */
 	unsigned char *key;
-
-	/*  */
-
 
 	return SUCCESS;
 }
@@ -99,3 +95,5 @@ ree_err_t rdb_dump_vault(vault *next, vault *vault)
 {
 	return SUCCESS;
 }
+
+

@@ -61,5 +61,7 @@ int main(int argc, char *args)
 	error = reedb_terminate(&rdb, "Program ran out of lines of code");
 	
 	printf("Returning with code: %d\n", error);
+	printf("Now let's do some random shit that nobody really gives a fuck about...\n");
+
 	return 0;
 }

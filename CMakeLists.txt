@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
 
+set(CMAKE_BUILD_TYPE Debug)
 project(reedb)
 add_subdirectory(reedb)
 add_executable(reedbd-http 
@@ -9,3 +10,5 @@ add_executable(reedbd-http
 target_link_libraries(reedbd-http
 		reedb
 		microhttpd)
+
+
