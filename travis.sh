@@ -11,17 +11,23 @@ set -e  # exit on error.
 set -x  # echo commands.
 
 # Preparation
-if [ ! -f ./cmake.tar.gz ]; then
+if [ ! -f $PWD/my_cmake/bin/cmake ]; then
 	wget --no-check-certificate https://cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O cmake.tar.gz
-	mkdir my_cmake && tar xf cmake.tar.gz -C my_cmake
+	mkdir my_cmake && tar xf cmake.tar.gz -C my_cmake --strip 1
 	alias cmake=$PWD/my_cmake/bin/cmake
 fi
+
+# Remove old build folders that might still exist
+rm -rf $PWD/_build
+
+REE_CMAKE=$PWD/my_cmake/bin/cmake
 
 # Actual build
 CFLAGS="-fsanitize=undefined"
 mkdir $PWD/_build && cd $PWD/_build
-cmake ..
-cmake --build .
+$REE_CMAKE ..
+$REE_CMAKE --build .
+
 
 # Clean up
 cd $PWD/.. && rm -rf $PWD/_build
