@@ -3,6 +3,12 @@
 
 language: c
 
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "V+EsSa4JAI1mp5WjLMdc1jH9eO4HsfgLsZMdwy117ZW6EY9/jVySIHGBcZlatIvgucUkjhreFjofupn28reVtFR9teGsynt9mbFRszPvyLLydJ3kV5cM58xbRwxUhjzeVq6Q3BvcTZyG2knOSdUdQFwAXlNaNq65bQD/uLwur24="
+
 # Use the faster container-based infrastructure.
 sudo: false
 matrix:
