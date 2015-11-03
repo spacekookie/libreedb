@@ -33,7 +33,7 @@
 #define SEC_MEM_SIZE 4096 // 4kb of memory. TODO: Be able to change this without recompiling
 
 /* Static fields that hold crypto context so the lib doesn't have to */
-static gcry_cipher_hd_t *rcry_handle;
+static gcry_cipher_hd_t rcry_handle;
 
 ree_err_t init_rdb_crypto(int flags)
 {
@@ -68,7 +68,7 @@ ree_err_t init_rdb_crypto(int flags)
 	}
 
 	gcry_error_t open_error = gcry_cipher_open( 
-		rcry_handle, RCRY_CORE_CIPHER, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE | GCRY_CIPHER_CBC_MAC);
+		&rcry_handle, RCRY_CORE_CIPHER, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE | GCRY_CIPHER_CBC_MAC);
 
 	if (open_error) {
 		fputs("Reedb was unable to open the gcrypt cipher handle!\n", stderr);
@@ -102,7 +102,7 @@ ree_err_t rcry_keygen(unsigned char *(*key), cryflgs_t flags)
 
 	if(flags == AUTO_USE)
 	{
-		gcry_error_t key_error = gcry_cipher_setkey((*rcry_handle), (*key), ksize_t);
+		gcry_error_t key_error = gcry_cipher_setkey(rcry_handle, (*key), ksize_t);
 		if (key_error) {
 			fputs("An error occured when setting the key for context\n", stderr);
 			return CRYPTO_UNKNOWN_FAILURE;
@@ -120,34 +120,32 @@ ree_err_t rcry_encrypt(crytarget_t type, void *data, unsigned char *(*output), u
 
 	if(type == STRING)
 	{
-		size_t text_length = strlen(data) + 1; // Null termination and all
-		unsigned char *tmp = gcry_malloc_secure(text_length);
+		size_t text_length = strlen(data) + sizeof(unsigned char); // Null termination and all
+		(*output) = gcry_malloc_secure(text_length);
 		char *afterBuffer = gcry_malloc_secure(text_length);
 
 		/* Set the key to the current one (just in case) */
 		int ksize_t = gcry_cipher_get_algo_keylen(RCRY_CORE_CIPHER);
-		gcry_error_t key_error = gcry_cipher_setkey((*rcry_handle), key, ksize_t);
+		gcry_error_t key_error = gcry_cipher_setkey(rcry_handle, key, ksize_t);
 		if (key_error) {
 			fputs("An error occured when setting the key for context\n", stderr);
 			return CRYPTO_UNKNOWN_FAILURE;
 		}
 
 		gcry_error_t cry_err = gcry_cipher_encrypt(
-			(*rcry_handle), tmp, text_length, data, text_length);
+			rcry_handle, (*output), text_length, data, text_length);
 
 		if (cry_err) {
-			printf("gcry_cipher_encrypt failed:  %s/%s\n", gcry_strsource(cry_err), gcry_strerror(cry_err));
+			printf("Encryption failure in module %s because of: %s\n", gcry_strsource(cry_err), gcry_strerror(cry_err));
 			return CRYPTO_UNKNOWN_FAILURE;
 		}
 
-		int index = 0;
-		printf("Our lovely key: ");
-		for (index = 0; index < text_length; index++)
-			printf("%02X", (unsigned char) tmp[index]);
-		printf("\n");
+		// int index = 0;
+		// printf("Our lovely key: ");
+		// for (index = 0; index < text_length; index++)
+		// 	printf("%02X", (unsigned char) tmp[index]);
+		// printf("\n");
 
-		(*output) = tmp;
-		tmp = NULL;
 	} 
 	else if(type == FILE_P)
 	{

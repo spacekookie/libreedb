@@ -90,7 +90,7 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	int success = rcry_random_secure(&salt, RCRY_SALT_LENGTH, 999);
 	
 	unsigned char *key_pad;
-	success = rcry_hash_tiger2(passphrase, key_pad, salt);
+	success = rcry_hash_tiger2(passphrase, &key_pad, salt);
 
 	/* Now create a cryptographically secure key and encrypt it with the user pw */
 	unsigned char *key;
@@ -102,14 +102,23 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 		goto failure_handle;
 	}
 
-	success = rcry_encrypt(STRING, (void*) key_pad, &encrypted_key, key);
-	if(success != 0)
-	{
-		fputs("Doing encryption has failed horribly!\n", stderr);
-		goto failure_handle;
-	}
+	int index = 0;
+	int text_length = strlen(key);
+	printf("Our lovely key: ");
+	for (index = 0; index < text_length; index++)
+		printf("%02X", (unsigned char) key[index]);
+	printf("\n");
 
 	return success;
+
+	// success = rcry_encrypt(STRING, key_pad, &encrypted_key, key);
+	// if(success != 0)
+	// {
+	// 	fputs("Doing encryption has failed horribly!\n", stderr);
+	// 	goto failure_handle;
+	// }
+
+	// return success;
 
 
 failure_handle:
