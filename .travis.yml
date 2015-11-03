@@ -1,11 +1,10 @@
-# Travis-CI Build for rabbitmq-c
+# Travis-CI Build for reedb
 # see travis-ci.org for details
 
 language: c
 
 # Use the faster container-based infrastructure.
 sudo: false
-
 matrix:
   include:
     - compiler: gcc
@@ -14,19 +13,20 @@ matrix:
 
 # Run the Build script
 script:
-  - ./travis.sh $CONFIG
+  - ./travis.sh cmake
 
+# Install required packages
 addons:
   apt:
     packages:
       - libgcrypt-dev
       - microhttpd-dev
 
-  coverity_scan:
-    project:
-      name: "reepass/reedb"
-      description: "Fully encrypted document-oriented database"
-    notification_email: sabel.katharina@gmail.com
-    build_command_prepend: cmake ..
-    build_command: cmake --build .
-    branch_pattern: coverity_scan
+  # coverity_scan:
+  #   project:
+  #     name: "reedb"
+  #     description: "Fully encrypted document-oriented database"
+  #   notification_email: sabel.katharina@gmail.com
+  #   build_command_prepend: cmake ..
+  #   build_command: cmake --build .
+  #   branch_pattern: coverity_scan
