@@ -7,7 +7,7 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
-   - secure: "V+EsSa4JAI1mp5WjLMdc1jH9eO4HsfgLsZMdwy117ZW6EY9/jVySIHGBcZlatIvgucUkjhreFjofupn28reVtFR9teGsynt9mbFRszPvyLLydJ3kV5cM58xbRwxUhjzeVq6Q3BvcTZyG2knOSdUdQFwAXlNaNq65bQD/uLwur24="
+   - secure: "X6Vs5IfJBseYJoirGHQIigEbYE6k8gdl9fCP9SyW+ErDACFRCusWjHMkUjVEmfbcqaUtBetQcsKZip7twHNCgxvxzydXOa30jn4tzBkkVIcUgSw5Zd3nruUy6D3pdNuf0/5YhZYH2nL9slU81kgApqD9kg2o/Fkw27mqdNAk/6g="
 
 # Use the faster container-based infrastructure.
 sudo: false
@@ -19,7 +19,7 @@ matrix:
 
 # Run the Build script
 script:
-  - ./travis.sh cmake
+  - ./travis.sh
 
 # Install required packages
 addons:
@@ -33,6 +33,6 @@ addons:
       name: "reepass/reedb"
       description: "Fully encrypted document-oriented database"
     notification_email: sabel.katharina@gmail.com
-    build_command_prepend: cmake ..
-    build_command: cmake --build .
+    build_command_prepend: "cmake .."
+    build_command:   "make"
     branch_pattern: coverity_scan
