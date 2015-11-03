@@ -78,7 +78,7 @@ ree_err_t rcry_encrypt(crytarget_t type, void *data, unsigned char *(*output), u
 ree_err_t rcry_decryt(crytarget_t *type, void *data, unsigned char *(*output), unsigned char *key);
 
 /* Generate a key from a padded passphrase or padded sub-key */
-ree_err_t rcry_keygen(unsigned char *(*key), cryflgs_t flags);
+ree_err_t rcry_keygen(unsigned char *key, cryflgs_t flags);
 
 /* Dump keys from a scope from secure memory */
 ree_err_t rcry_dump_key(unsigned char *scope);

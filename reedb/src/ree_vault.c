@@ -95,20 +95,14 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	/* Now create a cryptographically secure key and encrypt it with the user pw */
 	unsigned char *key;
 	unsigned char *encrypted_key;
-	success = rcry_keygen(&key, AUTO_USE);
+	success = rcry_keygen(key, AUTO_USE);
 	if(success != 0)
 	{
 		fputs("Creating a key has failed horribly!\n", stderr);
 		goto failure_handle;
 	}
 
-	int index = 0;
-	int text_length = strlen(key);
-	printf("Our lovely key: ");
-	for (index = 0; index < text_length; index++)
-		printf("%02X", (unsigned char) key[index]);
-	printf("\n");
-
+	printf("Our lovely key: %s", key);
 	return success;
 
 	// success = rcry_encrypt(STRING, key_pad, &encrypted_key, key);

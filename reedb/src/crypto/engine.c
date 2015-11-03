@@ -78,6 +78,12 @@ ree_err_t init_rdb_crypto(int flags)
 	return SUCCESS;
 }
 
+ree_err_t term_rdb_crypto()
+{
+	gcry_cipher_close(rcry_handle);
+	return SUCCESS;
+}
+
 ree_err_t rcry_random_secure(unsigned char *(*value), size_t size, unsigned int rcry_rnd_level)
 {
 	enum gcry_random_level level;
@@ -91,18 +97,24 @@ ree_err_t rcry_random_secure(unsigned char *(*value), size_t size, unsigned int 
 
 /** Generate a key in secure memory with a bunch of flags 
  *  TODO: Actually do something with the flags! :) */ 
-ree_err_t rcry_keygen(unsigned char *(*key), cryflgs_t flags)
+ree_err_t rcry_keygen(unsigned char *key, cryflgs_t flags)
 {
 	/* Get the required key length and malloc some secure memory for it */
 	int ksize_t = gcry_cipher_get_algo_keylen(RCRY_CORE_CIPHER);
-	(*key) = (unsigned char*) gcry_malloc_secure(ksize_t * sizeof(unsigned char));
+	unsigned char *tmp = (unsigned char*) gcry_malloc_secure(ksize_t * sizeof(unsigned char));
 
 	/* Then fill it with secure random garbage */
-	gcry_randomize((*key), ksize_t, GCRY_STRONG_RANDOM);
+	gcry_randomize(tmp, ksize_t, GCRY_STRONG_RANDOM);
+
+	/* Loop through the binary string and make it human readable */
+	int i; 
+	for (i = 0; i < ksize_t; i++, key += 2) 
+		snprintf (key, 3, "%02x", tmp[i]);
+
 
 	if(flags == AUTO_USE)
 	{
-		gcry_error_t key_error = gcry_cipher_setkey(rcry_handle, (*key), ksize_t);
+		gcry_error_t key_error = gcry_cipher_setkey(rcry_handle, key, ksize_t);
 		if (key_error) {
 			fputs("An error occured when setting the key for context\n", stderr);
 			return CRYPTO_UNKNOWN_FAILURE;
@@ -139,13 +151,6 @@ ree_err_t rcry_encrypt(crytarget_t type, void *data, unsigned char *(*output), u
 			printf("Encryption failure in module %s because of: %s\n", gcry_strsource(cry_err), gcry_strerror(cry_err));
 			return CRYPTO_UNKNOWN_FAILURE;
 		}
-
-		// int index = 0;
-		// printf("Our lovely key: ");
-		// for (index = 0; index < text_length; index++)
-		// 	printf("%02X", (unsigned char) tmp[index]);
-		// printf("\n");
-
 	} 
 	else if(type == FILE_P)
 	{

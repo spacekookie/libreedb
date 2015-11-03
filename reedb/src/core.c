@@ -222,24 +222,27 @@ ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 	}
 
 	/** Check if the vault module is active and terminate it */
-	if(rdb_vault_isActive()) rdb_vault_terminate(0);
+	if(rdb_vault_isActive()) 
+	{
+		/* Iterate over the scoped vaults here and free their memory */		
+		int count;
+		was_init = false;
 
-	int count;
-	was_init = false;
-
-	/* Iterate over the scoped vaults here and free their memory */
+		/* And then finally get rid of the module */
+		rdb_vault_terminate(0);
+	}
 
 	/* Release crypto context now */
-	// int success = term_rdb_crypto();
-	// if(success != 0)
-	// {
-	// 	//TODO: Really check for errors here. This might be important!
-	// }
+	int success = term_rdb_crypto();
+	if(success != 0)
+	{
+		// TODO: Really check for errors here. This might be important!
+	}
 
 	free((*container));
 	(*container) = NULL;
 	if(RDB_DEBUG) printf("Reedb is now shut down. Do not use your container pointer anymore!\n");
-	return 0;
+	return HUGE_SUCCESS; // Hello there Glados :)
 }
 
 /** Returns if this module was successfully initialised */
