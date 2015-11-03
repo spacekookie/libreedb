@@ -36,4 +36,4 @@ addons:
     notification_email: sabel.katharina@gmail.com
     build_command_prepend: "./get_cmake.sh && mkdir _build && cd _build && ../../my_cmake/bin/cmake .."
     build_command: "../../my_cmake/bin/cmake --build ."
-    branch_pattern: master
+    branch_pattern: develop
