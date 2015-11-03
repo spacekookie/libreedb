@@ -79,11 +79,11 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	/* Next up let's expand our base key */
 	unsigned char *salt;
 	rcry_random_secure(&salt, RCRY_SALT_LENGTH, 999);
-	printf("Our salt of the day is: %d\n", salt);
+	// printf("Our salt of the day is: %d\n", salt);
 	
 	unsigned char *key_pad;
 	rcry_hash_tiger2(passphrase, &key_pad, salt);
-	printf("Our lovely key: %s\n", key_pad);
+	// printf("Our lovely key: %s\n", key_pad);
 
 	/* And then generate a master key */
 	unsigned char *key;
