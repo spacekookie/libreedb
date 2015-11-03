@@ -32,7 +32,7 @@ ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *(*hash), unsigned
 	int hash_length = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
 
 	/* Allocate memory for our tmp hash array */
-	unsigned char *tmp = sizeof(unsigned char) + malloc(hash_length) + strlen(salt);
+	unsigned char *tmp = malloc(sizeof(unsigned char) + hash_length + strlen(salt));
 	if(tmp == NULL) return MALLOC_FAILED;
 
 	/* Concat the salt and the word to our message */
