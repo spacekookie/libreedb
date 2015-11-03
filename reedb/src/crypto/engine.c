@@ -20,6 +20,7 @@
 
 /* Like *the* most important import ever :) */
 #include <gcrypt.h>
+#include <stdio.h>
 
 /* Just some more stuff */
 #include "reedb/defs.h"

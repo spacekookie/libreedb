@@ -50,3 +50,5 @@ Debug/
 .settings/
 .metadata/
 .cproject
+my_cmake
+*.tar.gz
