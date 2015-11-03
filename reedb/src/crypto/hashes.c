@@ -73,7 +73,7 @@ ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned in
 	int hash_length = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
 
 	/* Allocate memory for our tmp hash array */
-	unsigned char *tmp = 1 + malloc(hash_length) + strlen(salt);
+	unsigned char *tmp = malloc(sizeof(char) + hash_length + strlen(salt));
 	if(tmp == NULL) return MALLOC_FAILED;
 
 	/* Concat the salt and the word to our message */
@@ -81,7 +81,7 @@ ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned in
 	if(message == NULL) return MALLOC_FAILED;
 
 	/* This is needed to make the string formattable as pretty shit*/
-	(*hash) = (char *) malloc(sizeof(char) * ((hash_length * 2) + 1));
+	(*hash) = (char *) malloc(sizeof(char) * ((hash_length * 2) + sizeof(char)));
 	unsigned char *p = (*hash);
 
 	if((*hash) == NULL) return MALLOC_FAILED;
@@ -99,7 +99,6 @@ ree_err_t rcry_hash_sha256(unsigned char *word, unsigned char *hash, unsigned in
 		snprintf (p, 3, "%02x", tmp[i]);
 
 	/* Clean up after ourselves again */
-	free(tmp);
 	p = NULL;
 
 	/* Return for success */

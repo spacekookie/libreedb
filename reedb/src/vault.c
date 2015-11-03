@@ -182,11 +182,13 @@ ree_err_t rdb_vault_create(ree_token *(*token), char *(*uuid), char *name, char 
 			free(ch_vault);
 			return VAULT_ALREADY_SCOPED;
 		}
-		
 	}
 
 	/* Add it to our vaults scope and exit with our status */
-	hashmap_put(vaults, name, vault);
+	hashmap_put(vaults, name, pub_vault);
+
+	/* Then free our memory and return success */
+	free(vault);
 	return success;
 }
 

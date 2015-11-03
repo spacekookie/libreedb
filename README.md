@@ -10,7 +10,7 @@ It does so by encrypting all data that is stored in a database folder (callded v
 **The library is not currently deemed stable enough to use in production!**
 
 The issue tracker has migrated to the [Lonely Robot Redmine](https://bugs.lonelyrobot.io/projects/reedb/issues).
-Please also note that the Wiki is horribly out-of-date and should generally be ignored. A new one will be written soon-ish.
+Please also note that the Github wiki is horribly out-of-date and should generally be ignored. Please refer to the [new wiki](https://bugs.lonelyrobot.io/projects/reedb/wiki) which is currently still in the making.
 
 Build
 ----------

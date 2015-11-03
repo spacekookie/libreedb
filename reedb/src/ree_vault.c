@@ -6,6 +6,13 @@
 #include "utils/files.h"
 #include "ree_vault.h"
 
+
+/* This is called in case of a failure */
+ree_err_t undo_directories()
+{
+	return SUCCESS;
+}
+
 ree_err_t create_folder_structure(char *name, char *path)
 {
 	int folder;
@@ -47,6 +54,7 @@ ree_err_t create_folder_structure(char *name, char *path)
 param_failure:
 	printf("Folder create error code %d, invalid parameters. Name: %s, Path: %s", 
 		folder, name, path);
+	int undo = undo_directories();
 	return VAULT_CREATE_FAILED;
 }
 
@@ -78,17 +86,26 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 
 	/* Next up let's expand our base key */
 	unsigned char *salt;
-	rcry_random_secure(&salt, RCRY_SALT_LENGTH, 999);
-	// printf("Our salt of the day is: %d\n", salt);
+	int success = rcry_random_secure(&salt, RCRY_SALT_LENGTH, 999);
 	
 	unsigned char *key_pad;
-	rcry_hash_tiger2(passphrase, &key_pad, salt);
-	// printf("Our lovely key: %s\n", key_pad);
+	success = rcry_hash_tiger2(passphrase, &key_pad, salt);
 
-	/* And then generate a master key */
+	/* Now create a cryptographically secure key and encrypt it with the user pw */
 	unsigned char *key;
+	success = rcry_keygen(&key, AUTO_USE);
 
-	return SUCCESS;
+	return success;
+
+error_recovery:
+	int undo = undo_directories();
+	free(key_pad);
+	free(salt);
+	free(key);
+	free(iv);
+	// TODO: Add free(hd) somehow
+
+	return VAULT_CREATE_FAILED;
 }
 
 ree_err_t rdb_dump_vault(vault *next, vault *vault)
