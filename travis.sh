@@ -26,6 +26,7 @@ REE_CMAKE=$PWD/my_cmake/bin/cmake
 # I hate you travis! :(
 CFLAGS="-fsanitize=undefined"
 mkdir $PWD/_build && cd $PWD/_build
+rm -rf ./CMakeCache.txt # To avoid cache errors
 $REE_CMAKE ..
 $REE_CMAKE --build .
 

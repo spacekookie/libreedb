@@ -28,11 +28,12 @@ addons:
       - libgcrypt-dev
       - libmicrohttpd-dev
 
+# This is turning into a huge cluster fuck
   coverity_scan:
     project:
       name: "reepass/reedb"
       description: "Fully encrypted document-oriented database"
     notification_email: sabel.katharina@gmail.com
-    build_command_prepend: "./get_cmake.sh && ../my_cmake/bin/cmake ."
-    build_command: "make"
+    build_command_prepend: "./get_cmake.sh && mkdir _build && cd _build && ../../my_cmake/bin/cmake .."
+    build_command: "../../my_cmake/bin/cmake --build ."
     branch_pattern: master
