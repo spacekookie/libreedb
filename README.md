@@ -1,12 +1,7 @@
-Reedb
-=====
+![Reedb Logo](https://raw.githubusercontent.com/reepass/reedb/develop/logo.png)
 
 [![Coverity Status](https://scan.coverity.com/projects/6872/badge.svg)](https://scan.coverity.com/projects/reepass-reedb)
 [![Build Status](https://travis-ci.org/reepass/reedb.svg?branch=master)](https://travis-ci.org/reepass/reedb)
-
-<!-- ![Reedb Logo](https://)
-[![Test coverage](https://img.shields.io/coveralls/SpiderOak/crypton.svg?style=flat)](https://coveralls.io/r/SpiderOak/crypton?branch=master)
- -->
 
 :lock: Reedb is a document oriented database that allows you to build applications that handle user data securely – with whatever language you want.
 
