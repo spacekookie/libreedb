@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
+#include "crypto/engine.h"
 #include "crypto/hashes.h"
 #include "utils/files.h"
 #include "ree_vault.h"
@@ -89,21 +90,34 @@ ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, 
 	int success = rcry_random_secure(&salt, RCRY_SALT_LENGTH, 999);
 	
 	unsigned char *key_pad;
-	success = rcry_hash_tiger2(passphrase, &key_pad, salt);
+	success = rcry_hash_tiger2(passphrase, key_pad, salt);
 
 	/* Now create a cryptographically secure key and encrypt it with the user pw */
 	unsigned char *key;
+	unsigned char *encrypted_key;
 	success = rcry_keygen(&key, AUTO_USE);
+	if(success != 0)
+	{
+		fputs("Creating a key has failed horribly!\n", stderr);
+		goto failure_handle;
+	}
+
+	success = rcry_encrypt(STRING, (void*) key_pad, &encrypted_key, key);
+	if(success != 0)
+	{
+		fputs("Doing encryption has failed horribly!\n", stderr);
+		goto failure_handle;
+	}
 
 	return success;
 
-error_recovery:
-	int undo = undo_directories();
+
+failure_handle:
+	undo_directories();
 	free(key_pad);
 	free(salt);
 	free(key);
-	free(iv);
-	// TODO: Add free(hd) somehow
+	//TODO: Add rcry_crypto_term(...) or something
 
 	return VAULT_CREATE_FAILED;
 }

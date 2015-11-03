@@ -35,7 +35,7 @@
 /* Static fields that hold crypto context so the lib doesn't have to */
 static gcry_cipher_hd_t *rcry_handle;
 
-ree_err_t init_rdb_crypto(enum cryflgs_t flags[])
+ree_err_t init_rdb_crypto(int flags)
 {
 	/* Version check should be the very first call because it
 	 makes sure that important subsystems are initialized. */
@@ -95,14 +95,14 @@ ree_err_t rcry_keygen(unsigned char *(*key), cryflgs_t flags)
 {
 	/* Get the required key length and malloc some secure memory for it */
 	int ksize_t = gcry_cipher_get_algo_keylen(RCRY_CORE_CIPHER);
-	(*key) = (unsigned char*) gcry_malloc_secure(ksize_t * sizeof(unsigned char))
+	(*key) = (unsigned char*) gcry_malloc_secure(ksize_t * sizeof(unsigned char));
 
 	/* Then fill it with secure random garbage */
-	gcry_randomize((*key)), ksize_t, GCRY_STRONG_RANDOM);
+	gcry_randomize((*key), ksize_t, GCRY_STRONG_RANDOM);
 
 	if(flags == AUTO_USE)
 	{
-		gcry_error_t key_error = gcry_cipher_setkey(hdt, &crypt_key, key_length);
+		gcry_error_t key_error = gcry_cipher_setkey((*rcry_handle), (*key), ksize_t);
 		if (key_error) {
 			fputs("An error occured when setting the key for context\n", stderr);
 			return CRYPTO_UNKNOWN_FAILURE;
@@ -111,35 +111,47 @@ ree_err_t rcry_keygen(unsigned char *(*key), cryflgs_t flags)
 	return SUCCESS;
 }
 
-ree_err_t rcry_encrypt(crytarget_t type, void *data, unsigned char *(*key))
+ree_err_t rcry_encrypt(crytarget_t type, void *data, unsigned char *(*output), unsigned char *key)
 {
-	if(type == FILE_P && (*key) != NULL)
+	if(type == FILE_P && key != NULL)
 	{
 		if(RDB_DEBUG) printf("[WARN]: When decrypting a file no key should be provided!\n");
 	}
 
-	switch(type) {
-	  case STRING:
-			size_t text_length = strlen(data) + 1; // Null termination and all
-			char *encrypted = gcry_malloc_secure(text_length);
-			char *afterBuffer = gcry_malloc_secure(text_length);
+	if(type == STRING)
+	{
+		size_t text_length = strlen(data) + 1; // Null termination and all
+		unsigned char *tmp = gcry_malloc_secure(text_length);
+		char *afterBuffer = gcry_malloc_secure(text_length);
 
-			gcry_error_t cry_err = gcry_cipher_encrypt(
-				rcry_handle, encrypted, text_length, data, text_length);
-			if (cry_err) {
-				printf("gcry_cipher_encrypt failed:  %s/%s\n", gcry_strsource(encryption_error), gcry_strerror(encryption_error));
-				return CRYPTO_UNKNOWN_FAILURE;
-			}
-	    break;
+		/* Set the key to the current one (just in case) */
+		int ksize_t = gcry_cipher_get_algo_keylen(RCRY_CORE_CIPHER);
+		gcry_error_t key_error = gcry_cipher_setkey((*rcry_handle), key, ksize_t);
+		if (key_error) {
+			fputs("An error occured when setting the key for context\n", stderr);
+			return CRYPTO_UNKNOWN_FAILURE;
+		}
 
-	  case FILE_P:
-	  	printf("Not yet implemented! Sorry :C\n");
-	  	break;
-		
-	   /* you can have any number of case statements */
-	  default:
-	  	printf("Type provided was empty!\n");
-	  	return CRYPTO_UNKNOWN_FAILURE;
+		gcry_error_t cry_err = gcry_cipher_encrypt(
+			(*rcry_handle), tmp, text_length, data, text_length);
+
+		if (cry_err) {
+			printf("gcry_cipher_encrypt failed:  %s/%s\n", gcry_strsource(cry_err), gcry_strerror(cry_err));
+			return CRYPTO_UNKNOWN_FAILURE;
+		}
+
+		int index = 0;
+		printf("Our lovely key: ");
+		for (index = 0; index < text_length; index++)
+			printf("%02X", (unsigned char) tmp[index]);
+		printf("\n");
+
+		(*output) = tmp;
+		tmp = NULL;
+	} 
+	else if(type == FILE_P)
+	{
+	  printf("Not yet implemented! Sorry :C\n");
 	}
 
 	return SUCCESS;
