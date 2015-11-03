@@ -22,11 +22,11 @@ addons:
       - libgcrypt-dev
       - libmicrohttpd-dev
 
-  # coverity_scan:
-  #   project:
-  #     name: "reedb"
-  #     description: "Fully encrypted document-oriented database"
-  #   notification_email: sabel.katharina@gmail.com
-  #   build_command_prepend: cmake ..
-  #   build_command: cmake --build .
-  #   branch_pattern: coverity_scan
+  coverity_scan:
+    project:
+      name: "reepass/reedb"
+      description: "Fully encrypted document-oriented database"
+    notification_email: sabel.katharina@gmail.com
+    build_command_prepend: cmake ..
+    build_command: cmake --build .
+    branch_pattern: coverity_scan

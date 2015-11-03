@@ -20,9 +20,10 @@ fi
 # Remove old build folders that might still exist
 rm -rf $PWD/_build
 
+# Now we need to define our own cmake command because travis sucks!
 REE_CMAKE=$PWD/my_cmake/bin/cmake
 
-# Actual build
+# I hate you travis! :(
 CFLAGS="-fsanitize=undefined"
 mkdir $PWD/_build && cd $PWD/_build
 $REE_CMAKE ..
