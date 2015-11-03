@@ -4,7 +4,7 @@
 language: c
 
 # Use the faster container-based infrastructure.
-sudo: true
+sudo: false
 matrix:
   include:
     - compiler: gcc
@@ -20,7 +20,7 @@ addons:
   apt:
     packages:
       - libgcrypt-dev
-      - microhttpd-dev
+      - libmicrohttpd-dev
 
   # coverity_scan:
   #   project:
