@@ -35,4 +35,4 @@ addons:
     notification_email: sabel.katharina@gmail.com
     build_command_prepend: "cmake .."
     build_command:   "make"
-    branch_pattern: coverity_scan
+    branch_pattern: master
