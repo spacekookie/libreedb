@@ -10,3 +10,7 @@ cmake --build .
 
 # Clean up
 cd $PWD/.. && rm -rf $PWD/_build
+
+echo '  ######################'
+echo 'Build passed successfully!'
+echo '  ######################'
