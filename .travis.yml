@@ -33,6 +33,6 @@ addons:
       name: "reepass/reedb"
       description: "Fully encrypted document-oriented database"
     notification_email: sabel.katharina@gmail.com
-    build_command_prepend: "cmake ."
-    build_command:   "make"
+    build_command_prepend: "./get_cmake.sh && ../my_cmake/bin/cmake ."
+    build_command: "make"
     branch_pattern: master
