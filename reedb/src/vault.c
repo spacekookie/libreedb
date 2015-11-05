@@ -66,8 +66,8 @@ ree_err_t rdb_vault_init(reedb_c *(*cont)) {
 
 void clean_vaults(vault *item, vault *data)
 {
-	rdb_dump_vault(item, data);
-
+	printf("Pretending to dump vault... %s\n", data->name);
+	// rdb_dump_vault(item, data);
 }
 
 ree_err_t rdb_vault_terminate(unsigned int mode)
