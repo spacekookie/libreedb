@@ -5,8 +5,8 @@
  * instances as well as checking that all other modules are loaded and
  * running correctly.
  *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
+ * (c) 2015           Lonely Robot.
+ * Authors:           Katharina 'spacekookie' Sabel
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -36,37 +36,37 @@
  */
 typedef struct rdb_vault
 {
-	char 			*name;
-	char			*path;
-	size_t		size;
+  char      *name;
+  char      *path;
+  size_t    size;
 } rdb_vault;
 
 /** Define what OS Reedb is running on */
 typedef enum ree_os {
-	LINUX 		= 0xE1, // Most Linux distributions
-	OSX 			= 0xE2, // Mac OS X
-	WINDOWS 	= 0xE3, // Windows
-	ANDROID 	= 0xE4, // Mobile: Android
-	IOS 			= 0xE5, // Mobile: iOS
-	BSD 			= 0xE6, // BSD
+  LINUX     = 0xE1, // Most Linux distributions
+  OSX       = 0xE2, // Mac OS X
+  WINDOWS   = 0xE3, // Windows
+  ANDROID   = 0xE4, // Mobile: Android
+  IOS       = 0xE5, // Mobile: iOS
+  BSD       = 0xE6, // BSD
 } ree_os;
 
 /* Field for distribution specific settings. Unsed so far. */
 typedef enum ree_distro {
-	FEDORA,
-	DEBIAN
+  FEDORA,
+  DEBIAN
 } ree_distro;
 
 /** Main Reedb container that gets passed around modules */
 typedef struct reedb_c {
-	bool 					active;
-	unsigned int 	passlength;
-	bool 					daemon;
-	char 					*path;
-	ree_os 				os;
+  bool          active;
+  unsigned int  passlength;
+  bool          daemon;
+  char          *path;
+  ree_os        os;
 
-	/* Store scoped vaults */
-	map_t					*scoped;
+  /* Store scoped vaults */
+  map_t         *scoped;
 } reedb_c;
 
 /** Sets the minimum passphrase length for Reedb */

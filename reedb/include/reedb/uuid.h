@@ -21,14 +21,14 @@
 #include "defs.h"
 
 typedef enum ree_uuid_t {
-	TYPE1, /* Type with MAC Address */
-	TYPE2, /* Cryptographically random UUID */
-	TYPE3, /* Globally sequential ID */
+  TYPE1, /* Type with MAC Address */
+  TYPE2, /* Cryptographically random UUID */
+  TYPE3, /* Globally sequential ID */
 } ree_uuid_t;
 
 typedef struct ree_uuid {
-	ree_uuid_t type;
-	char *field;
+  ree_uuid_t type;
+  char *field;
 } ree_uuid;
 
 ree_err_t rdb_generate_uuid(char *(*uuid), ree_uuid_t type);

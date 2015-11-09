@@ -4,8 +4,8 @@
  * vault struct. They are partially called by the vaults interface
  * and partially by smaller files such as the crypto engine.
  *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
+ * (c) 2015           Lonely Robot.
+ * Authors:           Katharina 'spacekookie' Sabel
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -35,22 +35,22 @@
 
 typedef struct vault
 {
-	/* Some metadata for the vault */
-	char				*id; 							// UUID string
-	size_t			size;							// number of files
-	char				*name;						// User defined name
-	char 				*path;						// Path on FS
+  /* Some metadata for the vault */
+  char        *id;              // UUID string
+  size_t      size;             // number of files
+  char        *name;            // User defined name
+  char        *path;            // Path on FS
 
-	time_t			created;					// Date created
-	time_t			modified;					// Date last modified
+  time_t      created;          // Date created
+  time_t      modified;         // Date last modified
 
-	/* Some crypto nonsense :) */
-	map_t				*keystore;				// Map of files -> crypt-keys or regions -> crypt-keys
-	map_t 			*tokens;					// Allowed access tokens
+  /* Some crypto nonsense :) */
+  map_t       *keystore;        // Map of files -> crypt-keys or regions -> crypt-keys
+  map_t       *tokens;          // Allowed access tokens
 
-	/* Maps for data storage */
-	map_t				*tags;						// Tags ordered by category (key)
-	map_t				*files;						// Datafiles ordered by their name (key)
+  /* Maps for data storage */
+  map_t       *tags;            // Tags ordered by category (key)
+  map_t       *files;           // Datafiles ordered by their name (key)
 } vault;
 
 /* Create a new vault (DEPRECIATED)! */

@@ -2,8 +2,8 @@
  * 
  * Implementation of the vault interface.
  *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
+ * (c) 2015           Lonely Robot.
+ * Authors:           Katharina 'spacekookie' Sabel
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -46,51 +46,51 @@ static map_t *vaults = NULL;
 
 /** Initialise the vault module with an existing Reedb container */
 ree_err_t rdb_vault_init(reedb_c *(*cont)) {
-	if (!(*cont)->active) {
-		fputs(ERR_CORE_NOT_INIT, stderr);
-		return NOT_INITIALISED;
-	}
+  if (!(*cont)->active) {
+    fputs(ERR_CORE_NOT_INIT, stderr);
+    return NOT_INITIALISED;
+  }
 
-	if(!active)
-	{
-	container = (*cont);
-	vaults = hashmap_new();
+  if(!active)
+  {
+  container = (*cont);
+  vaults = hashmap_new();
 
-	active = true;
-	return SUCCESS;
-	} else {
-		if(RDB_DEBUG) fputs("Module is already init!", stderr);
-		return FAILURE;
-	}
+  active = true;
+  return SUCCESS;
+  } else {
+    if(RDB_DEBUG) fputs("Module is already init!", stderr);
+    return FAILURE;
+  }
 }
 
 void clean_vaults(vault *item, vault *data)
 {
-	printf("Pretending to dump vault... %s\n", data->name);
-	// rdb_dump_vault(item, data);
+  printf("Pretending to dump vault... %s\n", data->name);
+  // rdb_dump_vault(item, data);
 }
 
 ree_err_t rdb_vault_terminate(unsigned int mode)
 {
-	if(active)
-	{
-		vault *start;
-		hashmap_get_one(vaults, (void**)(&start), 0);
-		
-		/** 
-		 * Will be called for every vaults in the vaults interface. The function
-		 * locks out all access to the vault, finishes all transactions in
-		 * progress and then dumps the datastructure from memory.
-		 */
-		hashmap_iterate(vaults, clean_vaults, (void**)(&start));
+  if(active)
+  {
+    vault *start;
+    hashmap_get_one(vaults, (void**)(&start), 0);
+    
+    /** 
+     * Will be called for every vaults in the vaults interface. The function
+     * locks out all access to the vault, finishes all transactions in
+     * progress and then dumps the datastructure from memory.
+     */
+    hashmap_iterate(vaults, clean_vaults, (void**)(&start));
 
-		/* Then free the actual hashmap */
-		hashmap_free(vaults);
-		return SUCCESS;
+    /* Then free the actual hashmap */
+    hashmap_free(vaults);
+    return SUCCESS;
 
-	} else {
-		return FAILURE;
-	}
+  } else {
+    return FAILURE;
+  }
 }
 
 /*
@@ -98,7 +98,7 @@ ree_err_t rdb_vault_terminate(unsigned int mode)
  * as internal workings with the entries field nulled out.
  */
 ree_err_t rdb_vault_list(rdb_vault **list) {
-	return SUCCESS;
+  return SUCCESS;
 }
 
 ree_err_t rdb_vault_scope(char **uuid, char *name, char *path) {
@@ -111,85 +111,85 @@ ree_err_t rdb_vault_unscope(char *uuid) {
 
 ree_err_t rdb_vault_create(ree_token *(*token), char *(*uuid), char *name, char *path, char *passphrase)
 {
-	if(name == NULL)
-	{
-		if(RDB_DEBUG) fputs("Name provided was NULL!\n", stderr);
-		return VAULT_CREATE_FAILED;
-	}
+  if(name == NULL)
+  {
+    if(RDB_DEBUG) fputs("Name provided was NULL!\n", stderr);
+    return VAULT_CREATE_FAILED;
+  }
 
-	if(path == NULL)
-	{
-		if(RDB_DEBUG) fputs("Path provided was NULL!\n", stderr);
-		return VAULT_CREATE_FAILED;
-	}
+  if(path == NULL)
+  {
+    if(RDB_DEBUG) fputs("Path provided was NULL!\n", stderr);
+    return VAULT_CREATE_FAILED;
+  }
 
-	if(passphrase == NULL)
-	{
-		if(RDB_DEBUG) fputs("Passphrase provided was empty!\n", stderr);
-		return VAULT_CREATE_FAILED;
-	}
+  if(passphrase == NULL)
+  {
+    if(RDB_DEBUG) fputs("Passphrase provided was empty!\n", stderr);
+    return VAULT_CREATE_FAILED;
+  }
 
-	//TODO: Change TYPE from config
-	int uuidsucess = rdb_generate_uuid(uuid, TYPE1);
-	if(uuidsucess != 0)
-	{
-		printf("UUID Create returned %d\n", uuidsucess);
-		return VAULT_CREATE_FAILED;
-	}
+  //TODO: Change TYPE from config
+  int uuidsucess = rdb_generate_uuid(uuid, TYPE1);
+  if(uuidsucess != 0)
+  {
+    printf("UUID Create returned %d\n", uuidsucess);
+    return VAULT_CREATE_FAILED;
+  }
 
-	int toksuccess = rdb_tokens_create((*token), 0);
-	if(toksuccess != 0)
-	{
-		printf("Token Create returned %d\n", toksuccess);
-		return VAULT_CREATE_FAILED;
-	}
+  int toksuccess = rdb_tokens_create((*token), 0);
+  if(toksuccess != 0)
+  {
+    printf("Token Create returned %d\n", toksuccess);
+    return VAULT_CREATE_FAILED;
+  }
 
-	/* Handle the public vault struct */
-	rdb_vault *pub_vault = malloc(sizeof(rdb_vault));
-	pub_vault->name = name;
-	pub_vault->path = path;
-	pub_vault->size = 0;
+  /* Handle the public vault struct */
+  rdb_vault *pub_vault = malloc(sizeof(rdb_vault));
+  pub_vault->name = name;
+  pub_vault->path = path;
+  pub_vault->size = 0;
 
-	/* Put it into the hashmap */
-	rdb_vault *ch_vault;
-	hashmap_get(container->scoped, name, (void**)(&ch_vault));
+  /* Put it into the hashmap */
+  rdb_vault *ch_vault;
+  hashmap_get(container->scoped, name, (void**)(&ch_vault));
 
-	if(ch_vault != NULL)
-	{
-		if(ch_vault->name == pub_vault->name && ch_vault->path == pub_vault->path)
-		{
-			if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
-			free(ch_vault);
-			return VAULT_ALREADY_SCOPED;
-		}
-	} else {
-		hashmap_put(container->scoped, name, pub_vault);
-	}
+  if(ch_vault != NULL)
+  {
+    if(ch_vault->name == pub_vault->name && ch_vault->path == pub_vault->path)
+    {
+      if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
+      free(ch_vault);
+      return VAULT_ALREADY_SCOPED;
+    }
+  } else {
+    hashmap_put(container->scoped, name, pub_vault);
+  }
 
-	/* Now actually create that internal vault struct */
-	vault *vault;
-	int success = rdb_create_vault(&vault, (*uuid), name, path, passphrase);
+  /* Now actually create that internal vault struct */
+  vault *vault;
+  int success = rdb_create_vault(&vault, (*uuid), name, path, passphrase);
 
-	/* Store it in the static hashmap */
-	ch_vault = NULL;
-	hashmap_get(vaults, name, (void**)(&ch_vault));
+  /* Store it in the static hashmap */
+  ch_vault = NULL;
+  hashmap_get(vaults, name, (void**)(&ch_vault));
 
-	if(ch_vault != NULL)
-	{
-		if(ch_vault->name == vault->name && ch_vault->path == vault->path)
-		{
-			if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
-			free(ch_vault);
-			return VAULT_ALREADY_SCOPED;
-		}
-	}
+  if(ch_vault != NULL)
+  {
+    if(ch_vault->name == vault->name && ch_vault->path == vault->path)
+    {
+      if(RDB_DEBUG) fputs("A vault by that ID is already scoped!\n", stderr);
+      free(ch_vault);
+      return VAULT_ALREADY_SCOPED;
+    }
+  }
 
-	/* Add it to our vaults scope and exit with our status */
-	hashmap_put(vaults, name, pub_vault);
+  /* Add it to our vaults scope and exit with our status */
+  hashmap_put(vaults, name, pub_vault);
 
-	/* Then free our memory and return success */
-	free(vault);
-	return success;
+  /* Then free our memory and return success */
+  free(vault);
+  return success;
 }
 
 ree_err_t rdb_vault_authenticate(ree_token *token, char *uuid)
@@ -224,5 +224,5 @@ ree_err_t rdb_vault_close(char *uuid, ree_token *token)
 
 bool rdb_vault_isActive()
 {
-	return active;
+  return active;
 }

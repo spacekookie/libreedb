@@ -24,8 +24,8 @@
 #include <stdlib.h>
 
 typedef struct ree_token {
-	unsigned char 	contents[128];
-	time_t					created;
+  unsigned char   contents[128];
+  time_t          created;
 } ree_token;
 
 ree_err_t rdb_tokens_create(char *(*token), unsigned int mode);

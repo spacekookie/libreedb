@@ -1,7 +1,7 @@
 /* reedb - core.c
  *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
+ * (c) 2015           Lonely Robot.
+ * Authors:           Katharina 'spacekookie' Sabel
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -47,211 +47,211 @@ static int settings[6];
 
 // static vault **active_vaults[];
 
-int __PASSLENGTH__ 	= 0;
-int __USRCODE__ 		= 1;
-int __DAEMON__ 			= 2;
-int __PATH__ 				= 3;
-int __OS__ 					= 4;
-int __OVERRIDE__ 		= 5;
+int __PASSLENGTH__  = 0;
+int __USRCODE__     = 1;
+int __DAEMON__      = 2;
+int __PATH__        = 3;
+int __OS__          = 4;
+int __OVERRIDE__    = 5;
 
 ree_err_t rdb_set_passlength(unsigned int length)
 {
-	if (was_init)
-	{
-		fputs(ERR_INIT_MSG, stderr);
-		return ALREADY_INIT;
-	}
+  if (was_init)
+  {
+    fputs(ERR_INIT_MSG, stderr);
+    return ALREADY_INIT;
+  }
 
-	if (length <= MIN_PASSLENGTH)
-	{
-		char error[] = "Can not set minimal passphrase length lower than %d", MIN_PASSLENGTH;
-		fputs(error, stderr);
-		return -1;
-	}
-	tmp_passlength = length;
-	settings[__PASSLENGTH__] = 1;
-	return 0;
+  if (length <= MIN_PASSLENGTH)
+  {
+    char error[] = "Can not set minimal passphrase length lower than %d", MIN_PASSLENGTH;
+    fputs(error, stderr);
+    return -1;
+  }
+  tmp_passlength = length;
+  settings[__PASSLENGTH__] = 1;
+  return 0;
 }
 
 ree_err_t rdb_set_usrcode(void *funct)
 {
-	if (was_init)
-	{
-		fputs(ERR_INIT_MSG, stderr);
-		return ALREADY_INIT;
-	}
-	settings[__USRCODE__] = 1;
-	return 0;
+  if (was_init)
+  {
+    fputs(ERR_INIT_MSG, stderr);
+    return ALREADY_INIT;
+  }
+  settings[__USRCODE__] = 1;
+  return 0;
 }
 
 ree_err_t rdb_set_daemon(bool daemon)
 {
-	printf("Length: %d\n", tmp_passlength);
-	if (was_init)
-	{
-		fputs(ERR_INIT_MSG, stderr);
-		return ALREADY_INIT;
-	}
-	tmp_daemon = daemon;
-	settings[__DAEMON__] = 1;
-	return 0;
+  printf("Length: %d\n", tmp_passlength);
+  if (was_init)
+  {
+    fputs(ERR_INIT_MSG, stderr);
+    return ALREADY_INIT;
+  }
+  tmp_daemon = daemon;
+  settings[__DAEMON__] = 1;
+  return 0;
 }
 
 ree_err_t rdb_set_path(char *path)
 {
-	if (was_init)
-	{
-		fputs(ERR_INIT_MSG, stderr);
-		return ALREADY_INIT;
-	}
+  if (was_init)
+  {
+    fputs(ERR_INIT_MSG, stderr);
+    return ALREADY_INIT;
+  }
 
-	tmp_path = path;
-	settings[__PATH__] = 1;
-	return 0;
+  tmp_path = path;
+  settings[__PATH__] = 1;
+  return 0;
 }
 ;
 
 ree_err_t rdb_set_os(ree_os man_os)
 {
-	if (was_init)
-	{
-		fputs(ERR_INIT_MSG, stderr);
-		return ALREADY_INIT;
-	}
-	tmp_os = man_os;
-	settings[__OS__] = 1;
-	return 0;
+  if (was_init)
+  {
+    fputs(ERR_INIT_MSG, stderr);
+    return ALREADY_INIT;
+  }
+  tmp_os = man_os;
+  settings[__OS__] = 1;
+  return 0;
 }
 
 ree_err_t rdb_set_override(bool override)
 {
-	if (was_init)
-	{
-		fputs(ERR_INIT_MSG, stderr);
-		return ALREADY_INIT;
-	}
-	tmp_override = override;
-	settings[__OVERRIDE__] = 1;
-	return 0;
+  if (was_init)
+  {
+    fputs(ERR_INIT_MSG, stderr);
+    return ALREADY_INIT;
+  }
+  tmp_override = override;
+  settings[__OVERRIDE__] = 1;
+  return 0;
 }
 
 ree_err_t reedb_init(reedb_c *(*container))
 {
 
-	if ((*container) == NULL)
-	{
-		if(RDB_DEBUG) fputs("Missing container struct!\n", stderr);
-		return MISSING_CONTAINER;
-	}
+  if ((*container) == NULL)
+  {
+    if(RDB_DEBUG) fputs("Missing container struct!\n", stderr);
+    return MISSING_CONTAINER;
+  }
 
-	(*container) = calloc(sizeof(reedb_c), 1);
-	if ((*container) == NULL)
-	{
-		if(RDB_DEBUG) fputs("Container malloc failed\n", stderr);
-		return MALLOC_FAILED;
-	}
+  (*container) = calloc(sizeof(reedb_c), 1);
+  if ((*container) == NULL)
+  {
+    if(RDB_DEBUG) fputs("Container malloc failed\n", stderr);
+    return MALLOC_FAILED;
+  }
 
-	if (settings[__PASSLENGTH__])
-	{
-		(*container)->passlength = tmp_passlength;
-	}
-	else
-	{
-		if(RDB_DEBUG) fputs("Failed to provide password length.\n", stderr);
-		return MISSING_PARAMS;
-	}
+  if (settings[__PASSLENGTH__])
+  {
+    (*container)->passlength = tmp_passlength;
+  }
+  else
+  {
+    if(RDB_DEBUG) fputs("Failed to provide password length.\n", stderr);
+    return MISSING_PARAMS;
+  }
 
-	// TODO: Check that user code is present here
-	if (settings[__OS__])
-	{
-		(*container)->os = tmp_os;
-	}
-	else
-	{
-		// TODO: PARSE OS HERE
-		if(RDB_DEBUG) fputs("No OS was provided...", stderr);
-		if (false)
-		{
-			if(RDB_DEBUG) fputs("and OS parse failed.", stderr);
-			return OS_PARSE_FAILED;
-		}
-		printf("\n");
-	}
+  // TODO: Check that user code is present here
+  if (settings[__OS__])
+  {
+    (*container)->os = tmp_os;
+  }
+  else
+  {
+    // TODO: PARSE OS HERE
+    if(RDB_DEBUG) fputs("No OS was provided...", stderr);
+    if (false)
+    {
+      if(RDB_DEBUG) fputs("and OS parse failed.", stderr);
+      return OS_PARSE_FAILED;
+    }
+    printf("\n");
+  }
 
-	/* Get secondary settings here */
-	if (settings[__DAEMON__])			(*container)->daemon = tmp_daemon;
-	if (settings[__PATH__])				(*container)->path = tmp_path;
+  /* Get secondary settings here */
+  if (settings[__DAEMON__])     (*container)->daemon = tmp_daemon;
+  if (settings[__PATH__])       (*container)->path = tmp_path;
 
-	// TODO: Check if a lock exists
-	bool locked = false;
-	if (locked && !tmp_override)
-	{
-		if(RDB_DEBUG) fputs("A previous instance of Reedb is still present.\n", stderr);
-		return ZOMBIE_INSTANCE;
-	}
+  // TODO: Check if a lock exists
+  bool locked = false;
+  if (locked && !tmp_override)
+  {
+    if(RDB_DEBUG) fputs("A previous instance of Reedb is still present.\n", stderr);
+    return ZOMBIE_INSTANCE;
+  }
 
-	/* Now start the crypto engine (chew chew) */
-	ree_err_t crypto = init_rdb_crypto(NULL);
-	if(crypto != 0)
-	{
-		if(RDB_DEBUG) fputs("A massive error occured while initialising the crypto engine. Aborting!\n", stderr);
-		return crypto;
-	}
+  /* Now start the crypto engine (chew chew) */
+  ree_err_t crypto = init_rdb_crypto(NULL);
+  if(crypto != 0)
+  {
+    if(RDB_DEBUG) fputs("A massive error occured while initialising the crypto engine. Aborting!\n", stderr);
+    return crypto;
+  }
 
-	/* This is used by other modules to guarantee the existence of the core module */
-	(*container)->active = true;
-	(*container)->scoped = hashmap_new();
+  /* This is used by other modules to guarantee the existence of the core module */
+  (*container)->active = true;
+  (*container)->scoped = hashmap_new();
 
-	if(RDB_DEBUG) printf("Reedb seems to have successfully initialised!\n");
+  if(RDB_DEBUG) printf("Reedb seems to have successfully initialised!\n");
 
-	/* Then set the init field to true */
-	was_init = true;
-	return 0;
+  /* Then set the init field to true */
+  was_init = true;
+  return 0;
 }
 
 ree_err_t reedb_terminate(reedb_c *(*container), char *reason)
 {
-	if (!was_init)
-	{
-		if(RDB_DEBUG)
-		{
-			printf(ERR_NOT_INIT, "__CORE__");
-			printf("\n");
-		}
-		return NOT_INITIALISED;
-	}
+  if (!was_init)
+  {
+    if(RDB_DEBUG)
+    {
+      printf(ERR_NOT_INIT, "__CORE__");
+      printf("\n");
+    }
+    return NOT_INITIALISED;
+  }
 
-	/** Check if the vault module is active and terminate it */
-	if(rdb_vault_isActive()) 
-	{
-		/* Iterate over the scoped vaults here and free their memory */		
-		int count;
-		was_init = false;
+  /** Check if the vault module is active and terminate it */
+  if(rdb_vault_isActive()) 
+  {
+    /* Iterate over the scoped vaults here and free their memory */   
+    int count;
+    was_init = false;
 
-		/* And then finally get rid of the module */
-		rdb_vault_terminate(0);
-	}
+    /* And then finally get rid of the module */
+    rdb_vault_terminate(0);
+  }
 
-	/* Release crypto context now */
-	int success = term_rdb_crypto();
-	if(success != 0)
-	{
-		// TODO: Really check for errors here. This might be important!
-	}
+  /* Release crypto context now */
+  int success = term_rdb_crypto();
+  if(success != 0)
+  {
+    // TODO: Really check for errors here. This might be important!
+  }
 
-	free((*container));
-	(*container) = NULL;
-	if(RDB_DEBUG) printf("Reedb is now shut down. Do not use your container pointer anymore!\n");
-	return HUGE_SUCCESS; // Hello there Glados :)
+  free((*container));
+  (*container) = NULL;
+  if(RDB_DEBUG) printf("Reedb is now shut down. Do not use your container pointer anymore!\n");
+  return HUGE_SUCCESS; // Hello there Glados :)
 }
 
 /** Returns if this module was successfully initialised */
 bool reedb_isActive()
 {
-	return was_init;
+  return was_init;
 }
 
 unsigned int get_active_count()
 {
-	return 5;
+  return 5;
 }

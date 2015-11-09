@@ -4,8 +4,8 @@
  * I don't know what else this is supposed to say. It's pretty damn fucking
  * self explanatory :) It makes dealing with shitty libraries less shitty.
  *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
+ * (c) 2015           Lonely Robot.
+ * Authors:           Katharina 'spacekookie' Sabel
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -26,7 +26,7 @@
 #ifndef SRC_CRYTIGER2_H_
 #define SRC_CRYTIGER2_H_
 
-#define RCRY_SALT_LENGTH 16 						// Salt length in bytes
+#define RCRY_SALT_LENGTH 16             // Salt length in bytes
 
 /* Used for file hashing */
 ree_err_t rcry_hash_tiger2(unsigned char *word, unsigned char *hash, unsigned char *salt);

@@ -5,8 +5,8 @@
  * key storage or message authentication in the backend. Switching cipher
  * is as simple as calling a function!
  *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
+ * (c) 2015           Lonely Robot.
+ * Authors:           Katharina 'spacekookie' Sabel
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -33,34 +33,34 @@
 
 typedef enum crytarget_t
 {
-	FILE_P,						// Indicates that a datafile struct is present
-	STRING,						// Indicates that it's a simple string encryption.
+  FILE_P,           // Indicates that a datafile struct is present
+  STRING,           // Indicates that it's a simple string encryption.
 } crytarget_t;
 
 typedef enum cryflgs_t
 {
-	/* Listing ciphers by name just because AES can change! */
-	RIJDAEL,					// The default
-	TWOFISH,					// Schneier says 'hi'
-	SERPENT,					// Second place in AES contest
-	RSA,							// Not currently implemented. Uses asymmetric RSA encryption
+  /* Listing ciphers by name just because AES can change! */
+  RIJDAEL,          // The default
+  TWOFISH,          // Schneier says 'hi'
+  SERPENT,          // Second place in AES contest
+  RSA,              // Not currently implemented. Uses asymmetric RSA encryption
 
-	CBC,							// Default mode of operation
-	CRT,							// Good for stream dumps
-	BLOCK_DUMP,				// Indicates that crypto should dump one block at a time
-	STREAM_DUMP,			// Makes crypto behave like a stream cipher
+  CBC,              // Default mode of operation
+  CRT,              // Good for stream dumps
+  BLOCK_DUMP,       // Indicates that crypto should dump one block at a time
+  STREAM_DUMP,      // Makes crypto behave like a stream cipher
 
-	MIGHTY,						// Specifies the strength of a generated key to strong
-	QUICK,						// Specifies the strength of a generated key to weak (but quick)
-	AUTO_USE,					// Indicate that a generated key should automatically be scoped
+  MIGHTY,           // Specifies the strength of a generated key to strong
+  QUICK,            // Specifies the strength of a generated key to weak (but quick)
+  AUTO_USE,         // Indicate that a generated key should automatically be scoped
 } cryflgs_t;
 
 /** The crypto context struct that is attached to a datafile */
 typedef struct cry_context
 {
-	unsigned char			*block_key;
-	unsigned char			*mac;
-	unsigned long			nonce;
+  unsigned char     *block_key;
+  unsigned char     *mac;
+  unsigned long     nonce;
 } cry_context;
 
 /* Init secure memory and start the crypto backend (libgcrypt) */

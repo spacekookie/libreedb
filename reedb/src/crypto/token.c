@@ -9,5 +9,5 @@
 
 ree_err_t rdb_tokens_create(char *(*token), unsigned int mode)
 {
-	return SUCCESS;
+  return SUCCESS;
 }

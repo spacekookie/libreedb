@@ -29,7 +29,7 @@
 
 /** Defines the type of data that should be */
 typedef enum gen_data_t {
-	string, integer, boolean
+  string, integer, boolean
 } gen_data_t;
 
 /*
@@ -38,34 +38,34 @@ typedef enum gen_data_t {
  * it should be read.
 */
 typedef struct gen_data {
-	gen_data_t 	type;
-	size_t			size; // > 1 means it's an array.
+  gen_data_t  type;
+  size_t      size; // > 1 means it's an array.
 
-	union v {
-		int 			*iptr;
-		char			*cptr;
-		bool 			*bptr;
-	} v;
+  union v {
+    int       *iptr;
+    char      *cptr;
+    bool      *bptr;
+  } v;
 } gen_data;
 
 /** Defines the file header which is passed out to users */
 typedef struct datafile_h {
-	char			*name;
-	char			*category;
-	map_t			*tags;
+  char      *name;
+  char      *category;
+  map_t     *tags;
 } datafile_h;
 
 /** Definition of the actual datafile struct. Not exposed to user */
 typedef struct datafile {
-	/* Some metadata (again) */
-	char 					*name;					// String name. Is hashed for the filesystem name
-	datafile_h		*header;				// Pointer to header struct. Used for indexing
-	size_t 				bsize;					// Size of the body map (revision numbers)
-	size_t				rsize;					// The amount of revisions that CAN be stored
+  /* Some metadata (again) */
+  char          *name;          // String name. Is hashed for the filesystem name
+  datafile_h    *header;        // Pointer to header struct. Used for indexing
+  size_t        bsize;          // Size of the body map (revision numbers)
+  size_t        rsize;          // The amount of revisions that CAN be stored
 
-	/* Actual datastorage (contains 25% more crypto than the competition) */
-	map_t					**body;					// Nested body maps for revisions and data
-	map_t					*locks;					// Stores locks on specific versions.
+  /* Actual datastorage (contains 25% more crypto than the competition) */
+  map_t         **body;         // Nested body maps for revisions and data
+  map_t         *locks;         // Stores locks on specific versions.
 } datafile;
 
 /** Creates a new file with a name */
@@ -91,7 +91,7 @@ ree_err_t get_header(datafile *file, datafile_h **headreq);
 ree_err_t read_file(datafile *file, bool versioning);
 
 /** Needs to be called to sync in-memory file with disk-file. Will dump
- * 	encrypted data to disk. Blocking operation until file lock is not present */
+ *  encrypted data to disk. Blocking operation until file lock is not present */
 ree_err_t sync(datafile *file, char mode);
 
 ree_err_t close(datafile *file);
