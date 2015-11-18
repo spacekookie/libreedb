@@ -1,4 +1,4 @@
-![Reedb Logo](https://raw.githubusercontent.com/reepass/reedb/develop/logo.png)
+![Reedb Logo](https://raw.githubusercontent.com/reepass/reedb/develop/extras/logo.png)
 
 [![Coverity Status](https://scan.coverity.com/projects/6872/badge.svg)](https://scan.coverity.com/projects/reepass-reedb)
 [![Build Status](https://travis-ci.org/reepass/reedb.svg?branch=master)](https://travis-ci.org/reepass/reedb)

@@ -28,12 +28,9 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <gcrypt.h>
 
 int main(int argc, char *args)
 {
-
-// Use debugging
 #define RDB_DEBUG true
 
 	/* Initialise Reedb container instance */
