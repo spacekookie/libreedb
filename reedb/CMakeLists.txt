@@ -3,8 +3,9 @@ add_library (reedb
 
     # Crypto stuff
     src/crypto/token.c
-    src/crypto/engine.c
+    src/crypto/engine_wrap.c
     src/crypto/hashes.c
+    src/crypto/RCryEngine.cpp
 
     # Utilities
     src/utils/hashmap.c
@@ -22,8 +23,10 @@ add_library (reedb
 
 # Link libraries against us
 target_link_libraries(reedb
-    gcrypt		# General purpose crypto library
-    protobuf)	# File serialisation
+    cryptopp    # Main C++ crypto library
+    gcrypt		# Additional crypto library
+
+    protobuf)   # Fast file serialisation
 
 # Include the subdirectories to search for headers
 target_include_directories (reedb PUBLIC "include")

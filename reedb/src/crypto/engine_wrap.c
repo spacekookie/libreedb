@@ -24,7 +24,7 @@
 
 /* Just some more stuff */
 #include "reedb/defs.h"
-#include "engine.h"
+#include "engine_wrap.h"
 
 /* Some macro definitions for the crypto module */
 #define RCRY_CORE_CIPHER GCRY_CIPHER_RIJNDAEL256 // This is a temporary workaround!

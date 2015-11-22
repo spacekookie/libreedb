@@ -116,7 +116,7 @@ static void aesTest(int gcry_mode, char * iniVector)
  
     size_t keyLength = gcry_cipher_get_algo_keylen(GCRY_CIPHER);
     size_t blkLength = gcry_cipher_get_algo_blklen(GCRY_CIPHER);
-    char * txtBuffer = "123456789 abcdefghijklmnopqrstuvwzyz ABCDEFGHIJKLMNOPQRSTUVWZYZ";
+    char * txtBuffer = "123456789abcdefghijklmnopqrstuvwzyz ABCDEFGHIJKLMNOPQRSTUVWZYZ";
     size_t txtLength = strlen(txtBuffer)+1; // string plus termination
     char * encBuffer = malloc(txtLength);
     char * outBuffer = malloc(txtLength);

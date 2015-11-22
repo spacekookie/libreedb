@@ -2,7 +2,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
-#include "crypto/engine.h"
+#include "engine_wrap.h"
 #include "crypto/hashes.h"
 #include "utils/files.h"
 #include "ree_vault.h"

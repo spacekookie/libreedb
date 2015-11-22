@@ -22,7 +22,7 @@
 #include "reedb/vault.h"
 
 /* Only needed for the termination */
-#include "crypto/engine.h"
+#include "engine_wrap.h"
 
 /* Utilities & More */
 #include "reedb/utils/hashmap.h"
