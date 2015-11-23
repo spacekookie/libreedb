@@ -3,3 +3,11 @@
 //
 
 #include "RCryEngine.h"
+
+RCryEngine::RCryEngine() {
+
+};
+
+ree_err_t RCryEngine::setFlags(cryflgs_t *flags) {
+
+};

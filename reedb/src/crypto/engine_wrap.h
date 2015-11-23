@@ -40,18 +40,18 @@ typedef enum crytarget_t
 typedef enum cryflgs_t
 {
   /* Listing ciphers by name just because AES can change! */
-  RIJDAEL,          // The default
-  TWOFISH,          // Schneier says 'hi'
-  SERPENT,          // Second place in AES contest
-  RSA,              // Not currently implemented. Uses asymmetric RSA encryption
-
-  CBC,              // Default mode of operation
-  CRT,              // Good for stream dumps
-  BLOCK_DUMP,       // Indicates that crypto should dump one block at a time
-  STREAM_DUMP,      // Makes crypto behave like a stream cipher
-
-  MIGHTY,           // Specifies the strength of a generated key to strong
-  QUICK,            // Specifies the strength of a generated key to weak (but quick)
+//  RIJDAEL,          // The default
+//  TWOFISH,          // Schneier says 'hi'
+//  SERPENT,          // Second place in AES contest
+//  RSA,              // Not currently implemented. Uses asymmetric RSA encryption
+//
+//  CBC,              // Default mode of operation
+//  CRT,              // Good for stream dumps
+//  BLOCK_DUMP,       // Indicates that crypto should dump one block at a time
+//  STREAM_DUMP,      // Makes crypto behave like a stream cipher
+//
+//  MIGHTY,           // Specifies the strength of a generated key to strong
+//  QUICK,            // Specifies the strength of a generated key to weak (but quick)
   AUTO_USE,         // Indicate that a generated key should automatically be scoped
 } cryflgs_t;
 

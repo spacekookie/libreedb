@@ -21,6 +21,8 @@
 #ifndef REEDB_RCRYENGINE_H
 #define REEDB_RCRYENGINE_H
 
+#include <lzma/index_hash.h>
+#include <reedb/utils/hashmap.h>
 #include "reedb/defs.h"
 
 /**
@@ -28,8 +30,7 @@
  * wrapper to make it compatible with the rest of the library.
  */
 class RCryEngine {
-    typedef enum cryflgs_t
-    {
+     typedef enum cryflgs_t {
         RIJDAEL,        // The default for symmetric cryptography
         TWOFISH,        // Schneier says 'hi'
         SERPENT,        // Second place in AES contest
@@ -46,11 +47,20 @@ class RCryEngine {
         AUTO,           // Indicate that a generated key should automatically be scoped
     } cryflgs_t;
 
-    typedef enum crytarget_t
-    {
+    typedef enum crytarget_t {
         FILE_P,           // Indicates that a datafile struct is present
         STRING,           // Indicates that it's a simple string encryption.
     } crytarget_t;
+
+private:
+    map_t *contexts;
+
+public:
+
+    RCryEngine();
+
+    ree_err_t setFlags(cryflgs_t flags[]);
+
 
 
 };

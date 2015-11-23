@@ -3,8 +3,8 @@ add_library (reedb
 
     # Crypto stuff
     src/crypto/token.c
-    src/crypto/engine_wrap.c
     src/crypto/hashes.c
+    src/crypto/engine_wrap.c
     src/crypto/RCryEngine.cpp
 
     # Utilities
