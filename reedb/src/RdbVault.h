@@ -13,6 +13,9 @@ extern "C" {
 using namespace std;
 
 class RdbVault {
+private:
+  
+public:
 
     /**
      * Creates a new Vault on the filesystem. Will throw a RdbAdvErrors
@@ -41,6 +44,9 @@ class RdbVault {
      */
     RdbVault(ree_uuid_t uuid, string passphrase);
 
+    /* Makes sure that all files are closed and keys are dumped */
+    ~RdbVault();
+    
     /**
      * Unlocks a vault that is already scoped and even loaded by a different
      * target. This is used to have multiple applications access the same
@@ -53,6 +59,16 @@ class RdbVault {
      * applications currently using it.
      */
     ree_err_t lockVault(ree_token *token);
+    
+    /**** FILE OPERATION FUNCTIONS ****/
+    
+    ree_err_t readFile(string name);
+    
+    ree_err_t addFile(string name);
+    
+    ree_err_t removeFile(string name);
+    
+    ree_err_t updateFile(string name, string data);
 
 };
 

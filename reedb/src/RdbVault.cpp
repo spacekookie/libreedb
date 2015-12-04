@@ -4,7 +4,7 @@
 
 #include "RdbVault.h"
 #include "utils/RdbAdvErrors.h"
-
+#include<string>
 
 RdbVault::RdbVault(string name, string path, string passphrase) {
 
