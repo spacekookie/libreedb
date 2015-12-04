@@ -19,26 +19,12 @@ typedef enum CacheMode {
   ENDLESS
 } CacheMode;
 
-/** Defines the type of data that should be */
-typedef enum gen_data_t {
-  string, integer, boolean
-} gen_data_t;
-
 /*
  * This struct can hold generic data. It carries a type
  * and size to determine as what data type and field size
  * it should be read.
 */
-typedef struct gen_data {
-  gen_data_t  type;
-  size_t      size; // > 1 means it's an array.
 
-  union v {
-    int       *iptr;
-    char      *cptr;
-    bool      *bptr;
-  } v;
-} gen_data;
 
 class RdbDatafile
 {
@@ -82,8 +68,8 @@ private:
   
   bool locked;
   
-  /* Actual data*/
-  map_t data;
+  /* Array of data maps. Each version creates a new map */
+  map_t *data[];
   
   /* @return If file is locked */
   bool isLocked();

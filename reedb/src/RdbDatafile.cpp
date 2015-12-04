@@ -18,6 +18,7 @@
  */
 
 #include "RdbDatafile.h"
+#include <malloc.h>
 
 RdbDatafile::RdbDatafile(string name, RdbVault *vault)
 {
@@ -37,5 +38,7 @@ RdbDatafile::RdbDatafile(string name, RdbVault *vault)
 
 void RdbDatafile::populate()
 {
-  this->data = hashmap_new();
+  /* We malloc enough space for two map pointers. One for us, one for the user */
+  this->data = (map_t*) new map_t*[2];
+  // this->data[0] = hashmap_new();
 }
