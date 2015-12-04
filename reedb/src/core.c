@@ -21,8 +21,8 @@
 #include "reedb/core.h"
 #include "reedb/vault.h"
 
-/* Only needed for the termination */
-#include "engine_wrap.h"
+/* Include the crypto engine wrapper for termination */
+#include "crypto/engine_wrap.h"
 
 /* Utilities & More */
 #include "reedb/utils/hashmap.h"

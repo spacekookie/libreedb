@@ -21,7 +21,7 @@
 #ifndef REEDB_RCRYENGINE_H
 #define REEDB_RCRYENGINE_H
 
-#include <lzma/index_hash.h>
+// #include <lzma/index_hash.h>
 #include <reedb/utils/hashmap.h>
 #include "reedb/defs.h"
 
@@ -58,11 +58,7 @@ private:
 public:
 
     RCryEngine();
-
     ree_err_t setFlags(cryflgs_t flags[]);
-
-
-
 };
 
 
