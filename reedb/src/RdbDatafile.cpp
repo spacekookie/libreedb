@@ -19,7 +19,23 @@
 
 #include "RdbDatafile.h"
 
-RdbDatafile::RdbDatafile(string name)
+RdbDatafile::RdbDatafile(string name, RdbVault *vault)
 {
+  /* Asign data to fields */
   this->name = name;
+  this->path = vault->getPath() + "/" + vault->getName() + "/datastore/" + name;
+  this->version = 1;
+  
+  /* Then populate them */
+  this->populate();
+  
+  /* Set cache mode to hotdrop so we can use the file immediately */
+  this->cache(HOTDROP);
+  
+  this->write();
+}
+
+void RdbDatafile::populate()
+{
+  this->data = hashmap_new();
 }

@@ -15,6 +15,14 @@ using namespace std;
 class RdbVault {
 private:
   
+  /* Some metadata fields about the vault */
+  ree_uuid uuid;
+  string name, path;
+  size_t fileCount;
+  
+  /* Crypto stuff */
+  unsigned char *cryptoKey[];
+  
 public:
 
     /**
@@ -70,6 +78,15 @@ public:
     
     ree_err_t updateFile(string name, string data);
 
+    /**** SOME FIELD ACCESSORS ****/
+    string getName();
+    
+    string getPath();
+    
+    ree_uuid getUUID();
+    
+    size_t getSize();
+    
 };
 
 #endif //REEDB_VAULT_H

@@ -16,6 +16,7 @@ add_library (reedb
     src/uuid.c
     src/vault.c
     src/RdbVault.cpp
+    src/RdbDatafile.cpp
 
     # Data storage
     src/datafile.c
