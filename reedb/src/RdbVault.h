@@ -14,8 +14,6 @@ using namespace std;
 
 class RdbVault {
 
-    RdbVault();
-
     /**
      * Creates a new Vault on the filesystem. Will throw a RdbAdvErrors
      * exception when that is not possible. The cause of the error will
@@ -43,8 +41,17 @@ class RdbVault {
      */
     RdbVault(ree_uuid_t uuid, string passphrase);
 
+    /**
+     * Unlocks a vault that is already scoped and even loaded by a different
+     * target. This is used to have multiple applications access the same
+     * vault.
+     */
     ree_err_t unlockVault(string passphrase, ree_token *(*token));
 
+    /**
+     * Lock a vault with an access token even if there are other
+     * applications currently using it.
+     */
     ree_err_t lockVault(ree_token *token);
 
 };

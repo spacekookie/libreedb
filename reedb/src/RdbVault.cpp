@@ -4,6 +4,7 @@
 
 #include "RdbVault.h"
 
-RdbVault::RdbVault() {
+
+RdbVault::RdbVault(string name, string path, string passphrase) {
 
 }

@@ -27,7 +27,8 @@ target_link_libraries(reedb
     cryptopp    # Main C++ crypto library
     gcrypt		# Additional crypto library
 
-    protobuf)   # Fast file serialisation
+    # protobuf  # Will be added in a future version (or so)
+    )
 
 # Include the subdirectories to search for headers
 target_include_directories (reedb PUBLIC "include")
