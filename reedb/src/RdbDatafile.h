@@ -2,6 +2,7 @@
 #define RDBDATAFILE_H
 
 #include <string>
+#include <vector>
 #include "RdbVault.h"
 
 extern "C" {
@@ -65,11 +66,14 @@ private:
   string name;
   string path;
   int version;
-  
   bool locked;
   
-  /* Array of data maps. Each version creates a new map */
-  map_t *data[];
+  /* Database metadata for queries */
+  string category;
+  string tags[];
+  
+  /* Vector of data maps. Each version creates a new map */
+  std::vector<map_t*> data;
   
   /* @return If file is locked */
   bool isLocked();

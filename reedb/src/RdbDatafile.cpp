@@ -18,7 +18,10 @@
  */
 
 #include "RdbDatafile.h"
+#include "reedb/utils/hashmap.h"
+
 #include <malloc.h>
+#include <vector>
 
 RdbDatafile::RdbDatafile(string name, RdbVault *vault)
 {
@@ -26,6 +29,9 @@ RdbDatafile::RdbDatafile(string name, RdbVault *vault)
   this->name = name;
   this->path = vault->getPath() + "/" + vault->getName() + "/datastore/" + name;
   this->version = 1;
+  
+  /* By default things should only be part of one category */
+  // this->category = 
   
   /* Then populate them */
   this->populate();
@@ -38,7 +44,13 @@ RdbDatafile::RdbDatafile(string name, RdbVault *vault)
 
 void RdbDatafile::populate()
 {
-  /* We malloc enough space for two map pointers. One for us, one for the user */
-  this->data = (map_t*) new map_t*[2];
+  /* Create a list of two map pointers. One for our version revision, one for theirs */
+  // this->data = new std::vector<map_t*>(2);
   // this->data[0] = hashmap_new();
+  
+  //this->data = new map_t*[2];
+  // *this->data[0] = (map_t*) hashmap_new();
+  
+  /* Generate a sample value for our version */
+  // hashmap_put((*this->data[0]), "Note", "I'm making a note here");
 }
