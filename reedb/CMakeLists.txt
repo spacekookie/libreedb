@@ -17,6 +17,7 @@ add_library (reedb
     src/vault.c
     src/RdbVault.cpp
     src/RdbDatafile.cpp
+    src/cppwrapper.cpp
 
     # Data storage
     src/datafile.c
