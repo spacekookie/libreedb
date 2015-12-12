@@ -20,19 +20,32 @@ typedef enum CacheMode {
   ENDLESS
 } CacheMode;
 
-/*
- * This struct can hold generic data. It carries a type
- * and size to determine as what data type and field size
- * it should be read.
-*/
-
+typedef struct FilePath {
+  string *path;
+  int opMode;
+} FilePath;
 
 class RdbDatafile
 {
 public:
-  RdbDatafile(string name, RdbVault *vault);
   
-  /** Use this constructor to initiate a file that has previously existed */
+  /** 
+   * Default constructor that creates a datfile. It goes through
+   * the entire file creation process and optionally also creates
+   * new keys for zones it should be long to.
+   * 
+   * @param name Name of the file (in cleartext)
+   * @param *parent Struct that contain parent path + permissions
+   */
+  RdbDatafile(string name, FilePath *parent);
+  
+  /** 
+   * Use this constructor to initiate a file that has previously 
+   * existed.
+   * 
+   * @param name Name of the file (in cleartext)
+   * @param oldFile Contents on the old file as binary buffer
+   */
   RdbDatafile(string name, string oldFile);
   
   /**
