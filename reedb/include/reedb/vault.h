@@ -59,6 +59,8 @@ ree_err_t rdb_vault_delete(char *uuid, ree_token *token, char *file);
 
 ree_err_t rdb_vault_close(char *uuid, ree_token *token);
 
+ree_err_t rdb_vault_testing();
+
 bool rdb_vault_isActive();
 
 #endif /* SRC_VAULT_H_ */

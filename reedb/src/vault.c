@@ -35,6 +35,9 @@
 #include "ree_vault.h"
 #include "datafile.h"
 
+/* Include the C++ wrapper file */
+#include "cppwrapper.h"
+
 /* Holds vault module state */
 static bool active = false;
 
@@ -225,4 +228,10 @@ ree_err_t rdb_vault_close(char *uuid, ree_token *token)
 bool rdb_vault_isActive()
 {
   return active;
+}
+
+/* This function gets exposed to the outside */
+ree_err_t rdb_vault_testing()
+{
+  cpp_datafile_testing();
 }

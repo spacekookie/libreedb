@@ -22,43 +22,47 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-#include "reedb/utils/hashmap.h"
 #include "reedb/vault.h"
-#include "reedb/core.h"
+#include "reedb/defs.h"
 
-#include <string.h>
 #include <stdio.h>
 
 int main(int argc, char *args)
 {
-#define RDB_DEBUG true
+  ree_err_t bla = rdb_vault_testing();
 
-	/* Initialise Reedb container instance */
-	// reedb_c *rdb;
-	// ree_err_t error;
-
-	// rdb_set_passlength(12);
-	// rdb_set_os(LINUX);
-
-	// /* Call the init */
-	// error = reedb_init(&rdb);
-	// printf("Init returning with code: %d\n", error);
-
-	// /* Init vault module */
-	// error = rdb_vault_init(&rdb);
-	// printf("Init vault mod returned with code: %d\n", error);
-
-	// /* Handles for vault ID stuff */
-	// ree_token 		*token;
-	// ree_uuid			*uuid;
-	// error = rdb_vault_create(&token, &uuid, "default", "/home/spacekookie", "super_password");
-	// printf("Create vault returned with code %d\n", error);
-
-	// /* Terminate our instance. Frees up all sensitive information from memory */
-	// error = reedb_terminate(&rdb, "Program ran out of lines of code");
-	
-	// printf("Returning with code: %d\n", error);
-	// printf("Now let's do some random shit that nobody really gives a fuck about...\n");
-
-	return 0;
+  if(bla != SUCCESS)
+  {
+    return bla;
+  }
+  return 0;
 }
+
+  
+  /* Initialise Reedb container instance */
+  // reedb_c *rdb;
+  // ree_err_t error;
+
+  // rdb_set_passlength(12);
+  // rdb_set_os(LINUX);
+
+  // /* Call the init */
+  // error = reedb_init(&rdb);
+  // printf("Init returning with code: %d\n", error);
+
+  // /* Init vault module */
+  // error = rdb_vault_init(&rdb);
+  // printf("Init vault mod returned with code: %d\n", error);
+
+  // /* Handles for vault ID stuff */
+  // ree_token 		*token;
+  // ree_uuid			*uuid;
+  // error = rdb_vault_create(&token, &uuid, "default", "/home/spacekookie",
+  // "super_password");
+  // printf("Create vault returned with code %d\n", error);
+
+  // /* Terminate our instance. Frees up all sensitive information from memory */
+  // error = reedb_terminate(&rdb, "Program ran out of lines of code");
+  
+  // printf("Returning with code: %d\n", error);
+  // printf("Now let's do some random shit that nobody really gives a fuck about...\n");
