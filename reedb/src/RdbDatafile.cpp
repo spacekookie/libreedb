@@ -44,10 +44,8 @@ void RdbDatafile::populate()
   
   cout << "First number: " << first.front() << endl;
 
-  map_t hashmap = hashmap_new();
   
-  hashmap_put(hashmap, "Reedb", "Yoooo");
-
+  
   // Try to insert something in the sucker
   //hashmap_put(&hashmap, "Reedb", "I am some awesome data");
   
