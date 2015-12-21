@@ -4,10 +4,8 @@
 #include "reedb/utils/hashmap.h"
 
 /* Some system requirements for data storage and file access*/
-#include <list>
-#include <fstream>
 #include <iostream>
-#include <malloc.h>
+#include <vector>
 
 using namespace std;
 
@@ -32,17 +30,34 @@ RdbDatafile::RdbDatafile(string name, FilePath *parent)
 
 void RdbDatafile::populate()
 {
+  
+  /* Create a list of hashmap pointers */
+  vector<map_t*> *revisions = new vector<map_t*>;
+  
+  /* Create a hashmap for some sample data */
+  map_t samples = hashmap_new();
+  char *data = "This is an example note. Feel free to delete it!";
+  hashmap_put(&samples, "Note", data);
+
+  /* Then creating two hashmap pointers for data! \o/*/
+  // revisions->push_back();
+  // revisions->push_back(hashmap_new());
+  
+  /* Then put some sample data into the first map*/
+  // hashmap_put(*revisions[0], "Label", "This is an example entry");
+  
+
   /* Create a list of two map pointers. One for our version revision, one for theirs */
-  list<int> first;
-  first.push_back(5);
-  first.push_front(2);
-  first.push_back(9);
-  
-  for(int x : first) {
-    cout << x << endl;
-  }
-  
-  cout << "First number: " << first.front() << endl;
+  //   list<int> first;
+  //   first.push_back(5);
+  //   first.push_front(2);
+  //   first.push_back(9);
+  //   
+  //   for(int x : first) {
+  //     std.cout << x << endl;
+  //   }
+  //   
+  //   cout << "First number: " << first.front() << endl;
 
   
   
