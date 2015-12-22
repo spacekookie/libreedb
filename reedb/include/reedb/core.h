@@ -1,98 +1,92 @@
-/* reedbd-http - core.h
- *
- * This header file contains handles to interact with the Reedb core module.
- * The core module is responsible for starting and terminating running Reedb
- * instances as well as checking that all other modules are loaded and
- * running correctly.
- *
- * (c) 2015           Lonely Robot.
- * Authors:           Katharina 'spacekookie' Sabel
- *
- * This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 3 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-3.html
- *
- * This library is distributed in the hope that it will be useful,
+/*
+ * <one line to give the library's name and an idea of what it does.>
+ * Copyright (C) 2015  <copyright holder> <email>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * -------------------------------------------
- *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
  */
 
-#ifndef SRC_CORE_H_
-#define SRC_CORE_H_
+#ifndef REEDB_H
+#define REEDB_H
 
-#include <stdbool.h>
-#include <stdlib.h>
+#include <string>
 
-#include "defs.h"
-#include "reedb/utils/hashmap.h"
+/* Internal reedb dependencies */
+#include "reedb/utils/helper.h"
 
-/* A very simple struct to hold information
- * about vaults to the outside!
- */
-typedef struct rdb_vault
+using namespace std;
+
+class Reedb
 {
-  char      *name;
-  char      *path;
-  size_t    size;
-} rdb_vault;
+public:
+  
+  /* Public constructor, destructor and equals operator overloading */
+  Reedb();
+  ~Reedb();
+  bool operator==(const Reedb& other) const;
+  
+  /* Manually override the minimum required passphrase length for a vault */
+  void setPassLength(unsigned int length);
+  
+  /** Provide a custom user function to execute concurrent to the Reedb threads */
+  void setUsrcode(void *function);
+  
+  /** Make Reedb run in daemon mode. This detaches all logging to file and makes the runtime more autonomous. */
+  void setDaemon(bool daemon);
+  
+  /** Set reedb verbose debugging mode. WARNING: Everything will be logged! */
+  void setVerbose(bool verbose);
+  
+  /** Set the operational path of Reedb. This is automatically set by default */
+  void setPath(string path);
+  
+  /* Manually set the OS */
+  void setOs(ree_os os);
+  
+  /* Manually set the distribution */
+  void setDistro(ree_distro distro);
+  
+  /** Toggle a force override to ignore previous instances of Reedb. WARNING: Can cause
+   * damage to data and corrupt an open vault!
+   */
+  void setOverride(bool override);
+  
+  /* Finalise creation and init Reedb */
+  void finalise();
+  
+  /* Terminate the current instance of reedb gracefully */
+  void terminate();
+  
+private:
+  
+  /* Basic info about the vault */
+  string *name;
+  string *path;
+  
+  /* File count in the vault storage and minimum passphrase length */
+  unsigned int vaultCount;
+  unsigned int passLength;
+  
+  /* Store the current OS and distribution for file paths and permissions */
+  ree_os os;
+  ree_distro distro;
+  
+  /* Is reedb running in detached daemon mode? */
+  bool daemon;
+  
+  /* Is reedb running in verbose logging mode? */
+  bool verbose;
+};
 
-/** Define what OS Reedb is running on */
-typedef enum ree_os {
-  LINUX     = 0xE1, // Most Linux distributions
-  OSX       = 0xE2, // Mac OS X
-  WINDOWS   = 0xE3, // Windows
-  ANDROID   = 0xE4, // Mobile: Android
-  IOS       = 0xE5, // Mobile: iOS
-  BSD       = 0xE6, // BSD
-} ree_os;
-
-/* Field for distribution specific settings. Unsed so far. */
-typedef enum ree_distro {
-  FEDORA,
-  DEBIAN
-} ree_distro;
-
-/** Main Reedb container that gets passed around modules */
-typedef struct reedb_c {
-  bool          active;
-  unsigned int  passlength;
-  bool          daemon;
-  char          *path;
-  ree_os        os;
-
-  /* Store scoped vaults */
-  map_t         *scoped;
-} reedb_c;
-
-/** Sets the minimum passphrase length for Reedb */
-ree_err_t rdb_set_passlength(unsigned int length);
-
-/** Provide a custom user function to execute concurrent to the Reedb threads */
-ree_err_t rdb_set_usrcode(void *funct);
-
-/** Make Reedb run in daemon mode. This detaches all logging to file and makes the runtime more autonomous. */
-ree_err_t rdb_set_daemon(bool daemon);
-
-/** Set the operational path of Reedb. This is automatically set by default */
-ree_err_t rdb_set_path(char *path);
-
-/** The OS should be parsed automatically. You can override it if you think this is a mistake */
-ree_err_t rdb_set_os(ree_os os);
-
-/** Mark that Reedb should override existing zombie instances at the risk of causing serious damage! */
-ree_err_t rdb_set_override(bool override);
-
-/** Actually init the core module after setting up all runtime parameters */
-ree_err_t reedb_init(reedb_c *(*container));
-
-/** Terminate the current Reedb instance and */
-ree_err_t reedb_terminate(reedb_c *(*container), char *reason);
-
-bool reedb_isActive();
-
-#endif /* SRC_CORE_H_ */
+#endif // REEDB_H

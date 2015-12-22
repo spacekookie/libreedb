@@ -1,27 +1,38 @@
 # Define a library of the following source files. Headers will be automatically loaded
 add_library (reedb
 
-    # Crypto stuff
-    src/crypto/token.c
-    src/crypto/hashes.c
-    src/crypto/engine_wrap.c
-    src/crypto/RCryEngine.cpp
+  # Utilities
+  src/utils/helper.c
+  
+  # Core interface
+  src/core.cpp
+  src/cppwrapper.cpp
+  
+  # Crypto
+  
+  # Data storage
+  src/RdbVault.cpp
+  src/RdbDatafile.cpp
+  
+  
+  # Crypto stuff
+  # src/crypto/token.c
+  # src/crypto/hashes.c
+  # src/crypto/engine_wrap.c
+  # src/crypto/RCryEngine.cpp
 
-    # Utilities
-    src/utils/hashmap.c
-    src/utils/files.c
+  # Utilities
+  # src/utils/hashmap.c
+  # src/utils/files.c
 
-    # Public interface
-    src/core.c
-    src/uuid.c
-    src/vault.c
-    src/RdbVault.cpp
-    src/RdbDatafile.cpp
-    src/cppwrapper.cpp
+  # Public interface
+  # src/core_legacy.c
+  # src/uuid.c
+  # src/vault.c
 
-    # Data storage
-    src/datafile.c
-    src/ree_vault.c
+  # Data storage
+  # src/datafile.c
+  # src/ree_vault.c
 )
 
 # Link libraries against us

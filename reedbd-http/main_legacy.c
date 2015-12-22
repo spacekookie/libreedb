@@ -24,6 +24,7 @@
 
 #include "reedb/vault.h"
 #include "reedb/defs.h"
+#include "reedb/utils/hashmap.h"
 
 #include <stdio.h>
 
@@ -33,8 +34,13 @@ int main(int argc, char *args)
 
   if(bla != SUCCESS)
   {
+    printf("Return code was %d\n", bla);
     return bla;
   }
+  
+  //map_t *map = hashmap_new();
+  
+  printf("Return code is just plain 0\n");
   return 0;
 }
 

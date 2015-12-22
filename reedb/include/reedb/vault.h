@@ -26,7 +26,7 @@
 #define SRC_VAULT_H_
 
 #include <stdbool.h>
-#include "core.h"
+#include "core_legacy.h"
 #include "crypto/token.h"
 #include "defs.h"
 
