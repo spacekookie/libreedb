@@ -6,13 +6,14 @@ add_library (reedb
   
   # Core interface
   src/core.cpp
+  # src/vault.cpp
   src/cppwrapper.cpp
   
   # Crypto
   
   # Data storage
-  src/RdbVault.cpp
-  src/RdbDatafile.cpp
+  src/ree_vault.cpp
+  src/datafile.cpp
   
   
   # Crypto stuff
@@ -37,8 +38,8 @@ add_library (reedb
 
 # Link libraries against us
 target_link_libraries(reedb
-    cryptopp    # Main C++ crypto library
-    gcrypt		# Additional crypto library
+    cryptopp # Main C++ crypto library
+    gcrypt      # Additional crypto library
 
     # protobuf  # Will be added in a future version (or so)
     )

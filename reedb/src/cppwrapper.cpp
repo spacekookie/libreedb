@@ -18,8 +18,11 @@
  */
 
 #include "cppwrapper.h"
-#include "RdbDatafile.h"
+#include "datafile.h"
+
+extern "C" {
 #include "reedb/defs.h"
+}
 
 #include <iostream>
 
@@ -29,6 +32,7 @@ ree_err_t cpp_datafile_testing(){
   
   std::cout << "I am some awesome C++ code!" << std::endl;
   
-  RdbDatafile *datafile = new RdbDatafile("default", fp);
+  datafile *df = new datafile("default", fp);
+  delete(df);
   return SUCCESS;
 }
