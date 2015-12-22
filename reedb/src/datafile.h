@@ -3,13 +3,11 @@
 
 #include <string>
 #include <vector>
-#include "RdbVault.h"
+#include <map>
 
-extern "C" {
-#include "reedb/utils/hashmap.h"
-}
+#include "ree_vault.h"
 
-typedef enum CacheMode {
+typedef enum cache_mode {
   /* Drop from cache after every action */
   HOTDROP, 
   
@@ -18,14 +16,14 @@ typedef enum CacheMode {
   
   /* Keep in cache until daemon shuts down */
   ENDLESS
-} CacheMode;
+} cache_mode;
 
-typedef struct FilePath {
+typedef struct file_path {
   string *path;
   int opMode;
-} FilePath;
+} file_path;
 
-class RdbDatafile
+class datafile
 {
 public:
   
@@ -37,7 +35,7 @@ public:
    * @param name Name of the file (in cleartext)
    * @param *parent Struct that contain parent path + permissions
    */
-  RdbDatafile(string name, FilePath *parent);
+  datafile(string name, FilePath *parent);
   
   /** 
    * Use this constructor to initiate a file that has previously 
@@ -46,27 +44,27 @@ public:
    * @param name Name of the file (in cleartext)
    * @param oldFile Contents on the old file as binary buffer
    */
-  RdbDatafile(string name, string oldFile);
+  datafile(string name, string oldFile);
   
   /**
    * 
    */
-  ree_err_t insertData(string data);
+  void insertData(string data);
   
   /**
    * 
    */
-  ree_err_t readFile(map_t *(*data));
+  // void readFile(map *(*data));
   
   /**
    * @param mode: The mode that should be used for caching. See @"CacheMode"
    */
-  ree_err_t cache(const CacheMode mode);
+  void cache(const CacheMode mode);
   
   /**
    * Closes the file and uncaches it.
    */
-  ree_err_t close();
+  void close();
   
   /**
    * Deletes this datafile, scrubs it from disk and removes the encryption
@@ -86,7 +84,7 @@ private:
   string tags[];
   
   /* Vector of data maps. Each version creates a new map */
-  std::vector<map_t*> data;
+  std::vector<std::map<string, void*>*> *data;
   
   /* @return If file is locked */
   bool isLocked();
