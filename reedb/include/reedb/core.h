@@ -21,9 +21,12 @@
 #define REEDB_H
 
 #include <string>
+#include <map>
 
 /* Internal reedb dependencies */
 #include "reedb/utils/helper.h"
+#include "reedb/utils/uuid.h"
+// #include "ree_vault.h"
 
 using namespace std;
 
@@ -68,6 +71,9 @@ public:
   /* Terminate the current instance of reedb gracefully */
   void terminate();
   
+  /* Return if this instance is ready to use */
+  bool isReady();
+  
 private:
   
   /* Basic info about the vault */
@@ -87,6 +93,12 @@ private:
   
   /* Is reedb running in verbose logging mode? */
   bool verbose;
+  
+  /* Indicate whether or not this instance of Reedb is ready to be used */
+  bool finalised = false;
+  
+  /* Map of scoped vaults for quick lookup */
+  map<uuid, void*> *scoped;
 };
 
 #endif // REEDB_H

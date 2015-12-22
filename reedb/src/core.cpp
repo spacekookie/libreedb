@@ -26,27 +26,28 @@ Reedb::Reedb()
 {
   cout << "Preparing to start a new Reedb instance..." << endl;
   
+  if(verbose) cout << "Defining sane defaults...";
+  
   /* Populate sane defaults */
   this->passLength = 12;
   this->vaultCount = 0;
   this->daemon = false;
   
   /* Development defaults... TODO: REMOVE THESE */
-  this->os = LINUX;
   this->verbose = true;
-  this->distro = FEDORA;
   
-  if(verbose) cout << "Defining sane defaults...done" << endl;
+  /* Some verbose loging */
+  if(verbose) cout << "done" << endl;
   if(verbose) cout << "Waiting for finialisation...";
 }
 
 void Reedb::finalise()
 {
-  if(verbose) cout << "done" << endl;
   if(verbose) cout << "Checking user settings and starting Reedb" << endl;
   
   if(this->passLength < 6) cout << "[WARN] Minimum passphrase length is realistically too low! Security may be severely compromised!" << endl;
 
-  
+  /* From now on it's ready to be used */
+  this->finalised = true;
   
 }
