@@ -28,7 +28,13 @@
 
 int main(int argc, char **args)
 {
+  Reedb *rdb = new Reedb();
+  rdb->set_os(LINUX);
+  rdb->set_distro(FEDORA);
+  rdb->set_verbose(true);
+  rdb->finalise();
   
+  rdb->terminate();
   
   std::cout << "We're done here..." << std::endl;
   return 0;

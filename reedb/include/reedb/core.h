@@ -23,9 +23,11 @@
 #include <string>
 #include <map>
 
-/* Internal reedb dependencies */
+/* Some utilities */
 #include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
+
+/* Core dependencies */
 // #include "ree_vault.h"
 
 using namespace std;
@@ -36,35 +38,8 @@ public:
   
   /* Public constructor, destructor and equals operator overloading */
   Reedb();
-  ~Reedb();
   bool operator==(const Reedb& other) const;
-  
-  /* Manually override the minimum required passphrase length for a vault */
-  void setPassLength(unsigned int length);
-  
-  /** Provide a custom user function to execute concurrent to the Reedb threads */
-  void setUsrcode(void *function);
-  
-  /** Make Reedb run in daemon mode. This detaches all logging to file and makes the runtime more autonomous. */
-  void setDaemon(bool daemon);
-  
-  /** Set reedb verbose debugging mode. WARNING: Everything will be logged! */
-  void setVerbose(bool verbose);
-  
-  /** Set the operational path of Reedb. This is automatically set by default */
-  void setPath(string path);
-  
-  /* Manually set the OS */
-  void setOs(ree_os os);
-  
-  /* Manually set the distribution */
-  void setDistro(ree_distro distro);
-  
-  /** Toggle a force override to ignore previous instances of Reedb. WARNING: Can cause
-   * damage to data and corrupt an open vault!
-   */
-  void setOverride(bool override);
-  
+
   /* Finalise creation and init Reedb */
   void finalise();
   
@@ -73,32 +48,31 @@ public:
   
   /* Return if this instance is ready to use */
   bool isReady();
-  
+
 private:
   
-  /* Basic info about the vault */
-  string *name;
+  /* Keep the destructor private so we are in control over resources */
+  ~Reedb();
+  
+  /* Where is the master config located */
   string *path;
-  
-  /* File count in the vault storage and minimum passphrase length */
+
+  /* How many vaults are managed by this instance */
   unsigned int vaultCount;
-  unsigned int passLength;
-  
-  /* Store the current OS and distribution for file paths and permissions */
-  ree_os os;
-  ree_distro distro;
-  
-  /* Is reedb running in detached daemon mode? */
-  bool daemon;
-  
-  /* Is reedb running in verbose logging mode? */
-  bool verbose;
+
+  /* Publicly set parameters for initialisation*/
+  SETTER(unsigned int, passLength)
+  SETTER(ree_os, os)
+  SETTER(ree_distro, distro)
+  SETTER(bool, daemon)
+  SETTER(bool, verbose)
+  SETTER(bool, override)
   
   /* Indicate whether or not this instance of Reedb is ready to be used */
   bool finalised = false;
   
   /* Map of scoped vaults for quick lookup */
-  map<uuid, void*> *scoped;
+  map<rdb_uuid, void*> *scoped;
 };
 
 #endif // REEDB_H

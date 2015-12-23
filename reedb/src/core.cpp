@@ -17,8 +17,11 @@
  * 
  */
 
+#include "reedb/utils/helper.h"
+#include "reedb/utils/uuid.h"
 #include "reedb/core.h"
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -38,7 +41,21 @@ Reedb::Reedb()
   
   /* Some verbose loging */
   if(verbose) cout << "done" << endl;
-  if(verbose) cout << "Waiting for finialisation...";
+  if(verbose) cout << "Waiting for finialisation..." << endl;
+}
+
+Reedb::~Reedb()
+{
+  cout << "=== Running cleanup ===" << endl;
+
+  for(pair<rdb_uuid, void*> entry : *scoped) {
+    std::cout << "Closing vault" << entry.first.id << endl;
+  }
+}
+
+bool Reedb::isReady()
+{
+  return finalised;
 }
 
 void Reedb::finalise()
@@ -46,8 +63,17 @@ void Reedb::finalise()
   if(verbose) cout << "Checking user settings and starting Reedb" << endl;
   
   if(this->passLength < 6) cout << "[WARN] Minimum passphrase length is realistically too low! Security may be severely compromised!" << endl;
+  
+  this->scoped = new map<rdb_uuid, void*>();
 
   /* From now on it's ready to be used */
   this->finalised = true;
-  
 }
+
+void Reedb::terminate()
+{
+  cout << "Instance " << this << " is being terminated. All active vaults are closed and dropped..." << endl;
+  
+  delete(this);
+}
+
