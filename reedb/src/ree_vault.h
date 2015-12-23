@@ -1,5 +1,5 @@
-#ifndef REEDB_VAULT_H
-#define REEDB_VAULT_H
+#ifndef REE_VAULT_H
+#define REE_VAULT_H
 
 #include <string>
 
@@ -91,4 +91,4 @@ public:
     
 };
 
-#endif //REEDB_VAULT_H
+#endif //REE_VAULT_H

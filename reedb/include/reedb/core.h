@@ -28,7 +28,7 @@
 #include "reedb/utils/uuid.h"
 
 /* Core dependencies */
-// #include "ree_vault.h"
+#include "datafile.h"
 
 using namespace std;
 
