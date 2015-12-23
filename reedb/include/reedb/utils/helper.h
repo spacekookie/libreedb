@@ -2,6 +2,37 @@
 #ifndef __RDB_UTILS_H__
 #define __RDB_UTILS_H__
 
+#define ACCESS(type, var) \
+private: \
+   type var; \
+public: \
+   type get_##var() \
+   {\
+      return this->var; \
+   }\
+   void set_##var(type val) \
+   {\
+      this->var = val; \
+   }
+
+#define GETTER(type, var) \
+private: \
+   type var; \
+public: \
+   type get_##var() \
+   {\
+      return this->var; \
+   }
+
+#define SETTER(type, var) \
+private: \
+   type var; \
+public: \
+   void set_##var(type val) \
+   {\
+      this->var = val; \
+   }
+
 /** Define what OS Reedb is running on */
 typedef enum ree_os {
   LINUX     = 0xE1, // Most Linux distributions
