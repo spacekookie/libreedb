@@ -27,9 +27,6 @@
 #include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
 
-/* Core dependencies */
-#include "datafile.h"
-
 using namespace std;
 
 class Reedb

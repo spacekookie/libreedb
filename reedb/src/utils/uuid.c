@@ -17,47 +17,4 @@
  * 
  */
 
-#include "../../include/reedb/utils/uuid.h"
-
-/* 
- * forward definitions
- */
-G_DEFINE_TYPE (uuid, uuid, G_TYPE_OBJECT);
-/*
-/* forward declarations of default virtual methods 
- */
-
-static void
-uuid_dispose (GObject *gobject)
-{
-  uuid *self = UUID (gobject);
-
-  /* 
-   * In dispose, you are supposed to free all types referenced from this
-   * object which might themselves hold a reference to self. Generally,
-   * the most simple solution is to unref all members on which you own a 
-   * reference.
-   */
-
-  /* Chain up to the parent class */
-  G_OBJECT_CLASS (uuid_parent_class)->dispose (gobject);
-}
-
-static void
-uuid_finalize (GObject *gobject)
-{
-  uuid *self = UUID (gobject);
-
-  /* Chain up to the parent class */
-  G_OBJECT_CLASS (uuid_parent_class)->finalize (gobject);
-}
-
-static void
-uuid_init (uuid *self)
-{
-  /* initialize all public and private members to reasonable default values. */
-
-  /* Default implementations for virtual methods 
-   * For pure-virtual functions, set these to NULL
-   */
-}
+#include "reedb/utils/uuid.h"

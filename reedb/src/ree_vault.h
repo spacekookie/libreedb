@@ -5,13 +5,6 @@
 
 #include "reedb/utils/uuid.h"
 
-/** Internal Reedb C requirements */
-// extern "C" {
-// #include "reedb/uuid.h"
-// #include "reedb/crypto/token.h"
-// #include "reedb/defs.h"
-// };
-
 using namespace std;
 
 class ree_vault {
@@ -21,9 +14,6 @@ private:
   struct rdb_uuid uuid;
   string name, path;
   size_t fileCount;
-  
-  /* Crypto stuff */
-  unsigned char *cryptoKey[];
   
 public:
 

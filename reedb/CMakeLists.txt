@@ -3,19 +3,32 @@ add_library (reedb
 
   # Utilities
   src/utils/helper.c
+  src/utils/uuid.c
   
   # Core interface
-  src/core.cpp
-  # src/vault.cpp
   src/cppwrapper.cpp
+  src/core.cpp
   
   # Crypto
   
   # Data storage
   src/ree_vault.cpp
-  src/datafile.cpp
-  
-  
+  # src/datafile.cpp
+)
+
+# Link libraries against us
+target_link_libraries(reedb
+    cryptopp 	# Main C++ crypto library
+    gcrypt   	# Additional crypto library
+)
+
+# Include the subdirectories to search for headers
+target_include_directories (reedb PUBLIC "include")
+target_include_directories (reedb PRIVATE "src")
+
+# since the name starts with 'lib' dont add it again
+set_target_properties (reedb PROPERTIES PREFIX "")
+
   # Crypto stuff
   # src/crypto/token.c
   # src/crypto/hashes.c
@@ -34,19 +47,3 @@ add_library (reedb
   # Data storage
   # src/datafile.c
   # src/ree_vault.c
-)
-
-# Link libraries against us
-target_link_libraries(reedb
-    cryptopp # Main C++ crypto library
-    gcrypt      # Additional crypto library
-
-    # protobuf  # Will be added in a future version (or so)
-    )
-
-# Include the subdirectories to search for headers
-target_include_directories (reedb PUBLIC "include")
-target_include_directories (reedb PRIVATE "src")
-
-# since the name starts with 'lib' dont add it again
-set_target_properties (reedb PROPERTIES PREFIX "")
