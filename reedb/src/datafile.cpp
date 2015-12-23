@@ -10,7 +10,7 @@
 
 using namespace std;
 
-datafile::datafile(string name, FilePath *parent)
+datafile::datafile(string name, file_path *parent)
 {
   /* Asign data to fields */
   this->name = name;
@@ -59,21 +59,4 @@ void datafile::populate()
   std::cout << "Debug 3...for real!" << endl; 
   
   delete(sampleNote);
-  
-  std::cout << "Debug 4..." << endl;
-  
-//   hashmap_put(samples, "Note", data);
-// 
-//   std::cout << "Debug 4" << endl;
-//   
-//   /* Now go add it to our revisions vector */
-//   this->data->push_back(samples);
-//   
-//   std::cout << "Just populated the sample revision with this awesome string: " << data << endl;
-//   
-//     for(int x : first) {
-//       std.cout << x << endl;
-//     }
-// 
-//   samples = NULL;
 }

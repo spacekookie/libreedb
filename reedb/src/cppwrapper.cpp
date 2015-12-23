@@ -27,7 +27,7 @@ extern "C" {
 #include <iostream>
 
 ree_err_t cpp_datafile_testing(){
-  FilePath *fp = new FilePath;
+  file_path *fp = new file_path;
   *fp->path = "/home/spacekookie/";
   
   std::cout << "I am some awesome C++ code!" << std::endl;

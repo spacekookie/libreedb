@@ -35,7 +35,7 @@ public:
    * @param name Name of the file (in cleartext)
    * @param *parent Struct that contain parent path + permissions
    */
-  datafile(string name, FilePath *parent);
+  datafile(string name, file_path *parent);
   
   /** 
    * Use this constructor to initiate a file that has previously 
@@ -59,7 +59,7 @@ public:
   /**
    * @param mode: The mode that should be used for caching. See @"CacheMode"
    */
-  void cache(const CacheMode mode);
+  void cache(const cache_mode mode);
   
   /**
    * Closes the file and uncaches it.
