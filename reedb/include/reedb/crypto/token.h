@@ -20,14 +20,14 @@
 #ifndef SRC_TOKEN_H_
 #define SRC_TOKEN_H_
 
-#include "reedb/uuid.h"
+#include "reedb/utils/uuid.h"
 #include <stdlib.h>
 
-typedef struct ree_token {
+typedef struct rdb_token {
   unsigned char   contents[128];
   time_t          created;
-} ree_token;
+} rdb_token;
 
-ree_err_t rdb_tokens_create(char *(*token), unsigned int mode);
+int rdb_tokens_create(char *(*token), unsigned int mode);
 
 #endif /* SRC_TOKEN_H_ */

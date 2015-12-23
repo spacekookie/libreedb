@@ -29,15 +29,15 @@
 
 using namespace std;
 
-class Reedb
+class reedb
 {
 public:
   
   /* Public constructor, destructor and equals operator overloading */
-  Reedb();
-  bool operator==(const Reedb& other) const;
+  reedb();
+  bool operator==(const reedb& other) const;
 
-  /* Finalise creation and init Reedb */
+  /* Finalise creation and init reedb */
   void finalise();
   
   /* Terminate the current instance of reedb gracefully */
@@ -49,7 +49,7 @@ public:
 private:
   
   /* Keep the destructor private so we are in control over resources */
-  ~Reedb();
+  ~reedb();
   
   /* Where is the master config located */
   string *path;
@@ -65,7 +65,7 @@ private:
   SETTER(bool, verbose)
   SETTER(bool, override)
   
-  /* Indicate whether or not this instance of Reedb is ready to be used */
+  /* Indicate whether or not this instance of reedb is ready to be used */
   bool finalised = false;
   
   /* Map of scoped vaults for quick lookup */

@@ -6,7 +6,7 @@ add_library (reedb
   src/utils/uuid.c
   
   # Core interface
-  src/cppwrapper.cpp
+  src/vaults.cpp
   src/core.cpp
   
   # Crypto

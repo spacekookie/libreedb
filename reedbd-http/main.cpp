@@ -23,17 +23,20 @@
  */
 
 #include "reedb/core.h"
+#include "reedb/vaults.h"
 
 #include <iostream>
 
 int main(int argc, char **args)
 {
-  Reedb *rdb = new Reedb();
+  reedb *rdb = new reedb();
   rdb->set_os(LINUX);
   rdb->set_distro(FEDORA);
   rdb->set_verbose(true);
   rdb->finalise();
   
+  
+  /* Shut it down */
   rdb->terminate();
   
   std::cout << "We're done here..." << std::endl;
