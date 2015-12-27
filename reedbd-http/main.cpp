@@ -35,6 +35,8 @@ int main(int argc, char **args)
   rdb->set_verbose(true);
   rdb->finalise();
   
+  rdb_vaults *v = new rdb_vaults();
+  rdb->register_vinterface(v);
   
   /* Shut it down */
   rdb->terminate();
