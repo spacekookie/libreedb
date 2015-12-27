@@ -52,7 +52,7 @@ public:
      * target. This is used to have multiple applications access the same
      * vault.
      */
-    void unlockVault(string passphrase, char *(*token));
+    char *(*unlockVault)(string passphrase);
 
     /**
      * Lock a vault with an access token even if there are other
