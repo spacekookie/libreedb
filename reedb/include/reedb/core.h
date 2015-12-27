@@ -21,14 +21,19 @@
 #define REEDB_H
 
 #include <string>
+#include <list>
 #include <map>
 
 /* Some utilities */
 #include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
 
+/* Include the vaults interface to be able to close them on shutdown */
+#include "reedb/vaults.h"
+
 using namespace std;
 
+/** Core handler class */
 class reedb
 {
 public:
@@ -37,6 +42,10 @@ public:
   reedb();
   bool operator==(const reedb& other) const;
 
+  /* Register a vaults interface with this reedb instance. There can be several vaults handlers 
+   * active at the same time with dfferent rule sets */
+  void register_vinterface(rdb_vaults *interface);
+  
   /* Finalise creation and init reedb */
   void finalise();
   
@@ -52,13 +61,11 @@ private:
   ~reedb();
   
   /* Where is the master config located */
-  string *path;
 
-  /* How many vaults are managed by this instance */
-  unsigned int vaultCount;
-
+  /* Rdb vault interfaces that are bound to this reedb instance */
+  list<rdb_vaults*> vault_interfaces;
+  
   /* Publicly set parameters for initialisation*/
-  SETTER(unsigned int, passLength)
   SETTER(ree_os, os)
   SETTER(ree_distro, distro)
   SETTER(bool, daemon)
@@ -67,9 +74,6 @@ private:
   
   /* Indicate whether or not this instance of reedb is ready to be used */
   bool finalised = false;
-  
-  /* Map of scoped vaults for quick lookup */
-  map<rdb_uuid, void*> *scoped;
 };
 
 #endif // REEDB_H

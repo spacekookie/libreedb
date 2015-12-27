@@ -25,18 +25,14 @@
 
 using namespace std;
 
-Reedb::Reedb()
+reedb::reedb()
 {
   cout << "Preparing to start a new Reedb instance..." << endl;
   
   if(verbose) cout << "Defining sane defaults...";
   
   /* Populate sane defaults */
-  this->passLength = 12;
-  this->vaultCount = 0;
   this->daemon = false;
-  
-  /* Development defaults... TODO: REMOVE THESE */
   this->verbose = true;
   
   /* Some verbose loging */
@@ -44,36 +40,44 @@ Reedb::Reedb()
   if(verbose) cout << "Waiting for finialisation..." << endl;
 }
 
-Reedb::~Reedb()
+reedb::~reedb()
 {
   cout << "=== Running cleanup ===" << endl;
-
-  for(pair<rdb_uuid, void*> entry : *scoped) {
-    std::cout << "Closing vault" << entry.first.id << endl;
+  
+  for(rdb_vaults* interface : this->vault_interfaces) {
+    delete(interface);
   }
 }
 
-bool Reedb::isReady()
+bool reedb::isReady()
 {
   return finalised;
 }
 
-void Reedb::finalise()
+void reedb::register_vinterface(rdb_vaults* interface)
+{
+  string interface_id = interface->get_id();
+  for(rdb_vaults* rv : this->vault_interfaces) {
+    if(rv->get_id() == interface_id) {
+      cout << "[ERROR] This interface is already registered! Skipping..." << endl;
+      return;
+    }
+  }
+  if(this->verbose) cout << "Adding interface with id " << interface_id << " to reedb instance..." << endl;
+  this->vault_interfaces.push_back(interface);
+}
+
+void reedb::finalise()
 {
   if(verbose) cout << "Checking user settings and starting Reedb" << endl;
-  
-  if(this->passLength < 6) cout << "[WARN] Minimum passphrase length is realistically too low! Security may be severely compromised!" << endl;
-  
-  this->scoped = new map<rdb_uuid, void*>();
 
   /* From now on it's ready to be used */
   this->finalised = true;
 }
 
-void Reedb::terminate()
+void reedb::terminate()
 {
   cout << "Instance " << this << " is being terminated. All active vaults are closed and dropped..." << endl;
   
   delete(this);
 }
-
