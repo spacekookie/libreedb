@@ -24,10 +24,11 @@
 #include <stdlib.h>
 
 typedef struct rdb_token {
-  unsigned char   contents[128];
-  time_t          created;
+  unsigned char	contents[128];
+  time_t	created;
+  unsigned int	timed;
 } rdb_token;
 
-int rdb_tokens_create(char *(*token), unsigned int mode);
+rdb_token *rdb_tokens_create(unsigned int timed);
 
 #endif /* SRC_TOKEN_H_ */

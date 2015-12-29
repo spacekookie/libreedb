@@ -8,6 +8,10 @@ typedef enum uuid_type {
 typedef struct rdb_uuid {
   char id[32];
   uuid_type type;
-} uuid;
+} rdb_uuid;
+
+rdb_uuid generate_uuid();
+
+rdb_uuid generate_uuid_with_type(uuid_type type);
 
 #endif /* __UUID_H__ */

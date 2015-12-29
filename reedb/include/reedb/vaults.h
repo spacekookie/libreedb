@@ -2,8 +2,11 @@
 #define VAULT_H
 
 #include "reedb/crypto/token.h"
-#include "reedb/utils/helper.h"
+
+extern "C" { 
 #include "reedb/utils/uuid.h"
+#include "reedb/utils/helper.h"
+}
 
 #include <string>
 #include <list>
@@ -85,6 +88,8 @@ public:
    * @param query: The name or id of the file to query from
    */
   map<string, string> query_file(rdb_uuid *id, rdb_token *token, string query);
+  
+  //TODO Add `void query_file_rev(...); `
   
   /**
    * Inserts data into a datafile. Requires a vault id and token to execute. Also
