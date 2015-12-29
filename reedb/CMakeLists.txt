@@ -10,6 +10,9 @@ add_library (reedb
   src/vaults.cpp
   
   # Crypto
+  src/crypto/token.cpp
+  src/crypto/rcry_utils.cpp
+  
   
   # Data storage
   src/ree_vault.cpp
