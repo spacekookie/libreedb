@@ -17,15 +17,15 @@ typedef enum rdb_data_t
 /* Data struct */
 typedef struct rdb_gendata
 {
-	rdb_data_t 	type;
-	size_t			size; // > 1 means it's an array.
+  rdb_data_t 	type;
+  size_t			size; // > 1 means it's an array.
 
-	union v
-	{
-		int 			*iptr;
-		char			*cptr;
-		bool 			*bptr;
-	} v;
+  union v
+  {
+    int	*iptr;
+    char *cptr;
+    bool *bptr;
+  } v;
 
 } rdb_gendata;
 

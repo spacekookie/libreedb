@@ -52,3 +52,5 @@ Debug/
 .cproject
 my_cmake
 *.tar.gz
+.idea/*
+*.kdev4

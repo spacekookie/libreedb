@@ -9,10 +9,10 @@
 #ifndef SRC_HASHMAP_H_
 #define SRC_HASHMAP_H_
 
-#define MAP_MISSING -3 		// No such element
-#define MAP_FULL -2 			// Hashmap is full
-#define MAP_OMEM -1 			// Out of Memory
-#define MAP_OK 0 					// OK
+#define MAP_MISSING -3    // No such element
+#define MAP_FULL -2       // Hashmap is full
+#define MAP_OMEM -1       // Out of Memory
+#define MAP_OK 0          // OK
 
 /*
  * any_t is a pointer.  This allows you to put arbitrary structures in
@@ -36,7 +36,7 @@ typedef any_t map_t;
 /*
  * Return an empty hashmap. Returns NULL if empty.
 */
-extern map_t hashmap_new();
+extern map_t *hashmap_new();
 
 /*
  * Iteratively call f with argument (item, data) for

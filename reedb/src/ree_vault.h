@@ -1,74 +1,84 @@
-/* reedb - ree_vault.h
- * 
- * This file contains functions that actually run on an internal
- * vault struct. They are partially called by the vaults interface
- * and partially by smaller files such as the crypto engine.
- *
- * (c) 2015 					Lonely Robot.
- * Authors:						Katharina 'spacekookie' Sabel
- *
- * This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 3 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-3.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * -------------------------------------------
- *
- */
+#ifndef REE_VAULT_H
+#define REE_VAULT_H
 
-#ifndef SRC_REE_VAULT_H_
-#define SRC_REE_VAULT_H_
+#include <string>
 
-// System imports
-#include <stdbool.h>
+#include "reedb/utils/uuid.h"
 
-// Internal imports
-#include "reedb/utils/hashmap.h"
-#include "reedb/crypto/token.h"
-#include "reedb/defs.h"
-#include "datafile.h"
+using namespace std;
 
-typedef struct vault
-{
-	/* Some metadata for the vault */
-	char				*id; 							// UUID string
-	size_t			size;							// number of files
-	char				*name;						// User defined name
-	char 				*path;						// Path on FS
+class ree_vault {
+private:
+  
+  /* Some metadata fields about the vault */
+  struct rdb_uuid uuid;
+  string name, path;
+  size_t fileCount;
+  
+public:
 
-	time_t			created;					// Date created
-	time_t			modified;					// Date last modified
+    /**
+     * Creates a new Vault on the filesystem. Will throw a RdbAdvErrors
+     * exception when that is not possible. The cause of the error will
+     * be specified in the exception.
+     *
+     * Three parameters are required to create a vault. Name, path and
+     * a master passphrase. Everything else (uuid, tokens, etc.) will
+     * be generated for you.
+     *
+     * @param name: RdbVault name on the filesystem
+     * @param path: Location of the vault on the filesystem
+     * @param passphrase: Master lock passphrase for the data
+     *
+     */
+    ree_vault(string name, string path, string passphrase);
 
-	/* Some crypto nonsense :) */
-	map_t				*keystore;				// Map of files -> crypt-keys or regions -> crypt-keys
-	map_t 			*tokens;					// Allowed access tokens
+    /**
+     * Only creates a new vault object from an existing vault that was
+     * previously scoped on the system. A UUID is used as an index from
+     * main config file. If a vault is not properly scoped yet it needs
+     * to be added to the scope via the central #{vault.h} interface.
+     *
+     * @param uuid: Existing vault identifier (unique to a system)
+     * @param passphrase: Master lock passphrase to unlock the vault.
+     */
+    ree_vault(rdb_uuid uuid, string passphrase);
 
-	/* Maps for data storage */
-	map_t				*tags;						// Tags ordered by category (key)
-	map_t				*files;						// Datafiles ordered by their name (key)
-} vault;
+    /* Makes sure that all files are closed and keys are dumped */
+    ~ree_vault();
+    
+    /**
+     * Unlocks a vault that is already scoped and even loaded by a different
+     * target. This is used to have multiple applications access the same
+     * vault.
+     */
+    char *(*unlockVault)(string passphrase);
 
-/* Create a new vault (DEPRECIATED)! */
-ree_err_t rdb_create_vault(vault *(*vault), char *uuid, char *name, char *path, char *passphrase);
+    /**
+     * Lock a vault with an access token even if there are other
+     * applications currently using it.
+     */
+    void lockVault(char *token);
+    
+    /**** FILE OPERATION FUNCTIONS ****/
+    
+    void readFile(string name);
+    
+    void addFile(string name);
+    
+    void removeFile(string name);
+    
+    void updateFile(string name, string data);
 
-/* Unlock a vault and get a token */
-ree_err_t rdb_unlock_vault(vault *vault, char *passphrase, ree_token *(*token));
+    /**** SOME FIELD ACCESSORS ****/
+    string getName();
+    
+    string getPath();
+    
+    rdb_uuid getUUID();
+    
+    size_t getSize();
+    
+};
 
-/* Lock a vault again */
-ree_err_t rdb_lock_vault(vault *vault, ree_token *token);
-
-/* Dump a vault from memory (more than just lock it!) */
-ree_err_t rdb_dump_vault(vault *next, vault *vault);
-
-/* Get the headers off a vault */
-ree_err_t rdb_get_headers(vault *vault);
-
-/* The search request is just handed through from the interface */
-ree_err_t rdb_search_headers(vault *vault, char *search);
-
-#endif
+#endif //REE_VAULT_H
