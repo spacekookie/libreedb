@@ -25,11 +25,11 @@
 
 using namespace CryptoPP;
 
-rdb_token *rdb_tokens_create(unsigned int timed)
+void rdb_tokens_create(rdb_token **token, unsigned int timed)
 {
-  rdb_token *token = (rdb_token*) malloc(sizeof(rdb_token));
-  token->timed = timed;
-  token->created = 0;
+  (*token) = (rdb_token*) malloc(sizeof(rdb_token));
+  (*token)->timed = timed;
+  (*token)->created = 0;
   
   /** Temporary string for our random sink */
   std::string encoded;
@@ -48,6 +48,6 @@ rdb_token *rdb_tokens_create(unsigned int timed)
   encoded.erase(end_pos, encoded.end());
  
   /** Save our token in the struct */
-  token->contents = &encoded->c_str();
-  return token;
+  (*token)->contents = (char*) malloc(sizeof(char) * 127);
+  std::memcpy((*token)->contents, encoded.c_str(), sizeof(char) * 127);
 }

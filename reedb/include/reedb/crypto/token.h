@@ -22,13 +22,14 @@
 
 #include "reedb/utils/uuid.h"
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct rdb_token {
-  const char	*contents;
+  char 		*contents;
   time_t	created;
   unsigned int	timed;
 } rdb_token;
 
-rdb_token *rdb_tokens_create(unsigned int timed);
+void rdb_tokens_create(rdb_token **token, unsigned int timed);
 
 #endif /* SRC_TOKEN_H_ */
