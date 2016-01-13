@@ -32,4 +32,6 @@ typedef struct rdb_token {
 
 void rdb_tokens_create(rdb_token **token, unsigned int timed);
 
+void rdb_tokens_destroy(rdb_token *token);
+
 #endif /* SRC_TOKEN_H_ */

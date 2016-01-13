@@ -20,10 +20,16 @@
 #include <cryptopp/des.h>
 #include <string>
 
-#include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 using namespace CryptoPP;
+
+void rdb_tokens_destroy(rdb_token **token)
+{
+  free((*token)->contents);
+  free((*token);
+}
+
 
 void rdb_tokens_create(rdb_token **token, unsigned int timed)
 {
