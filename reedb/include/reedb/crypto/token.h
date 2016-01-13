@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 typedef struct rdb_token {
-  unsigned char	contents[128];
+  const char	*contents;
   time_t	created;
   unsigned int	timed;
 } rdb_token;
