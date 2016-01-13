@@ -13,13 +13,11 @@ add_library (reedb
   src/crypto/token.cpp
   src/crypto/rcry_utils.cpp
   
-  
   # Data storage
   src/ree_vault.cpp
   # src/datafile.cpp
 )
 
-# Link libraries against us
 target_link_libraries(reedb
     cryptopp 	# Main C++ crypto library
     gcrypt   	# Additional crypto library

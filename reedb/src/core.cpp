@@ -17,9 +17,13 @@
  * 
  */
 
+// Public facing reedb includes
+#include "reedb/crypto/token.h"
 #include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
 #include "reedb/core.h"
+
+//
 #include <iostream>
 #include <map>
 
@@ -73,6 +77,10 @@ void reedb::finalise()
 
   /* From now on it's ready to be used */
   this->finalised = true;
+  
+  rdb_token *token = rdb_tokens_create(1);
+  
+  std::cout << "Our token: " << token->contents << std::endl;
 }
 
 void reedb::terminate()
