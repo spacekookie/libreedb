@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# ############################################## #
-#                                                #
-#  This is the reedb build script that compiles  #
-#  Reedb for travis on Linux systems.            #
-#                                                #
-# ############################################## #
+# ############################################################# #
+#                                                               #
+#  This is the reedb build script that compiles                 #
+#  Reedb for travis on Linux systems. Because Ubuntu sucks!     #
+#                                                               #
+# ############################################################# #
 
 set -e  # exit on error.
 set -x  # echo commands.

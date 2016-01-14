@@ -3,14 +3,14 @@
 [![Coverity Status](https://scan.coverity.com/projects/6872/badge.svg)](https://scan.coverity.com/projects/reepass-reedb)
 [![Build Status](https://travis-ci.org/reepass/reedb.svg?branch=master)](https://travis-ci.org/reepass/reedb)
 
-:lock: Reedb is a document oriented database that allows you to build applications that handle user data securely – with whatever language you want.
+:lock: Reedb is a fully encrypted document-oriented database that allows you to build applications that handle data securely - and a load of extentions to go with it...
 
-It does so by encrypting all data that is stored in a database folder (callded vault) with nested symmetric ciphers provided by libgcrypt (which also powers software like GPG) which allows for multi-user access and selective sharing.
+All data stored in a reedb database (also called a 'vault') is encrypted with symmetric ciphers (see [roadmap](wiki/roadmap)) provided by [crypto++](http://cryptopp.com/). Nesting the ciphers to create zones and groups allows for selective sharing and access management for new revisions of a file.
 
-**The library is not currently deemed stable enough to use in production!**
+*Please note that the library (and management daemon) is currently not deemed stable enough to use in production*
 
-The issue tracker has migrated to the [Lonely Robot Redmine](https://bugs.lonelyrobot.io/projects/reedb/issues).
-Please also note that the Github wiki is horribly out-of-date and should generally be ignored. Please refer to the [new wiki](https://bugs.lonelyrobot.io/projects/reedb/wiki) which is currently still in the making.
+If you want to contribute to the project, maybe head over to the wiki and have a look at the roadmap
+
 
 Build
 ----------

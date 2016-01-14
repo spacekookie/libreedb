@@ -25,8 +25,9 @@ script:
 addons:
   apt:
     packages:
-      - libgcrypt-dev
-      - libmicrohttpd-dev
+      - libgcrypt-dev       # C crypto - secure RAM
+      - libcryptopp-dev     # C++ crypto - ciphers & keygen
+      - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
   coverity_scan:
