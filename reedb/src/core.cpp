@@ -77,11 +77,6 @@ void reedb::finalise()
 
   /* From now on it's ready to be used */
   this->finalised = true;
-  
-  rdb_token *token;
-  rdb_tokens_create(&token, 0);
-  
-  std::cout << token->contents << std::endl;
 }
 
 void reedb::terminate()

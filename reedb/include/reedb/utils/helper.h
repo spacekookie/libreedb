@@ -2,6 +2,7 @@
 #ifndef __RDB_UTILS_H__
 #define __RDB_UTILS_H__
 
+/** Auto ACCESS, GETTER and SETTER macros to generate functions on the fly*/
 #define ACCESS(type, var) \
 private: \
    type var; \

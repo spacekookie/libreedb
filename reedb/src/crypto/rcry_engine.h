@@ -25,6 +25,7 @@ extern "C" {
 #include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
 }
+
 #include <map>
 
 typedef enum rcryflgs_t {
