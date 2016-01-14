@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-#include "ree_vault.h"
+using namespace std;
 
 typedef enum cache_mode {
   /* Drop from cache after every action */
@@ -22,6 +22,7 @@ typedef struct file_path {
   string *path;
   int opMode;
 } file_path;
+
 
 class datafile
 {

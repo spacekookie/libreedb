@@ -14,8 +14,8 @@ add_library (reedb
   
   # Data storage
   src/ree_vault.cpp
-  # src/datafile.cpp
-  src/datastore/parser.cpp
+  src/datafile.cpp
+  # src/datastore/parser.cpp
 )
 
 target_link_libraries(reedb
@@ -48,4 +48,3 @@ set_target_properties (reedb PROPERTIES PREFIX "")
   # Data storage
   # src/datafile.c
   # src/ree_vault.c
-add_subdirectory(src/datastore)
