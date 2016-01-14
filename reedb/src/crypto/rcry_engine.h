@@ -60,6 +60,8 @@ public:
 
     rcry_engine();
     void set_flags(cryflgs_t flags[]);
+    
+    byte **keygen(rcryflgs_t *flags);
 };
 
 
