@@ -5,6 +5,7 @@ extern "C" {
 }
 
 #include "reedb/vaults.h"
+#include "ree_vault.h"
 
 #include <iostream>
 
@@ -14,8 +15,7 @@ extern "C" {
 
 rdb_vaults::rdb_vaults()
 {
-  std::cout << "Wooohoooo" << std::endl;
-  id = "Silly id...";
+  this->id = "AAA";
 }
 
 rdb_vaults::~rdb_vaults()
@@ -30,6 +30,6 @@ list<vault_head> *rdb_vaults::list_vaults()
 
 vault_head* rdb_vaults::create(string name, string path, string passphrase)
 {
-  
+  ree_vault *vault = new ree_vault(name, path, passphrase);
 }
 

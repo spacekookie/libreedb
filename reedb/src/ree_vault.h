@@ -1,9 +1,18 @@
 #ifndef REE_VAULT_H
 #define REE_VAULT_H
 
+// Runtime includes
 #include <string>
+#include <list>
+#include <map>
 
+// Internal Reedb includes
+#include "datafile.h"
+
+extern "C" {
+#include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
+}
 
 using namespace std;
 
@@ -11,9 +20,20 @@ class ree_vault {
 private:
   
   /* Some metadata fields about the vault */
-  struct rdb_uuid uuid;
-  string name, path;
-  size_t fileCount;
+  GETTER(rdb_uuid, uuid);
+  GETTER(string, name)
+  GETTER(string, path)
+  GETTER(size_t, file_count)
+  
+  /* File management fields */
+  map<string, datafile_h*> *headers;
+  map<string, datafile*> *files;
+  map<string, bool> *locks;
+  
+  /* Header fields */
+  map<string, void*> h_fields;
+  
+  byte *master_key;
   
 public:
 
@@ -58,26 +78,32 @@ public:
      * Lock a vault with an access token even if there are other
      * applications currently using it.
      */
-    void lockVault(char *token);
+    void lock_vault(char *token);
     
     /**** FILE OPERATION FUNCTIONS ****/
     
-    void readFile(string name);
+    void read_file(string name);
     
-    void addFile(string name);
+    void add_file(string name);
     
-    void removeFile(string name);
+    void remove_file(string name);
     
-    void updateFile(string name, string data);
-
-    /**** SOME FIELD ACCESSORS ****/
-    string getName();
+    void update_file(string name, string data);
     
-    string getPath();
-    
-    rdb_uuid getUUID();
-    
-    size_t getSize();
+    /** 
+     * Search through the vault with RQL. If search is NULL all 
+     * headers will be returned
+     * 
+     * @param search: Search query. See documentation on details
+     * 			how to use Reedb Query Language (RQL).
+     * 
+     * @returns list<datafile_h>: selection of headers
+     */
+    list<datafile_h> search_headers(string search);
+  
+    /** Adds the ability to add custom fields to the header */
+    void add_hfields(string name, void* type);
+    void remove_hfields(string name);
     
 };
 
