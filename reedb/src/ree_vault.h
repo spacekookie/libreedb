@@ -31,9 +31,9 @@ private:
   map<string, bool> *locks;
   
   /* Header fields */
-  map<string, void*> h_fields;
+  map<string, void*> *h_fields;
   
-  byte *master_key;
+  char *master_key;
   
 public:
 

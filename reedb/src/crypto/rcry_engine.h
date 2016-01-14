@@ -24,9 +24,11 @@
 extern "C" {
 #include "reedb/utils/helper.h"
 #include "reedb/utils/uuid.h"
+#include "reedb/defs.h"
 }
 
 #include <map>
+#include <list>
 
 typedef enum rcryflgs_t {
   RIJDAEL,        // The default for symmetric cryptography
@@ -50,18 +52,31 @@ typedef enum crytarget_t {
   STRING,           // Indicates that it's a simple string encryption.
 } crytarget_t;
 
+typedef char rcry_token;
+
 /**
- * Main encryption class of Reedb. Handles encryption objects, states and ciphers. It gets called from the C-binding
- * wrapper to make it compatible with the rest of the library.
+ * Main crypto interface for Reedb. Is instantiated once and can handle
+ * crypto for multiple vaults. Vaults get assigned tokens and UUIDs needed
+ * to switch the engine to their context. Then they can do crypto ops in that
+ * context.
+ * 
+ * TODO: Make this multi-threadded as both libgcrypt and crypto++ are threadsafe.
  */
 class rcry_engine {
+  
+private:
+  std::map<rdb_uuid*, rcry_token> tokens;
 
 public:
 
-    rcry_engine();
-    void set_flags(cryflgs_t flags[]);
+  /** Empty constructor that generates everything from scratch */
+  rcry_engine();
+  
+  rcry_engine(std::list<rdb_uuid> *ids);
+  
+  void set_flags(cryflgs_t flags[]);
     
-    byte **keygen(rcryflgs_t *flags);
+  char **keygen(rcryflgs_t *flags);
 };
 
 
