@@ -23,6 +23,20 @@ typedef struct file_path {
   int opMode;
 } file_path;
 
+/** 
+ * Struct that holds a file header. Is part of a datafile but 
+ * is used here to allow iteration and caching of the head for
+ * quick access via RQL
+ */
+typedef struct datafile_h {
+  string *name;
+  string *tags;
+  string category;
+  
+  unsigned int size;
+  unsigned int version;
+  bool locked;
+}datafile_h ;
 
 class datafile
 {
