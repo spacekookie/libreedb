@@ -11,11 +11,11 @@ add_library (reedb
   
   # Crypto
   src/crypto/token.cpp
-  src/crypto/rcry_utils.cpp
   
   # Data storage
   src/ree_vault.cpp
   # src/datafile.cpp
+  src/datastore/parser.cpp
 )
 
 target_link_libraries(reedb
@@ -48,3 +48,4 @@ set_target_properties (reedb PROPERTIES PREFIX "")
   # Data storage
   # src/datafile.c
   # src/ree_vault.c
+add_subdirectory(src/datastore)
