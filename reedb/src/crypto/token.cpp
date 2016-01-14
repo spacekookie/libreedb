@@ -24,10 +24,11 @@
 
 using namespace CryptoPP;
 
-void rdb_tokens_destroy(rdb_token **token)
+void rdb_tokens_destroy(rdb_token *token)
 {
-  free((*token)->contents);
-  free((*token);
+  std::cout << "Destroying token from " << token->created << std::endl;
+  free(token->contents);
+  free(token);
 }
 
 
