@@ -1,9 +1,10 @@
-# Travis-CI Build for reedb
-# see travis-ci.org for details
+#############################
+#                           #
+#  Reedb travis build file  #
+#                           #
+#############################
 
 language: cpp
-
-# Required to install gcc 4.8+...
 sudo: true
 
 env:
@@ -19,6 +20,13 @@ before_install:
 install:
 - sudo apt-get install -qq g++-4.8
 - export CXX="g++-4.8"
+- echo g++-4.8 --version
+
+matrix:
+  include:
+    - compiler: g++
+      os: linux
+      env: CONFIG=cmake
 
 # Run the Build script
 script:
@@ -30,7 +38,7 @@ addons:
     packages:
       - libgcrypt-dev       # C crypto - secure RAM
       - libcryptopp-dev     # C++ crypto - ciphers & keygen
-      - libmicrohttpd-dev   # Micro C HTTP server
+#      - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
   coverity_scan:
