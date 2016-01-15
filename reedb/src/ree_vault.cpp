@@ -27,7 +27,6 @@ ree_vault::ree_vault(string name, string path, string passphrase)
   this->h_fields = new map<string, void*>();
   
   /* Next up we need to generate a key */
-  this->master_key = 
   
 }
 

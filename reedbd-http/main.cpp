@@ -38,6 +38,8 @@ int main(int argc, char **args)
   rdb_vaults *v = new rdb_vaults();
   rdb->register_vinterface(v);
   
+  v->create("Name", "Parth", "Passphrase!");
+  
   /* Shut it down */
   rdb->terminate();
   

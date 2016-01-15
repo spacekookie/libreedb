@@ -75,7 +75,6 @@ public:
   rcry_engine(std::list<rdb_uuid> *ids);
   
   void set_flags(cryflgs_t flags[]);
-    
   char **keygen(rcryflgs_t *flags);
 };
 
