@@ -1,3 +1,6 @@
+# Really make sure that cmake knows we use C++11 here!
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # Define a library of the following source files. Headers will be automatically loaded
 add_library (reedb
 
@@ -31,22 +34,3 @@ target_include_directories (reedb PRIVATE "src")
 
 # since the name starts with 'lib' dont add it again
 set_target_properties (reedb PROPERTIES PREFIX "")
-
-  # Crypto stuff
-  # src/crypto/token.c
-  # src/crypto/hashes.c
-  # src/crypto/engine_wrap.c
-  # src/crypto/RCryEngine.cpp
-
-  # Utilities
-  # src/utils/hashmap.c
-  # src/utils/files.c
-
-  # Public interface
-  # src/core_legacy.c
-  # src/uuid.c
-  # src/vault.c
-
-  # Data storage
-  # src/datafile.c
-  # src/ree_vault.c
