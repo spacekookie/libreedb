@@ -11,11 +11,11 @@ env:
 
 # Use the faster container-based infrastructure.
 sudo: false
-matrix:
-  include:
-    - compiler: g++
-      os: linux
-      env: CONFIG=cmake
+# matrix:
+#   include:
+#     - compiler: g++
+#       os: linux
+#       env: CONFIG=cmake
 
 # Run the Build script
 script:
