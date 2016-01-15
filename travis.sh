@@ -14,16 +14,18 @@ set -x  # echo commands.
 if [ ! -f $PWD/my_cmake/bin/cmake ]; then
 	wget --no-check-certificate https://cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O cmake.tar.gz
 	mkdir my_cmake && tar xf cmake.tar.gz -C my_cmake --strip 1
-	alias cmake=$PWD/my_cmake/bin/cmake
+	# export cmake="$PWD/my_cmake/bin/cmake"
 fi
 
 # Remove old build folders that might still exist
 rm -rf $PWD/_build
 
 # Now we need to define our own cmake command because travis sucks!
+echo "Aliasing cmake..."
 REE_CMAKE=$PWD/my_cmake/bin/cmake
 
 # Set up g++ 4.8 because Ubuntu LTS is a piece of shit
+echo "Setting up new GCC compilers NOW..."
 export CXX="g++-4.8"
 export CC="gcc-4.8"
 
