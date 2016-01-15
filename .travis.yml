@@ -1,7 +1,7 @@
 # Travis-CI Build for reedb
 # see travis-ci.org for details
 
-language: c
+language: c++
 
 env:
   global:
