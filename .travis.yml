@@ -5,6 +5,7 @@
 #############################
 
 language: cpp
+compiler:g++
 sudo: true
 
 env:
@@ -20,13 +21,7 @@ before_install:
 install:
 - sudo apt-get install -qq g++-4.8
 - export CXX="g++-4.8"
-- echo g++-4.8 --version
-
-matrix:
-  include:
-    - compiler: g++
-      os: linux
-      env: CONFIG=cmake
+- CXX --version
 
 # Run the Build script
 script:

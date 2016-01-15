@@ -5,7 +5,8 @@ set(CMAKE_BUILD_TYPE Debug)
 project(reedb)
 add_subdirectory(reedb)
 
-add_executable(reedbd-http reedbd-http/main.cpp)
+add_executable(reedbd-http 
+  reedbd-http/main.cpp)
 
 # Library dependencies for the http extention
 target_link_libraries(reedbd-http

@@ -2,8 +2,8 @@
 
 # ############################################################# #
 #                                                               #
-#  This is the reedb build script that compiles                 #
-#  Reedb for travis on Linux systems. Because Ubuntu sucks!     #
+#  This is the reedb build script that compiles Reedb for       #
+#  travis on Linux systems. Ubuntu sucks!                       #
 #                                                               #
 # ############################################################# #
 
@@ -24,7 +24,7 @@ rm -rf $PWD/_build
 REE_CMAKE=$PWD/my_cmake/bin/cmake
 
 # I hate you travis! :(
-CFLAGS="-fsanitize=undefined"
+# CFLAGS="-fsanitize=undefined"
 mkdir $PWD/_build && cd $PWD/_build
 rm -rf ./CMakeCache.txt # To avoid cache errors
 $REE_CMAKE ..
