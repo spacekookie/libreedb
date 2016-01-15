@@ -6,7 +6,9 @@
 
 language: cpp
 compiler: g++
-sudo: true
+
+# Fixes issue with disallowed packages
+sudo: false
 
 # Stop spamming me please...
 notifications:
@@ -29,7 +31,7 @@ before_install:
   - free -tm
   - make --version
   - export CXX="g++-4.8 -std=c++11"
-  - export CC="gcc-4.8 -std=c++11"
+  - export CC="gcc-4.8 -std=c99"
   - $CC --version
   - $CXX --version
 

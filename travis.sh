@@ -27,7 +27,7 @@ REE_CMAKE=$PWD/my_cmake/bin/cmake
 # Set up g++ 4.8 because Ubuntu LTS is a piece of shit
 echo "Setting up new GCC compilers NOW..."
 export CXX="g++-4.8 -std=c++11"
-export CC="gcc-4.8 -std=c++11"
+export CC="gcc-4.8 -std=c99"
 
 # Updated now!
 $CXX --version
