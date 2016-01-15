@@ -5,7 +5,7 @@
 #############################
 
 language: cpp
-compiler:g++
+compiler: g++
 sudo: true
 
 env:
