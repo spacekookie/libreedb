@@ -23,6 +23,9 @@ rm -rf $PWD/_build
 # Now we need to define our own cmake command because travis sucks!
 REE_CMAKE=$PWD/my_cmake/bin/cmake
 
+# Set up g++ 4.8 because Ubuntu LTS is a piece of shit
+if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+
 # I hate you travis! :(
 # CFLAGS="-fsanitize=undefined"
 mkdir $PWD/_build && cd $PWD/_build
