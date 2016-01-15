@@ -3,19 +3,14 @@
 
 language: cpp
 
+# Required to install gcc 4.8+...
+sudo: true
+
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "X6Vs5IfJBseYJoirGHQIigEbYE6k8gdl9fCP9SyW+ErDACFRCusWjHMkUjVEmfbcqaUtBetQcsKZip7twHNCgxvxzydXOa30jn4tzBkkVIcUgSw5Zd3nruUy6D3pdNuf0/5YhZYH2nL9slU81kgApqD9kg2o/Fkw27mqdNAk/6g="
-
-# Use the faster container-based infrastructure.
-sudo: false
-# matrix:
-#   include:
-#     - compiler: g++
-#       os: linux
-#       env: CONFIG=cmake
 
 before_install:
 - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
