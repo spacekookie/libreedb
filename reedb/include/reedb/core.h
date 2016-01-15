@@ -73,7 +73,7 @@ private:
   SETTER(bool, override)
   
   /* Indicate whether or not this instance of reedb is ready to be used */
-  bool finalised = false;
+  bool finalised;
 };
 
 #endif // REEDB_H

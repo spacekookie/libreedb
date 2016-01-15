@@ -31,6 +31,7 @@ using namespace std;
 
 reedb::reedb()
 {
+  this->finalised = false;
   cout << "Preparing to start a new Reedb instance..." << endl;
   
   if(verbose) cout << "Defining sane defaults...";
