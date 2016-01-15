@@ -28,8 +28,8 @@ before_install:
   - pwd
   - free -tm
   - make --version
-  - export CXX="g++-4.8"
-  - export CC="gcc-4.8"
+  - export CXX="g++-4.8 -std=c++11"
+  - export CC="gcc-4.8 -std=c++11"
   - $CC --version
   - $CXX --version
 
@@ -41,7 +41,7 @@ script:
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
       - gcc-4.8
       - g++-4.8
