@@ -1,0 +1,23 @@
+syntax = "proto2";
+package reedb_proto;
+
+message proto_file {
+  message pair {
+    required string key = 1;
+    required string val = 2;
+  }
+  
+  message revision {
+    required int32 rev_no = 1;
+    repeated pair entry = 2;
+  }
+  
+  required string name = 1;
+  required string category = 2;
+  
+  // Find a way to automatically generate this
+  repeated string url = 3;
+  repeated string tags = 4;
+  
+  repeated revision revs = 5;
+}

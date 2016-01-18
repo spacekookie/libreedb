@@ -36,7 +36,7 @@ typedef struct datafile_h {
   unsigned int size;
   unsigned int version;
   bool locked;
-}datafile_h ;
+} datafile_h ;
 
 class datafile
 {
@@ -95,8 +95,8 @@ private:
   bool locked;
   
   /* Database metadata for queries */
-  string category;
-  string tags[];
+  string *category;
+  string *tags;
   
   /* Vector of data maps. Each version creates a new map */
   std::vector<std::map<string, void*>*> *data;
@@ -110,8 +110,9 @@ private:
    */
   void populate();
   
-  /**
-   * Writes the data from 
+  /** 
+   * Fills the protocol buffer, pipes the bytestream through the 
+   * crypto engine and then dumps that to disk as base64 encoded
    */
   void write();
   

@@ -3,11 +3,12 @@ add_library (reedb
 
   # Utilities
   src/utils/helper.c
-  src/utils/uuid.c
+  src/utils/uuid.cpp
   
   # Core interface
   src/core.cpp
   src/vaults.cpp
+  #src/config.cpp
   
   # Crypto
   src/crypto/token.cpp
@@ -17,12 +18,15 @@ add_library (reedb
   # Data storage
   src/ree_vault.cpp
   src/datafile.cpp
-  # src/datastore/parser.cpp
+  
+  # Protocol buffer auto generated
+  src/datafile.pb.cc
 )
 
+# Dynamically linked libraries
 target_link_libraries(reedb
-    cryptopp 	# Main C++ crypto library
-    gcrypt   	# Additional crypto library
+  cryptopp
+  gcrypt
 )
 
 # Include the subdirectories to search for headers
