@@ -9,9 +9,11 @@
 // Internal Reedb includes
 #include "datafile.h"
 
+#include "reedb/crypto/token.h"
+#include "reedb/utils/uuid.h"
+
 extern "C" {
 #include "reedb/utils/helper.h"
-#include "reedb/utils/uuid.h"
 }
 
 using namespace std;
@@ -34,6 +36,7 @@ private:
   map<string, void*> *h_fields;
   
   char *master_key;
+  rdb_token token;
   
 public:
 
@@ -46,12 +49,14 @@ public:
      * a master passphrase. Everything else (uuid, tokens, etc.) will
      * be generated for you.
      *
+     * @param token: Reference pointer to a token to be created
+     * @param uuid: Reference pointer to a uuid to be created
      * @param name: RdbVault name on the filesystem
      * @param path: Location of the vault on the filesystem
      * @param passphrase: Master lock passphrase for the data
      *
      */
-    ree_vault(string name, string path, string passphrase);
+    ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), string name, string path, string passphrase);
 
     /**
      * Only creates a new vault object from an existing vault that was
@@ -62,7 +67,7 @@ public:
      * @param uuid: Existing vault identifier (unique to a system)
      * @param passphrase: Master lock passphrase to unlock the vault.
      */
-    ree_vault(rdb_uuid uuid, string passphrase);
+    ree_vault(rdb_uuid uuid, string path, string passphrase);
 
     /* Makes sure that all files are closed and keys are dumped */
     ~ree_vault();

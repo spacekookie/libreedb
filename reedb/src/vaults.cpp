@@ -2,6 +2,7 @@
 extern "C" { 
 #include "reedb/utils/uuid.h"
 #include "reedb/utils/helper.h"
+#include "reedb/crypto/token.h"
 }
 
 #include "reedb/vaults.h"
@@ -30,6 +31,11 @@ list<vault_head> *rdb_vaults::list_vaults()
 
 vault_head* rdb_vaults::create(string name, string path, string passphrase)
 {
-  ree_vault *vault = new ree_vault(name, path, passphrase);
+  /* Create a token and UUID reference */
+  rdb_token *token;
+  rdb_uuid *uuid;
+  
+  /* Then pass everything we need down to the constructor */
+  ree_vault *vault = new ree_vault(&token, &uuid, name, path, passphrase);
 }
 

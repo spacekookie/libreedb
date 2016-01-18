@@ -8,11 +8,16 @@
 
 using namespace std;
 
-ree_vault::ree_vault(string name, string path, string passphrase)
+ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), string name, string path, string passphrase)
 {
-  /* Let's make a vault...start with default field inits */
+  /* First generate and asign UUID */
+  uuid_helper uh;
+  *uuid = uh.generate();
+  this->uuid = **uuid;
   
-  this->uuid = generate_uuid();
+  /* Then generate and asign token */
+  rdb_tokens_create(token, 0);
+  
   this->name = name;
   this->path = path;
   this->file_count = 0;
@@ -30,7 +35,7 @@ ree_vault::ree_vault(string name, string path, string passphrase)
   
 }
 
-ree_vault::ree_vault(rdb_uuid uuid, string passphrase)
+ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase)
 {
 
 }
