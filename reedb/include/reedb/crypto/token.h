@@ -20,7 +20,6 @@
 #ifndef SRC_TOKEN_H_
 #define SRC_TOKEN_H_
 
-#include "reedb/utils/uuid.h"
 #include <stdlib.h>
 #include <string.h>
 

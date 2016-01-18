@@ -1,10 +1,3 @@
-/*
- * token.c
- *
- *  Created on: 10 Aug 2015
- *      Author: spacekookie
- */
-
 // Reedb internal includes
 #include "reedb/crypto/token.h"
 #include "crypto/rcry_engine.h"

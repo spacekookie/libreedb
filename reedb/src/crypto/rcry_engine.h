@@ -21,36 +21,28 @@
 #ifndef REEDB_RCRYENGINE_H
 #define REEDB_RCRYENGINE_H
 
+#include "reedb/utils/uuid.h"
+#include "reedb/crypto/token.h"
+
 extern "C" {
 #include "reedb/utils/helper.h"
-#include "reedb/utils/uuid.h"
 #include "reedb/defs.h"
 }
 
 #include <map>
 #include <list>
-
-typedef enum rcryflgs_t {
-  RIJDAEL,        // The default for symmetric cryptography
-  TWOFISH,        // Schneier says 'hi'
-  SERPENT,        // Second place in AES contest
-  RSA,            // Not currently implemented. Uses asymmetric RSA encryption
-  ECC,            // Shiny elyptic curve cryptography (future default)
-
-  CBC,            // Default mode for symmetric crypto
-  CRT,            // Good for symmetric stream dumps
-  BLOCK_DUMP,     // Indicates that crypto should dump one block at a time
-  STREAM_DUMP,    // Makes crypto behave like a stream cipher
-
-  MIGHTY,         // Specifies the strength of a generated key to strong
-  QUICK,          // Specifies the strength of a generated key to weak (but quick)
-  AUTO,           // Indicate that a generated key should automatically be scoped
-} cryflgs_t;
+#include <string>
 
 typedef enum crytarget_t {
   FILE_P,           // Indicates that a datafile struct is present
   STRING,           // Indicates that it's a simple string encryption.
 } crytarget_t;
+
+typedef struct crycontext {
+  unsigned char *key;
+  unsigned char *entropy;
+  // ...
+} crycontext;
 
 typedef char rcry_token;
 
@@ -65,17 +57,55 @@ typedef char rcry_token;
 class rcry_engine {
   
 private:
-  std::map<rdb_uuid*, rcry_token> tokens;
+  std::map<rdb_uuid*, rcry_token> *tokens;
+  crycontext *context;
 
 public:
 
   /** Empty constructor that generates everything from scratch */
   rcry_engine();
-  
   rcry_engine(std::list<rdb_uuid> *ids);
   
-  void set_flags(cryflgs_t flags[]);
-  char **keygen(rcryflgs_t *flags);
+  void switch_context(rcry_token *token,rdb_uuid *uuid);
+  
+  /** 
+   * Generate a master key for a vault with a specific token. 
+   * Token must be known and context loaded
+   * 
+   * @param key: Reference pointer the key will be written into. Key is stored in secmem
+   * @param token: Token given to the vault by this crypto engine
+   *
+   */
+  void master_keygen(unsigned char *(*key), rcry_token *token);
+  
+  /**_____________________
+   * !! NOT IMPLEMENTED !! (See roadmap on github.com/reepass/reedb/wiki)
+   * 
+   * Generate a key for a specific zone inside a vault. The zone needs to be specified
+   * via its ID, the master key must be unlocked and the right context switch needs to be performed first.
+   * 
+   * @param key: Reference pointer the key will be written into. Stored in secmem
+   * @param zone: Zone identifier
+   * @param token: The token for the vault
+   * 
+   */
+  void zone_keygen(unsigned char *(*key), std::string zone, rcry_token *token);
+  
+  /**
+   * Encrypt in the current context with the current key scoped
+   */
+  unsigned char *encrypt(void *data);
+  
+  /**
+   * Decrypt in the current context with the current key scoped
+   */
+  unsigned char *decrypt(void *data);
+  
+  /** Init a scope and get a token */
+  void init();
+  
+  /** Hand in your token */
+  void close();
 };
 
 

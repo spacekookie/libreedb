@@ -22,8 +22,8 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-#include "reedb/core.h"
-#include "reedb/vaults.h"
+#include <reedb/core.h>
+#include <reedb/vaults.h>
 
 #include <iostream>
 
