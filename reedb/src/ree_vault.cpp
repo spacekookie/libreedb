@@ -18,6 +18,8 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), string name, string
   /* Then generate and asign token */
   rdb_tokens_create(token, 0);
   
+  // cout << "Our token is: " << (*token)->contents << endl;
+  
   this->name = name;
   this->path = path;
   this->file_count = 0;

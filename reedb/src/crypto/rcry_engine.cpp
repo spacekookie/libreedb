@@ -3,3 +3,8 @@
 //
 
 #include "rcry_engine.h"
+
+rcry_engine::rcry_engine()
+{
+
+}
