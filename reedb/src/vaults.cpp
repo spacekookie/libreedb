@@ -45,6 +45,6 @@ vault_head* rdb_vaults::create(string name, string path, string passphrase)
   rdb_uuid *uuid;
   
   /* Then pass everything we need down to the constructor */
-  ree_vault *vault = new ree_vault(&token, &uuid, name, path, passphrase);
+  ree_vault *vault = new ree_vault(&token, &uuid, engine, name, path, passphrase);
 }
 

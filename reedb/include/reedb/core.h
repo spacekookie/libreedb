@@ -25,7 +25,10 @@
 #include <map>
 
 /* Some utilities */
+extern "C" {
 #include "reedb/utils/helper.h"
+}
+
 #include "reedb/utils/uuid.h"
 
 /* Include the vaults interface to be able to close them on shutdown */

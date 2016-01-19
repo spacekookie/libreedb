@@ -21,10 +21,7 @@ char *rdb_expand_path(const char *path) {
   wordexp(path, &exp_result, 0);
   
   char *result = malloc(sizeof(char) * sizeof(exp_result));
-  
-  
-  
   // memcpy(exp_result.we_wordc, result, sizeof(exp_result));
   
-  return result;
+  return (char*) exp_result.we_wordc;
 }

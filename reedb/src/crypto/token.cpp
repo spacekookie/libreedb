@@ -35,7 +35,7 @@ void rdb_tokens_create(rdb_token **token, unsigned int timed)
   std::string encoded;
   
   /** Create a generation scratch */
-  const unsigned int BLOCKSIZE = 95;
+  const unsigned int BLOCKSIZE = 95; // TODO: What?
   byte pcbScratch[BLOCKSIZE];
 
   /** Using a ANSI approved Cipher */
@@ -48,6 +48,6 @@ void rdb_tokens_create(rdb_token **token, unsigned int timed)
   encoded.erase(end_pos, encoded.end());
  
   /** Save our token in the struct */
-  (*token)->contents = (char*) malloc(sizeof(char) * 127);
-  std::memcpy((*token)->contents, encoded.c_str(), sizeof(char) * 127);
+  (*token)->contents = (char*) malloc(sizeof(char) * 127); // FIXME WHAAAT?
+  std::memcpy((*token)->contents, encoded.c_str(), sizeof(char) * 127); // WAT?
 }

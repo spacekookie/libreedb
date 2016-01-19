@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstring>
 
+#include <wordexp.h>
 #include <stddef.h>
 
 // Cryptography includes
@@ -47,8 +48,32 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
   /* Next up we need to generate a key */
   engine->master_keygen(&master_key, nullptr);
 
-  cout << "== Some path ==" << endl;
-  cout << rdb_expand_path("~") << endl;
+  /** CREATE DIRECTORIES **/
+  
+  wordexp_t expantion;
+  wordexp(path.c_str(), &expantion, 0);
+
+  /* Expand our path, add the name as a folder and data dir */
+  filesystem::path target(expantion.we_wordv[0]); 
+  target /= name.c_str();
+  target /= "datastore";
+  filesystem::create_directories(target);
+  
+  target.remove_leaf() /= "keystore";
+  filesystem::create_directories(target);
+
+  target.remove_leaf() /= "checksum";
+  filesystem::create_directories(target);
+
+  target.remove_leaf() /= "metadata";
+  filesystem::create_directories(target);
+  
+  wordfree(&expantion);
+
+  /* Now write our default configuration to disk */
+  
+  /* Encrypt the key with the master passphrase and write that to disk */
+  
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase)

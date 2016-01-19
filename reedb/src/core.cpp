@@ -18,9 +18,6 @@
  */
 
 // Public facing reedb includes
-#include "reedb/crypto/token.h"
-#include "reedb/utils/helper.h"
-#include "reedb/utils/uuid.h"
 #include "reedb/core.h"
 
 //
