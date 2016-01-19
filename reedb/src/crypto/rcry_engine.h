@@ -76,7 +76,7 @@ public:
    * @param token: Token given to the vault by this crypto engine
    *
    */
-  void master_keygen(unsigned char *(*key), rcry_token *token);
+  void master_keygen(unsigned char *(*key), rdb_uuid *uuid);
   
   /**_____________________
    * !! NOT IMPLEMENTED !! (See roadmap on github.com/reepass/reedb/wiki)
