@@ -65,4 +65,6 @@ ree_distro rdb_find_distro();
  */ 
 ree_os rdb_find_os();
 
+char *rdb_expand_path(const char *path);
+
 #endif /* __RDB_UTILS_H__ */
