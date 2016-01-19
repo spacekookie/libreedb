@@ -9,6 +9,7 @@
 // Internal Reedb includes
 #include "datafile.h"
 
+#include "crypto/rcry_engine.h"
 #include "reedb/crypto/token.h"
 #include "reedb/utils/uuid.h"
 
@@ -35,7 +36,7 @@ private:
   /* Header fields */
   map<string, void*> *h_fields;
   
-  char *master_key;
+  unsigned char *master_key;
   rdb_token token;
   
 public:
@@ -56,7 +57,7 @@ public:
      * @param passphrase: Master lock passphrase for the data
      *
      */
-    ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), string name, string path, string passphrase);
+    ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path, string passphrase);
 
     /**
      * Only creates a new vault object from an existing vault that was

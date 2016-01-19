@@ -1,14 +1,25 @@
-// Reedb includes
 #include "ree_vault.h"
 #include "reedb/utils/errors.h"
-#include "crypto/rcry_utils.h"
 
-// Some runtime includes
+#include <boost/filesystem.hpp>
 #include <iostream>
+#include <cstring>
+
+#include <stddef.h>
+
+// Cryptography includes
+#include "crypto/rcry_engine.h"
+#include "crypto/rcry_utils.h"
+#include <cryptopp/aes.h>
+
+extern "C" {
+#include "reedb/utils/helper.h"
+}
 
 using namespace std;
+using namespace boost;
 
-ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), string name, string path, string passphrase)
+ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path, string passphrase)
 {
   /* First generate and asign UUID */
   uuid_helper uh;
@@ -34,7 +45,10 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), string name, string
   this->h_fields = new map<string, void*>();
   
   /* Next up we need to generate a key */
-  
+  engine->master_keygen(&master_key, nullptr);
+
+  cout << "== Some path ==" << endl;
+  cout << rdb_expand_path("~") << endl;
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase)

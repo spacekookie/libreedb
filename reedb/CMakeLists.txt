@@ -25,8 +25,17 @@ add_library (reedb
 
 # Dynamically linked libraries
 target_link_libraries(reedb
+  
+  # Boost dependencies
+  boost_filesystem
+  boost_system
+  
+  # Crypto dependencies
   cryptopp
   gcrypt
+  
+  # Utils
+  protobuf
 )
 
 # Include the subdirectories to search for headers
