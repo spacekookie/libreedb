@@ -36,6 +36,8 @@ target_link_libraries(reedb
   
   # Utils
   protobuf
+  config++
+  usb
 )
 
 # Include the subdirectories to search for headers

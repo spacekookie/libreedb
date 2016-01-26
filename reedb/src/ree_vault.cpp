@@ -1,12 +1,17 @@
 #include "ree_vault.h"
-#include "reedb/utils/errors.h"
 
-#include <boost/filesystem.hpp>
+#include "reedb/utils/errors.h"
 #include <iostream>
 #include <cstring>
 
+// Advanced path handling
+#include <boost/filesystem.hpp>
 #include <wordexp.h>
 #include <stddef.h>
+
+// Config handling
+#include <iomanip>
+#include <cstdlib>
 
 // Cryptography includes
 #include "crypto/rcry_engine.h"
@@ -52,25 +57,36 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
   
   wordexp_t expantion;
   wordexp(path.c_str(), &expantion, 0);
+  
+  bool created = true;
+  string combined = name + ".vault";
 
   /* Expand our path, add the name as a folder and data dir */
   filesystem::path target(expantion.we_wordv[0]); 
-  target /= name.c_str();
+  target /= combined.c_str();
   target /= "datastore";
-  filesystem::create_directories(target);
+  created = filesystem::create_directories(target);
   
-  target.remove_leaf() /= "keystore";
-  filesystem::create_directories(target);
+  if(created)
+  {
+    target.remove_leaf() /= "keystore";
+    filesystem::create_directories(target);
 
-  target.remove_leaf() /= "checksum";
-  filesystem::create_directories(target);
+    target.remove_leaf() /= "checksum";
+    filesystem::create_directories(target);
 
-  target.remove_leaf() /= "metadata";
-  filesystem::create_directories(target);
-  
+    target.remove_leaf() /= "metadata";
+    filesystem::create_directories(target);
+    target.remove_leaf();
+  } else {
+    cout << "Creating vault path went wront!" << endl;
+    wordfree(&expantion);
+    throw 1;
+  }
   wordfree(&expantion);
 
   /* Now write our default configuration to disk */
+
   
   /* Encrypt the key with the master passphrase and write that to disk */
   
