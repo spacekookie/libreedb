@@ -1,3 +1,5 @@
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # Define a library of the following source files. Headers will be automatically loaded
 add_library (reedb
 
@@ -37,7 +39,6 @@ target_link_libraries(reedb
   # Utils
   protobuf
   config++
-  usb
 )
 
 # Include the subdirectories to search for headers
