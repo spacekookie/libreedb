@@ -91,6 +91,12 @@ public:
    */
   void zone_keygen(unsigned char *(*key), std::string zone, rcry_token *token);
   
+  /** Simple utility function to encrypt a C++ string */
+  string *encrypt_string(string *data);
+  
+  /** Simple utility function to decrypt a C++ string */
+  string *decrypt_string(string *data);
+  
   /**
    * Encrypt in the current context with the current key scoped
    */

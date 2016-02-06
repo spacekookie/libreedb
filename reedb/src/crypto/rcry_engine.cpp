@@ -23,6 +23,17 @@ void rcry_engine::init()
 
 }
 
+/** Simple utility function to encrypt a C++ string */
+string *rcry_engine::encrypt_string(string* data)
+{
+  
+}
+
+  
+  /** Simple utility function to decrypt a C++ string */
+//   string *decrypt_string(string *data);
+  
+
 void rcry_engine::master_keygen(unsigned char *(*key), rdb_uuid *uuid)
 {
   AutoSeededRandomPool prng;
