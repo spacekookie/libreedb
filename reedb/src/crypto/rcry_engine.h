@@ -29,6 +29,9 @@ extern "C" {
 #include "reedb/defs.h"
 }
 
+#include <cryptopp/aes.h>
+using CryptoPP::AES;
+
 #include <map>
 #include <list>
 #include <string>
@@ -39,16 +42,14 @@ typedef enum crytarget_t {
 } crytarget_t;
 
 typedef struct crycontext {
-  unsigned char *key;
-  unsigned char *entropy;
-  // ...
+  unsigned char key[AES::MAX_KEYLENGTH];
 } crycontext;
 
-typedef char rcry_token;
+typedef rdb_token rcry_token;
 
 /**
  * Main crypto interface for Reedb. Is instantiated once and can handle
- * crypto for multiple vaults. Vaults get assigned tokens and UUIDs needed
+ * crypto for multiple vaults_interface. Vaults get assigned tokens and UUIDs needed
  * to switch the engine to their context. Then they can do crypto ops in that
  * context.
  * 
@@ -57,7 +58,7 @@ typedef char rcry_token;
 class rcry_engine {
   
 private:
-  std::map<rdb_uuid*, rcry_token> *tokens;
+  std::map<rdb_token*, crycontext*> *context_map;
   crycontext *context;
 
 public:
@@ -66,7 +67,7 @@ public:
   rcry_engine();
   rcry_engine(std::list<rdb_uuid> *ids);
   
-  void switch_context(rcry_token *token,rdb_uuid *uuid);
+  void switch_context(rdb_token *token);
   
   /** 
    * Generate a master key for a vault with a specific token. 
@@ -76,7 +77,7 @@ public:
    * @param token: Token given to the vault by this crypto engine
    *
    */
-  void master_keygen(unsigned char *(*key), rdb_uuid *uuid);
+  void master_keygen(byte *(*key), rdb_uuid *uuid);
   
   /**_____________________
    * !! NOT IMPLEMENTED !! (See roadmap on github.com/reepass/reedb/wiki)
@@ -92,10 +93,10 @@ public:
   void zone_keygen(unsigned char *(*key), std::string zone, rcry_token *token);
   
   /** Simple utility function to encrypt a C++ string */
-  string *encrypt_string(string *data);
+  std::string *encrypt_string(std::string *data);
   
   /** Simple utility function to decrypt a C++ string */
-  string *decrypt_string(string *data);
+  std::string *decrypt_string(std::string *data);
   
   /**
    * Encrypt in the current context with the current key scoped
@@ -107,8 +108,16 @@ public:
    */
   unsigned char *decrypt(void *data);
   
-  /** Init a scope and get a token */
-  void init();
+  /**
+   * Initialise a vault on this crypto engine by giving it a master key
+   * and binding it to a token. A vault can then switch crypto context
+   * by providing it's token to the engine and then doing operations in
+   * that crypto space.
+   * 
+   * @param master_key: The master key of a vault
+   * @param token: A token the key gets bound to
+   */
+  void init(unsigned char *master_key, rdb_token *token);
   
   /** Hand in your token */
   void close();
