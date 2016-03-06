@@ -22,6 +22,7 @@
 
 //
 #include <iostream>
+#include <reedb/vaults.h>
 #include <map>
 
 using namespace std;
@@ -79,7 +80,7 @@ void reedb::finalise()
 
 void reedb::terminate()
 {
-  cout << "Instance " << this << " is being terminated. All active vaults are closed and dropped..." << endl;
+  cout << "Instance " << this << " is being terminated. All active vaults_interface are closed and dropped..." << endl;
   
   delete(this);
 }

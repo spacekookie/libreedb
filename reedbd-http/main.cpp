@@ -29,21 +29,20 @@
 
 int main(int argc, char **args)
 {
+    reedb *rdb = new reedb();
+    rdb->set_os(LINUX);
+    rdb->set_distro(FEDORA);
+    rdb->set_verbose(true);
+    rdb->finalise();
 
-  reedb *rdb = new reedb();
-  rdb->set_os(LINUX);
-  rdb->set_distro(FEDORA);
-  rdb->set_verbose(true);
-  rdb->finalise();
-  
-  rdb_vaults *v = new rdb_vaults();
-  rdb->register_vinterface(v);
-  
-  v->create("default", "~/Documents/", "foobar32");
-  
-  /* Shut it down */
-  rdb->terminate();
-  
-  std::cout << "We're done here..." << std::endl;
-  return 0;
+    rdb_vaults *v = new rdb_vaults();
+    rdb->register_vinterface(v);
+
+    v->create("default", "~/Documents/", "foobar32");
+
+    /* Shut it down */
+    rdb->terminate();
+
+    std::cout << "We're done here..." << std::endl;
+    return 0;
 }
