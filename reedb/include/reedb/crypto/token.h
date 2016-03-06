@@ -35,7 +35,7 @@ public:
   void destroy(rdb_token *token);
 };
 
-void rdb_tokens_create(rdb_token **token, unsigned int timed);
+void rdb_tokens_create(rdb_token *(*token), unsigned int timed);
 
 void rdb_tokens_destroy(rdb_token *token);
 
