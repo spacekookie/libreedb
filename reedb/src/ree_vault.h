@@ -35,8 +35,6 @@ private:
   
   /* Header fields */
   map<string, void*> *h_fields;
-  
-  unsigned char *master_key;
   rdb_token token;
   
 public:
