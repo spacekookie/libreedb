@@ -95,10 +95,10 @@ public:
     void zone_keygen(unsigned char *(*key), std::string zone, rcry_token *token);
 
     /** Simple utility function to encrypt a C++ string */
-    std::string *encrypt_string(std::string *data);
+    std::string *encrypt_string(std::string data);
 
     /** Simple utility function to decrypt a C++ string */
-    std::string *decrypt_string(std::string *data);
+    std::string *decrypt_string(std::string data);
 
     /**
     * Encrypt in the current context with the current key scoped
@@ -111,7 +111,7 @@ public:
     unsigned char *decrypt(void *data);
 
     /** Alpha support function needed to get the key from the crypto engine in encrypted form */
-    void get_encrypted_key(unsigned char *(*key), std::string passphrase);
+    std::string *get_encrypted_key(unsigned char *(*key), std::string passphrase);
 
     /**
     * Initialise a vault on this crypto engine by giving it a master key

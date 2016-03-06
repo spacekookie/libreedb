@@ -69,7 +69,7 @@ void rcry_engine::init(rdb_token *token) {
 }
 
 /** Simple utility function to encrypt a C++ string */
-string *rcry_engine::encrypt_string(string *data) {
+string *rcry_engine::encrypt_string(string data) {
     AutoSeededRandomPool prng;
 
     byte key[AES::DEFAULT_KEYLENGTH];
@@ -142,10 +142,11 @@ string *rcry_engine::encrypt_string(string *data) {
 //   string *decrypt_string(string *data);
 
 void rcry_engine::switch_context(rdb_token *token) {
+    map<rdb_token*, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+
     if (token == nullptr) goto release;
 
     cout << "Checking for token availability..." << endl;
-    map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
     if (it != (*this->context_map).end()) {
         this->cry_lock = true;
         this->context_key = (*this->context_map)[token];
@@ -162,13 +163,37 @@ void rcry_engine::switch_context(rdb_token *token) {
     cout << "Crypto Engine now released for new token" << endl;
 }
 
-void rcry_engine::get_encrypted_key(unsigned char **key, std::string passphrase) {
+string *rcry_engine::get_encrypted_key(unsigned char **key, string passphrase) {
+    string *encrypted, encoded;
+
+    if(passphrase.length() == AES::MAX_KEYLENGTH) goto failure;
 
     /* First save the current key in a stack array */
     byte raw_key[AES::MAX_KEYLENGTH];
     memcpy(this->context_key, raw_key, AES::MAX_KEYLENGTH);
 
-    
+    /* Take the hashed passphrase and make it usable as a key */
+    byte key_ish[AES::MAX_KEYLENGTH];
+    memcpy((byte*) passphrase.c_str(), key_ish, sizeof(key_ish));
+    memcpy(key_ish, this->context_key, AES::MAX_KEYLENGTH);
+
+    /* Take the raw byte key and make it a hex string to encrypt easier */
+    encoded.clear();
+    StringSource(this->context->key, sizeof(this->context->key), true,
+                 new HexEncoder(
+                         new StringSink(encoded)
+                 ) // HexEncoder
+    ); // StringSource
+    cout << "key: " << encoded << endl;
+
+    encrypted = this->encrypt_string(encoded);
+    this->switch_context(nullptr);
+
+    return encrypted;
+
+    failure:
+        cout << "Something went wrong while attempting to encrypt the master key. Aborting!" << endl;
+        return nullptr;
 }
 
 void rcry_engine::master_keygen(byte *key, rdb_uuid *uuid) {

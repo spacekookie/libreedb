@@ -44,8 +44,6 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     rdb_tokens_create(token, 0);
     this->token = **(token);
 
-    // cout << "Our token is: " << (*token)->contents << endl;
-
     this->name = name;
     this->path = path;
     this->file_count = 0;
@@ -122,6 +120,8 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 
     delete(hostname);
     delete(username);
+
+    cout << "Vault token: " << (*token)->contents << endl;
 
     /* Encrypt the key with the master passphrase and write that to disk */
     engine->switch_context(&this->token);
