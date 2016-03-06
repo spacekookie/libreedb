@@ -38,7 +38,6 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     uuid_helper uh;
     *uuid = uh.generate();
     this->uuid = **uuid;
-    engine->init(*token);
 
     /* Then generate and asign token */
     rdb_tokens_create(token, 0);
@@ -123,8 +122,8 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 
     cout << "Vault token: " << (*token)->contents << endl;
 
-    /* Encrypt the key with the master passphrase and write that to disk */
-    engine->switch_context(&this->token);
+    engine->init(*token);
+    engine->switch_context(*token);
 
     unsigned char *encrypted_key;
     engine->get_encrypted_key(&encrypted_key, passphrase);
