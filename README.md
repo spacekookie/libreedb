@@ -10,7 +10,7 @@ Build
 
 Compilation dependencies
 
-`gcc cmake libgcrypt libmicrohttp`
+`gcc cmake libgcrypt libcrypto++ libmicrohttp libboost`
 
 An out-of-source build is recommended
 
