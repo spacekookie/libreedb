@@ -11,6 +11,9 @@
 using CryptoPP::AES;
 
 #include <cryptopp/osrng.h>
+#include <cryptopp/base64.h>
+
+using CryptoPP::Base64Encoder;
 
 using CryptoPP::AutoSeededRandomPool;
 
@@ -54,6 +57,8 @@ using CryptoPP::CBC_Mode;
 #include "assert.h"
 #include <iterator>
 
+#include "rcry_utils.h"
+
 using namespace std;
 
 rcry_engine::rcry_engine() {
@@ -66,105 +71,41 @@ void rcry_engine::init(rdb_token *token) {
 
     /* Then create a key for this context token in a map */
     prng.GenerateBlock((*this->context_map)[token], sizeof((*this->context_map)[token]));
-
-//    string encoded;
-//    encoded.clear();
-//    StringSource(context_map->find(token)->second, sizeof(context_map->find(token)->second), true,
-//                 new HexEncoder(
-//                         new StringSink(encoded)
-//                 ) // HexEncoder
-//    ); // StringSource
-//    cout << "Supposedly a key: " << encoded << endl;
 }
 
 /** Simple utility function to encrypt a C++ string */
 string *rcry_engine::encrypt_string(string data) {
-    AutoSeededRandomPool prng;
 
-    byte key[AES::DEFAULT_KEYLENGTH];
-    prng.GenerateBlock(key, sizeof(key));
+}
 
-    byte iv[AES::BLOCKSIZE];
-    prng.GenerateBlock(iv, sizeof(iv));
+char *rcry_engine::encrypt(void *data, size_t size) {
+    string CipherText;
 
-    string plain = "CBC Mode Test";
-    string cipher, encoded, recovered;
 
-    /*********************************\
-    \*********************************/
 
-    // Pretty print key
-    encoded.clear();
-    StringSource(this->context->key, sizeof(this->context->key), true,
-                 new HexEncoder(
-                         new StringSink(encoded)
-                 ) // HexEncoder
+    // Encryptor
+    CryptoPP::CBC_Mode<AES>::Encryption
+            Encryptor( this->context_key, sizeof(AES::MAX_KEYLENGTH), iv );
+
+    // Encryption
+    CryptoPP::StringSource( PlainText, true,
+                            new CryptoPP::StreamTransformationFilter( Encryptor,
+                                                                      new CryptoPP::StringSink( CipherText )
+                            ) // StreamTransformationFilter
     ); // StringSource
-    cout << "key: " << encoded << endl;
 
-    // Pretty print iv
-    encoded.clear();
-    StringSource(iv, sizeof(iv), true,
-                 new HexEncoder(
-                         new StringSink(encoded)
-                 ) // HexEncoder
-    ); // StringSource
-    cout << "iv: " << encoded << endl;
-
-    /*********************************\
-    \*********************************/
-
-    try {
-        cout << "plain text: " << plain << endl;
-
-        CBC_Mode<AES>::Encryption e;
-        e.SetKeyWithIV(this->context->key, sizeof(this->context->key), iv);
-
-        // The StreamTransformationFilter removes
-        //  padding as required.
-        StringSource s(plain, true,
-                       new StreamTransformationFilter(e,
-                                                      new StringSink(cipher)
-                       ) // StreamTransformationFilter
-        ); // StringSource
-
-    }
-    catch (const CryptoPP::Exception &e) {
-        cerr << e.what() << endl;
-        exit(1);
-    }
-
-    /*********************************\
-    \*********************************/
-
-    // Pretty print
-    encoded.clear();
-    StringSource(cipher, true,
-                 new HexEncoder(
-                         new StringSink(encoded)
-                 ) // HexEncoder
-    ); // StringSource
-    cout << "cipher text: " << encoded << endl;
+    return nullptr;
 }
 
 /** Simple utility function to decrypt a C++ string */
 //   string *decrypt_string(string *data);
 
 void rcry_engine::switch_context(rdb_token *token) {
-    string encoded;
-    encoded.clear();
-    StringSource(context_map->find(token)->second, sizeof(context_map->find(token)->second), true,
-                 new HexEncoder(
-                         new StringSink(encoded)
-                 ) // HexEncoder
-    ); // StringSource
-    cout << "Supposedly a key: " << encoded << endl;
-
     map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
 
     if (token == nullptr) goto release;
 
-    cout << "Checking for token availability..." << endl;
+    cout << "Checking for token availability...";
     if (it != (*this->context_map).end()) {
         this->cry_lock = true;
         this->context_key = (*this->context_map)[token];
@@ -176,12 +117,12 @@ void rcry_engine::switch_context(rdb_token *token) {
                              new StringSink(encoded)
                      ) // HexEncoder
         ); // StringSource
-        cout << "Current context key: " << encoded << endl;
 
+        cout << "done!" << endl;
         return;
     }
 
-    cout << "[ERROR] Token not found!" << endl;
+    cout << "[ERROR]" << endl << "Token not found!" << endl;
     return;
 
     release:
@@ -190,36 +131,26 @@ void rcry_engine::switch_context(rdb_token *token) {
     cout << "Crypto Engine now released for new token" << endl;
 }
 
-string *rcry_engine::get_encrypted_key(unsigned char **key, string passphrase) {
-    string *encrypted, encoded;
+string *rcry_engine::get_encrypted_key(char *salt, rdb_token *token, string *passphrase) {
+    unsigned char *encrypted;
 
-    if (passphrase.length() == AES::MAX_KEYLENGTH) goto failure;
+    /* Check that we're actually allowed to access this token by comparing it to the current context */
+    map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+    // if (token == nullptr) goto release;
+    // if ((*this->context_map)[token] != context_key) goto release;
 
-    /* First save the current key in a stack array */
-    byte raw_key[AES::MAX_KEYLENGTH];
-    memcpy(this->context_key, raw_key, AES::MAX_KEYLENGTH);
+    rcry_utils utils;
 
-    /* Take the hashed passphrase and make it usable as a key */
-    byte key_ish[AES::MAX_KEYLENGTH];
-    memcpy((byte *) passphrase.c_str(), key_ish, sizeof(key_ish));
-    memcpy(key_ish, this->context_key, AES::MAX_KEYLENGTH);
+    /* Save the current key, generate a salt and salt-hash the current user passphrase */
+    byte *buffer = this->context_key;
+    salt = utils.generate_random(8);
+    byte *user_key = (byte*) utils.salted_tiger2_hash(salt, passphrase);
 
-    /* Take the raw byte key and make it a hex string to encrypt easier */
-    encoded.clear();
-    StringSource(this->context->key, sizeof(this->context->key), true,
-                 new HexEncoder(
-                         new StringSink(encoded)
-                 ) // HexEncoder
-    ); // StringSource
-    cout << "key: " << encoded << endl;
+    /* Now manually overwrite the key! */
+    this->context_key = user_key;
 
-    encrypted = this->encrypt_string(encoded);
-    this->switch_context(nullptr);
-
-    return encrypted;
-
-    failure:
-    cout << "Something went wrong while attempting to encrypt the master key. Aborting!" << endl;
+    /* Now go and encrypt our buffer with the new context key */
+    encrypted = this->encrypt(buffer, AES::MAX_KEYLENGTH);
     return nullptr;
 }
 

@@ -22,6 +22,7 @@
 #include <cryptopp/aes.h>
 
 #include <cryptopp/osrng.h>
+
 using CryptoPP::AutoSeededRandomPool;
 
 extern "C" {
@@ -32,8 +33,8 @@ using namespace std;
 using namespace boost;
 using namespace libconfig;
 
-ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path, string passphrase)
-{
+ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path,
+                     string passphrase) {
     /* Generate a UUID and initialise the crypto engine with said token */
     uuid_helper uh;
     *uuid = uh.generate();
@@ -49,12 +50,12 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 
     cout << "Creating a new vault. From scratch" << endl;
 
-    this->headers = new map<string, datafile_h*>();
-    this->files = new map<string, datafile*>();
+    this->headers = new map<string, datafile_h *>();
+    this->files = new map<string, datafile *>();
     this->locks = new map<string, bool>();
 
     /* Now things required for quick header caching */
-    this->h_fields = new map<string, void*>();
+    this->h_fields = new map<string, void *>();
 
     /** CREATE DIRECTORIES **/
 
@@ -70,8 +71,7 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     target /= "datastore";
     created = filesystem::create_directories(target);
 
-    if(created)
-    {
+    if (created) {
         target.remove_leaf() /= "keystore";
         filesystem::create_directories(target);
 
@@ -117,22 +117,26 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     /** Then write our configuration */
     cfg.writeFile(config_path.c_str());
 
-    delete(hostname);
-    delete(username);
+    delete (hostname);
+    delete (username);
 
-    cout << "Vault token: " << (*token)->contents << endl;
-
+    /* Initialise the crypto engine for this vault */
     engine->init(*token);
     engine->switch_context(*token);
 
-    unsigned char *encrypted_key;
-    engine->get_encrypted_key(&encrypted_key, passphrase);
+    /* Then retrieve the key in encrypted form to write it to disk */
+    char *salt;
+    string *encrypted_key = engine->get_encrypted_key(salt, *token, &passphrase);
+    // get_encrypted_key(char *salt, rdb_token *token, string passphrase)
+    // rcry_engine::get_encrypted_key(unsigned char**, std::__cxx11::string&)
 
     /* Release the crypto engine again */
     engine->switch_context(nullptr);
+
+    /* Write things to disk. Make it official! */
+
 }
 
-ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase)
-{
+ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {
 
 }

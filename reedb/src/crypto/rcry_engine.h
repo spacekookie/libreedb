@@ -42,7 +42,7 @@ typedef enum crytarget_t {
 } crytarget_t;
 
 typedef struct crycontext {
-    byte key[32];
+    byte key[CryptoPP::AES::MAX_KEYLENGTH];
 } crycontext;
 
 typedef rdb_token rcry_token;
@@ -103,15 +103,25 @@ public:
     /**
     * Encrypt in the current context with the current key scoped
     */
-    unsigned char *encrypt(void *data);
+    char *encrypt(void *data, size_t size);
 
     /**
     * Decrypt in the current context with the current key scoped
     */
-    unsigned char *decrypt(void *data);
+    char *decrypt(void *data, size_t size);
 
-    /** Alpha support function needed to get the key from the crypto engine in encrypted form */
-    std::string *get_encrypted_key(unsigned char *(*key), std::string passphrase);
+    /**
+     * Alpha support function needed to get the key from the crypto engine
+     * in encrypted form.
+     * This is planned to be changed, however to get the system working, this
+     * is the most elegant solution. DO _NOT_ ignore warnings thrown by this function!!
+     * Thank you.
+     *
+     * @param salt: A pointer to an array that will hold a salt for the user passphrase
+     * @param token: Your current token, just for security!
+     * @param passphrase: The user passphrase used to encrypt the vault key.
+     */
+    std::string *get_encrypted_key(char *salt, rdb_token *token, std::string *passphrase);
 
     /**
     * Initialise a vault on this crypto engine by giving it a master key
@@ -119,10 +129,19 @@ public:
     * by providing it's token to the engine and then doing operations in
     * that crypto space.
     *
-    * @param master_key: The master key of a vault
     * @param token: A token the key gets bound to
     */
     void init(rdb_token *token);
+
+    /**
+     * Alpha support function! Please don't ignore warnings thrown by this function.
+     *
+     * @param token: A pointer to be populated with a token
+     * @param encrypted_key: The encrypted key pulled from a file
+     * @param salt: The salt used to hash the user passphrase.
+     * @param passphrase: The user passphrase to decrypt the key
+     */
+    void init(rdb_token *token, std::string encrypted_key, byte* iv, byte *salt, std::string passphrase);
 
     /** Hand in your token */
     void close();
