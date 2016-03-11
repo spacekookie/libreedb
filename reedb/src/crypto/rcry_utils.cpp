@@ -17,6 +17,8 @@ using CryptoPP::SHA;
 #include <string>
 #include <iostream>
 
+#include <gcrypt.h>
+
 using namespace CryptoPP;;
 using namespace std;
 
@@ -64,4 +66,21 @@ char *rcry_utils::salted_sha256_hash(char *salt, string *input) {
     byte digest[CryptoPP::SHA256::DIGESTSIZE];
     hash.CalculateDigest(digest, (byte *) input->c_str(), input->length());
     return (char *) digest;
+}
+
+char *rcry_utils::insecure_tiger2_hash(char *input, bool clear) {
+    int digest_len = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
+    int in_len = strlen(input);
+    char *digest = (char*) malloc(digest_len);
+    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, input, in_len);
+
+    if(clear) {
+        string encoded;
+        StringSource((byte*) digest, digest_len, true,
+                     new HexEncoder(new StringSink(encoded)));
+
+        memcpy(digest, encoded.c_str(), sizeof(long) * digest_len); // WHAT THE FUCK??
+    }
+
+    return digest;
 }

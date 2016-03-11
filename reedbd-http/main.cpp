@@ -26,9 +26,8 @@
 #include <reedb/vaults.h>
 
 #include <iostream>
+int main(int argc, char **args) {
 
-int main(int argc, char **args)
-{
     reedb *rdb = new reedb();
     rdb->set_os(LINUX);
     rdb->set_distro(FEDORA);

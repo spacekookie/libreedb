@@ -83,16 +83,16 @@ char *rcry_engine::encrypt(void *data, size_t size) {
 
 
 
-    // Encryptor
-    CryptoPP::CBC_Mode<AES>::Encryption
-            Encryptor( this->context_key, sizeof(AES::MAX_KEYLENGTH), iv );
-
-    // Encryption
-    CryptoPP::StringSource( PlainText, true,
-                            new CryptoPP::StreamTransformationFilter( Encryptor,
-                                                                      new CryptoPP::StringSink( CipherText )
-                            ) // StreamTransformationFilter
-    ); // StringSource
+//    // Encryptor
+//    CryptoPP::CBC_Mode<AES>::Encryption
+//            Encryptor( this->context_key, sizeof(AES::MAX_KEYLENGTH), iv );
+//
+//    // Encryption
+//    CryptoPP::StringSource( PlainText, true,
+//                            new CryptoPP::StreamTransformationFilter( Encryptor,
+//                                                                      new CryptoPP::StringSink( CipherText )
+//                            ) // StreamTransformationFilter
+//    ); // StringSource
 
     return nullptr;
 }
@@ -132,7 +132,7 @@ void rcry_engine::switch_context(rdb_token *token) {
 }
 
 string *rcry_engine::get_encrypted_key(char *salt, rdb_token *token, string *passphrase) {
-    unsigned char *encrypted;
+    char *encrypted;
 
     /* Check that we're actually allowed to access this token by comparing it to the current context */
     map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);

@@ -37,7 +37,9 @@ public:
      *
      * @param input: The input that should be hashed
      */
-    char *insecure_tiger2_hash(std::string *input);
+    char *insecure_tiger2_hash(char *input, bool clear);
+
+
 
     /**
      * Takes an input and a salt which should be cryptographically
