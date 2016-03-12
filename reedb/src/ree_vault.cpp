@@ -124,6 +124,8 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     engine->init(*token);
     engine->switch_context(*token);
 
+    cout << "Now encrypting key.." << endl;
+
     /* Then retrieve the key in encrypted form to write it to disk */
     char *salt;
     string *encrypted_key = engine->get_encrypted_key(salt, *token, &passphrase);

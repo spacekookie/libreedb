@@ -22,10 +22,11 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-#include <reedb/core.h>
-#include <reedb/vaults.h>
+ #include <reedb/core.h>
+ #include <iostream>
 
-#include <iostream>
+using namespace std;
+
 int main(int argc, char **args) {
 
     reedb *rdb = new reedb();
@@ -44,4 +45,4 @@ int main(int argc, char **args) {
 
     std::cout << "We're done here..." << std::endl;
     return 0;
-}
+ }
