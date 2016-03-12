@@ -60,9 +60,9 @@ public:
     static char *md_sha256_salted(char *salt, const char *message, bool clear);
     static char *md_blake_salted(char *salt, const char *message, bool clear);
 
-    static char *md_tiger2(char *salt, const char *message, bool clear);
-    static char *md_sha256(char *salt, const char *message, bool clear);
-    static char *md_blake(char *salt, const char *message, bool clear);
+    static char *md_tiger2(const char *message, bool clear);
+    static char *md_sha256(const char *message, bool clear);
+    static char *md_blake(const char *message, bool clear);
 };
 
 #endif /* SRC_RCRY_UTILS_H */
