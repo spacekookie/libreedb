@@ -3,9 +3,7 @@
 //
 
 #include "rcry_engine.h"
-
 #include <iostream>
-
 #include <cryptopp/aes.h>
 
 using CryptoPP::AES;
@@ -14,7 +12,6 @@ using CryptoPP::AES;
 #include <cryptopp/base64.h>
 
 using CryptoPP::Base64Encoder;
-
 using CryptoPP::AutoSeededRandomPool;
 
 #include <iostream>
@@ -74,26 +71,47 @@ void rcry_engine::init(rdb_token *token) {
 }
 
 /** Simple utility function to encrypt a C++ string */
-string *rcry_engine::encrypt_string(string data) {
+string rcry_engine::encrypt_string(string data, crycontext *context) {
+    string plain = "Yo dawg, I heard you like encryption!";
+    string cipher, encoded, recovered;
+
+    try {
+        cout << "plain text: " << data << endl;
+
+        CBC_Mode<AES>::Encryption e;
+        e.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
+        StringSource s(data, true, new StreamTransformationFilter(e, new StringSink(cipher)));
+    }
+    catch (const CryptoPP::Exception &e) {
+        cerr << e.what() << endl;
+        exit(1);
+    }
+
+    return cipher;
+}
+
+string rcry_engine::decrypt_string(string data, crycontext *context) {
+    string encoded, recovered;
+
+    StringSource(data, true, new HexEncoder(new StringSink(encoded)));
+    cout << "cipher text: " << encoded << endl;
+
+    try {
+        CBC_Mode<AES>::Decryption d;
+        d.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
+        StringSource s(data, true, new StreamTransformationFilter(d, new StringSink(recovered)));
+
+        cout << "Recovered Text: " << recovered << endl;
+
+    } catch (const CryptoPP::Exception &e) {
+        cerr << e.what() << endl;
+        exit(1);
+    }
+    return recovered;
 
 }
 
-char *rcry_engine::encrypt(void *data, size_t size) {
-    string CipherText;
-
-
-
-//    // Encryptor
-//    CryptoPP::CBC_Mode<AES>::Encryption
-//            Encryptor( this->context_key, sizeof(AES::MAX_KEYLENGTH), iv );
-//
-//    // Encryption
-//    CryptoPP::StringSource( PlainText, true,
-//                            new CryptoPP::StreamTransformationFilter( Encryptor,
-//                                                                      new CryptoPP::StringSink( CipherText )
-//                            ) // StreamTransformationFilter
-//    ); // StringSource
-
+char *rcry_engine::encrypt(void *data, crycontext *context) {
     return nullptr;
 }
 
@@ -108,15 +126,11 @@ void rcry_engine::switch_context(rdb_token *token) {
     cout << "Checking for token availability...";
     if (it != (*this->context_map).end()) {
         this->cry_lock = true;
-        this->context_key = (*this->context_map)[token];
+        memcpy(this->context_key, (*this->context_map)[token], AES::MAX_KEYLENGTH);
 
-        string encoded;
-        encoded.clear();
-        StringSource(this->context_key, AES::MAX_KEYLENGTH, true,
-                     new HexEncoder(
-                             new StringSink(encoded)
-                     ) // HexEncoder
-        ); // StringSource
+        // string encoded;
+        // encoded.clear();
+        // StringSource(this->context_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
 
         cout << "done!" << endl;
         return;
@@ -139,18 +153,34 @@ string *rcry_engine::get_encrypted_key(char *salt, rdb_token *token, string *pas
     // if (token == nullptr) goto release;
     // if ((*this->context_map)[token] != context_key) goto release;
 
-    rcry_utils utils;
-
     /* Save the current key, generate a salt and salt-hash the current user passphrase */
-    byte *buffer = this->context_key;
-    salt = utils.generate_random(8);
-    byte *user_key = (byte*) utils.salted_tiger2_hash(salt, passphrase);
+    byte buffer[AES::MAX_KEYLENGTH];
+    memcpy(buffer, this->context_key, AES::MAX_KEYLENGTH);
+
+    salt = rcry_utils::generate_random(8, true);
+    byte *user_key = (byte *) rcry_utils::md_sha256_salted(salt, passphrase->c_str(), false);
 
     /* Now manually overwrite the key! */
-    this->context_key = user_key;
+    memcpy(this->context_key, user_key, AES::MAX_KEYLENGTH);
+
+    /* Generate an IV for  */
+    crycontext *context = new crycontext();
+
+//    string encoded;
+//    StringSource(user_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
+//    cout << "PW Hash:" << encoded << endl;
+
+    char *iv = rcry_utils::generate_random(CryptoPP::AES::BLOCKSIZE, true);
+    memcpy(iv, context->iv, CryptoPP::AES::BLOCKSIZE);
+    context->size = CryptoPP::AES::BLOCKSIZE;
 
     /* Now go and encrypt our buffer with the new context key */
-    encrypted = this->encrypt(buffer, AES::MAX_KEYLENGTH);
+    string buffered_key = string((char *) buffer);
+    string encrypted_key = this->encrypt_string(buffered_key, context);
+
+    // Used for testing
+    // string recovered = this->decrypt_string(foo, context);
+
     return nullptr;
 }
 

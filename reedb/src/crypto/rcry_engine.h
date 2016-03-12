@@ -30,6 +30,7 @@ extern "C" {
 }
 
 #include <cryptopp/aes.h>
+
 using CryptoPP::AES;
 
 #include <map>
@@ -42,7 +43,10 @@ typedef enum crytarget_t {
 } crytarget_t;
 
 typedef struct crycontext {
-    byte key[CryptoPP::AES::MAX_KEYLENGTH];
+    byte zone[16];
+    byte iv[CryptoPP::AES::BLOCKSIZE];
+    size_t size;
+    bool clear;
 } crycontext;
 
 typedef rdb_token rcry_token;
@@ -56,17 +60,18 @@ typedef rdb_token rcry_token;
  * TODO: Make this multi-threadded as both libgcrypt and crypto++ are threadsafe.
  */
 class rcry_engine {
-  
+
 private:
-    std::map<rdb_token*, byte[AES::MAX_KEYLENGTH]> *context_map;
+    std::map<rdb_token *, byte[AES::MAX_KEYLENGTH]> *context_map;
     crycontext *context;
-    byte *context_key;
+    byte context_key[AES::MAX_KEYLENGTH];
     bool cry_lock = false;
 
 public:
 
     /** Empty constructor that generates everything from scratch */
     rcry_engine();
+
     rcry_engine(std::list<rdb_uuid> *ids);
 
     void switch_context(rdb_token *token);
@@ -94,21 +99,21 @@ public:
     */
     void zone_keygen(unsigned char *(*key), std::string zone, rcry_token *token);
 
-    /** Simple utility function to encrypt a C++ string */
-    std::string *encrypt_string(std::string data);
+    /** Simple utility function to decrypt a C++ string */
+    std::string encrypt_string(std::string data, crycontext *context);
 
     /** Simple utility function to decrypt a C++ string */
-    std::string *decrypt_string(std::string data);
+    std::string decrypt_string(std::string data, crycontext *context);
 
     /**
     * Encrypt in the current context with the current key scoped
     */
-    char *encrypt(void *data, size_t size);
+    char *encrypt(void *data, crycontext *context);
 
     /**
     * Decrypt in the current context with the current key scoped
     */
-    char *decrypt(void *data, size_t size);
+    char *decrypt(void *data, crycontext *context);
 
     /**
      * Alpha support function needed to get the key from the crypto engine
@@ -141,7 +146,7 @@ public:
      * @param salt: The salt used to hash the user passphrase.
      * @param passphrase: The user passphrase to decrypt the key
      */
-    void init(rdb_token *token, std::string encrypted_key, byte* iv, byte *salt, std::string passphrase);
+    void init(rdb_token *token, std::string encrypted_key, byte *iv, byte *salt, std::string passphrase);
 
     /** Hand in your token */
     void close();
