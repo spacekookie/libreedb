@@ -3,21 +3,13 @@
 
 #include <string>
 
+/**
+ * A class with static members of utility functions used for
+ * cryptographic procedures.
+ */
 class rcry_utils {
 
 public:
-
-    /**
-    * Generate random numbers with AutoSeededX917RNG pool.
-    * Takes a length as parameter and mallocs a string on
-    * secmem
-    *
-    * @param length: The char-length of the required random string
-    */
-    char *generate_random(unsigned int length);
-
-    /** Generates something close to a hash-id */
-    char *generate_minitoken();
 
     /**
      * Takes an input and a salt which should be cryptographically
@@ -60,6 +52,17 @@ public:
      * @param input: The input that should be hashed
      */
     std::string *insecure_sha1_hash(std::string *input);
+
+    static char *generate_random(unsigned int length, bool clear);
+    static char *generate_minitoken();
+
+    static char *md_tiger2_salted(char *salt, const char *message, bool clear);
+    static char *md_sha256_salted(char *salt, const char *message, bool clear);
+    static char *md_blake_salted(char *salt, const char *message, bool clear);
+
+    static char *md_tiger2(char *salt, const char *message, bool clear);
+    static char *md_sha256(char *salt, const char *message, bool clear);
+    static char *md_blake(char *salt, const char *message, bool clear);
 };
 
 #endif /* SRC_RCRY_UTILS_H */

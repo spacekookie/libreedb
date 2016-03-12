@@ -1,51 +1,113 @@
 #include "rcry_utils.h"
-#include "malloc.h"
+
 
 // Crypto++ includes
 #include <cryptopp/base64.h>
 #include <cryptopp/osrng.h>
 #include <cryptopp/tiger.h>
 #include <cryptopp/des.h>
-
 #include <cryptopp/hex.h>
-
-using CryptoPP::HexEncoder;
-
 #include <cryptopp/sha.h>
-using CryptoPP::SHA;
 
+// Standardlib include
 #include <string>
 #include <iostream>
+#include "malloc.h"
 
+// libgcrypt hashing
 #include <gcrypt.h>
 
-using namespace CryptoPP;;
+using namespace CryptoPP;
 using namespace std;
 
-char *rcry_utils::generate_random(unsigned int length) {
-    char *random = (char *) malloc(sizeof(char) * length);
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /** Temporary string for our random sink */
-    std::string encoded;
+char *rcry_utils::generate_minitoken() {
+    char *token;
 
-    /** Create a generation scratch */
-    const unsigned int BLOCKSIZE = length;
-    byte pcbScratch[BLOCKSIZE];
+    /* Use gcrypt random number generator */
+    token = (char *) gcry_random_bytes_secure(32, GCRY_STRONG_RANDOM);
 
-    /** Using a ANSI approved Cipher */
-    CryptoPP::AutoSeededX917RNG<CryptoPP::DES_EDE3> rng;
-    rng.GenerateBlock(pcbScratch, BLOCKSIZE);
+    /* Use Crypto++ utilities because they are very convenient */
+    string encoded; // TODO: Write your own so we can ditch crypto++ ?
+    StringSource((byte *) token, 32, true, new HexEncoder(new StringSink(encoded)));
 
-    /** Base64 encode and strip newlines from random block */
-    StringSource ss(pcbScratch, sizeof(pcbScratch), true, new Base64Encoder(new StringSink(encoded)));
-    std::string::iterator end_pos = std::remove(encoded.begin(), encoded.end(), '\n');
-    encoded.erase(end_pos, encoded.end());
-
-    /** Save our token in the struct */
-    std::memcpy(random, encoded.c_str(), sizeof(char) * length);
-
-    return random;
+    /* Then copy it back in place */
+    memcpy(token, encoded.c_str(), sizeof(long) * 32);
+    return token;
 }
+
+char *rcry_utils::generate_random(unsigned int length, bool clear) {
+    // void * gcry_random_bytes_secure (size_t nbytes, enum gcry_random_level level)
+    char *token;
+    token = (char *) gcry_random_bytes_secure(length, GCRY_STRONG_RANDOM);
+
+    if (clear) {
+        string encoded;
+        StringSource((byte *) token, length, true,
+                     new HexEncoder(new StringSink(encoded)));
+        memcpy(token, encoded.c_str(), sizeof(long) * length); // WHAT THE FUCK??
+    }
+
+    return token;
+}
+
+char *rcry_utils::md_tiger2_salted(char *salt, const char *message, bool clear) {
+
+}
+
+char *rcry_utils::md_sha256_salted(char *salt, const char *message, bool clear) {
+    int digest_len = gcry_md_get_algo_dlen(GCRY_MD_SHA256);
+    int in_len = strlen(message);
+
+    // Malloc some space for a digest and a salty message. The latter one gets freed later.
+    char *digest = (char *) malloc(digest_len);
+    char *salty_message = (char *) malloc(strlen(salt) * sizeof(char) + strlen(message) * sizeof(char));
+
+    // Concatinate our salt with the message and a wonderful seperator named "::"
+    strcpy(salty_message, salt);
+    strcat(salty_message, "::");
+    strcat(salty_message, message);
+
+    cout << "Salty message: " << salty_message << endl;
+    gcry_md_hash_buffer(GCRY_MD_SHA256, digest, salty_message, in_len);
+
+    if (clear) {
+        string encoded;
+        StringSource((byte *) digest, digest_len, true,
+                     new HexEncoder(new StringSink(encoded)));
+
+        memcpy(digest, encoded.c_str(), sizeof(long) * digest_len); // WHAT THE FUCK??
+    }
+
+    free(salty_message);
+    return digest;
+}
+
+char *rcry_utils::md_blake_salted(char *salt, const char *message, bool clear) { }
+
+char *rcry_utils::md_tiger2(char *salt, const char *message, bool clear) {
+    int digest_len = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
+    int in_len = strlen(message);
+    char *digest = (char *) malloc(digest_len);
+    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, message, in_len);
+
+    if (clear) {
+        string encoded;
+        StringSource((byte *) digest, digest_len, true,
+                     new HexEncoder(new StringSink(encoded)));
+
+        memcpy(digest, encoded.c_str(), sizeof(long) * digest_len); // WHAT THE FUCK??
+    }
+
+    return digest;
+}
+
+char *rcry_utils::md_sha256(char *salt, const char *message, bool clear) { }
+
+char *rcry_utils::md_blake(char *salt, const char *message, bool clear) { }
+
 
 byte *return_buffer(const std::string &string) {
     byte *return_string = new byte[string.length() + 1];
@@ -66,21 +128,4 @@ char *rcry_utils::salted_sha256_hash(char *salt, string *input) {
     byte digest[CryptoPP::SHA256::DIGESTSIZE];
     hash.CalculateDigest(digest, (byte *) input->c_str(), input->length());
     return (char *) digest;
-}
-
-char *rcry_utils::insecure_tiger2_hash(char *input, bool clear) {
-    int digest_len = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
-    int in_len = strlen(input);
-    char *digest = (char*) malloc(digest_len);
-    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, input, in_len);
-
-    if(clear) {
-        string encoded;
-        StringSource((byte*) digest, digest_len, true,
-                     new HexEncoder(new StringSink(encoded)));
-
-        memcpy(digest, encoded.c_str(), sizeof(long) * digest_len); // WHAT THE FUCK??
-    }
-
-    return digest;
 }
