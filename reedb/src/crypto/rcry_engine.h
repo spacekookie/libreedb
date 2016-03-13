@@ -126,7 +126,7 @@ public:
      * @param token: Your current token, just for security!
      * @param passphrase: The user passphrase used to encrypt the vault key.
      */
-    std::string *get_encrypted_key(char *salt, rdb_token *token, std::string *passphrase);
+    std::string get_encrypted_key(char *(*salt), char *(*iv), rdb_token *token, std::string *passphrase);
 
     /**
     * Initialise a vault on this crypto engine by giving it a master key
@@ -146,7 +146,7 @@ public:
      * @param salt: The salt used to hash the user passphrase.
      * @param passphrase: The user passphrase to decrypt the key
      */
-    void init(rdb_token *token, std::string encrypted_key, byte *iv, byte *salt, std::string passphrase);
+    void init(rdb_token *token, std::string encrypted_key, char *iv, char *salt, std::string passphrase);
 
     /** Hand in your token */
     void close();

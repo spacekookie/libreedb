@@ -55,6 +55,7 @@ using CryptoPP::CBC_Mode;
 #include <iterator>
 
 #include "rcry_utils.h"
+#include <gcrypt.h>
 
 using namespace std;
 
@@ -63,24 +64,29 @@ rcry_engine::rcry_engine() {
 }
 
 void rcry_engine::init(rdb_token *token) {
-    /* Initilise a random pool generator */
-    AutoSeededRandomPool prng;
+    /* Generate STRONG_RANDOM key of size 32 byte */
+    char *random = (char *) gcry_random_bytes_secure(AES::MAX_KEYLENGTH, GCRY_STRONG_RANDOM);
 
-    /* Then create a key for this context token in a map */
-    prng.GenerateBlock((*this->context_map)[token], sizeof((*this->context_map)[token]));
+    /* Then copy from stack into token map space */
+    memcpy((*this->context_map)[token], random, AES::MAX_KEYLENGTH);
 }
 
 /** Simple utility function to encrypt a C++ string */
 string rcry_engine::encrypt_string(string data, crycontext *context) {
-    string plain = "Yo dawg, I heard you like encryption!";
+    string plain = "Hello Reedb! :)";
     string cipher, encoded, recovered;
 
     try {
-        cout << "plain text: " << data << endl;
+        StringSource(data, true, new HexEncoder(new StringSink(encoded)));
+        cout << "plain text: " << encoded << endl;
 
         CBC_Mode<AES>::Encryption e;
         e.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
         StringSource s(data, true, new StreamTransformationFilter(e, new StringSink(cipher)));
+
+        encoded.clear();
+        StringSource(cipher, true, new HexEncoder(new StringSink(encoded)));
+        cout << "Encrypted: " << encoded << endl;
     }
     catch (const CryptoPP::Exception &e) {
         cerr << e.what() << endl;
@@ -145,11 +151,11 @@ void rcry_engine::switch_context(rdb_token *token) {
     cout << "Crypto Engine now released for new token" << endl;
 }
 
-string *rcry_engine::get_encrypted_key(char *salt, rdb_token *token, string *passphrase) {
-    char *encrypted;
+string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *token, string *passphrase) {
+    string encoded;
 
     /* Check that we're actually allowed to access this token by comparing it to the current context */
-    map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+    // map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
     // if (token == nullptr) goto release;
     // if ((*this->context_map)[token] != context_key) goto release;
 
@@ -157,31 +163,42 @@ string *rcry_engine::get_encrypted_key(char *salt, rdb_token *token, string *pas
     byte buffer[AES::MAX_KEYLENGTH];
     memcpy(buffer, this->context_key, AES::MAX_KEYLENGTH);
 
-    salt = rcry_utils::generate_random(8, true);
-    byte *user_key = (byte *) rcry_utils::md_sha256_salted(salt, passphrase->c_str(), false);
+    encoded.clear();
+    StringSource(buffer, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
+    cout << "Buffer: " << encoded << endl;
+
+    *salt = rcry_utils::generate_random(8, true);
+    byte *user_key = (byte *) rcry_utils::md_sha256_salted(*salt, passphrase->c_str(), false);
 
     /* Now manually overwrite the key! */
     memcpy(this->context_key, user_key, AES::MAX_KEYLENGTH);
 
-    /* Generate an IV for  */
+    encoded.clear();
+    StringSource(this->context_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
+    cout << "User key: " << encoded << endl;
+
+    /* Create a new context object for our crypto to work on */
     crycontext *context = new crycontext();
+    context->size = AES::MAX_KEYLENGTH;
 
-//    string encoded;
-//    StringSource(user_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
-//    cout << "PW Hash:" << encoded << endl;
+    /* Now generate an IV and store it in the context */
+    rcry_utils::generate_normal_rand(iv, AES::BLOCKSIZE * sizeof(char));
+    memcpy(context->iv, *iv, AES::BLOCKSIZE);
 
-    char *iv = rcry_utils::generate_random(CryptoPP::AES::BLOCKSIZE, true);
-    memcpy(iv, context->iv, CryptoPP::AES::BLOCKSIZE);
-    context->size = CryptoPP::AES::BLOCKSIZE;
+    /* Then clean it up for future generations */
+    encoded.clear();
+    StringSource((byte *) (*iv), AES::BLOCKSIZE, true, new HexEncoder(new StringSink(encoded)));
+    memcpy((char *)(*iv), encoded.c_str(), AES::BLOCKSIZE * sizeof(char));
 
     /* Now go and encrypt our buffer with the new context key */
     string buffered_key = string((char *) buffer);
     string encrypted_key = this->encrypt_string(buffered_key, context);
 
-    // Used for testing
-    // string recovered = this->decrypt_string(foo, context);
+    encoded.clear();
+    StringSource(encrypted_key, true, new HexEncoder(new StringSink(encoded)));
+    cout << "Encrypted Key: " << encoded << endl;
 
-    return nullptr;
+    return encoded;
 }
 
 void rcry_engine::master_keygen(byte *key, rdb_uuid *uuid) {
