@@ -52,6 +52,11 @@ char *rcry_utils::generate_random(unsigned int length, bool clear) {
     return rand;
 }
 
+void rcry_utils::generate_weak_rand(char **data, unsigned int length) {
+    (*data) = (char *) malloc(sizeof(char) * length);
+    (*data) = (char *) gcry_random_bytes_secure(length, GCRY_WEAK_RANDOM);
+}
+
 void rcry_utils::generate_normal_rand(char **data, unsigned int length) {
     (*data) = (char *) malloc(sizeof(char) * length);
     (*data) = (char *) gcry_random_bytes_secure(length, GCRY_STRONG_RANDOM);

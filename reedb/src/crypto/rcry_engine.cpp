@@ -77,8 +77,8 @@ string rcry_engine::encrypt_string(string data, crycontext *context) {
     string cipher, encoded, recovered;
 
     try {
-        StringSource(data, true, new HexEncoder(new StringSink(encoded)));
-        cout << "plain text: " << encoded << endl;
+        //        StringSource(data, true, new HexEncoder(new StringSink(encoded)));
+        //        cout << "plain text: " << encoded << endl;
 
         CBC_Mode<AES>::Encryption e;
         e.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
@@ -86,7 +86,7 @@ string rcry_engine::encrypt_string(string data, crycontext *context) {
 
         encoded.clear();
         StringSource(cipher, true, new HexEncoder(new StringSink(encoded)));
-        cout << "Encrypted: " << encoded << endl;
+        //        cout << "Encrypted: " << encoded << endl;
     }
     catch (const CryptoPP::Exception &e) {
         cerr << e.what() << endl;
@@ -99,8 +99,8 @@ string rcry_engine::encrypt_string(string data, crycontext *context) {
 string rcry_engine::decrypt_string(string data, crycontext *context) {
     string encoded, recovered;
 
-    StringSource(data, true, new HexEncoder(new StringSink(encoded)));
-    cout << "cipher text: " << encoded << endl;
+//    StringSource(data, true, new HexEncoder(new StringSink(encoded)));
+//    cout << "cipher text: " << encoded << endl;
 
     try {
         CBC_Mode<AES>::Decryption d;
@@ -163,9 +163,9 @@ string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *tok
     byte buffer[AES::MAX_KEYLENGTH];
     memcpy(buffer, this->context_key, AES::MAX_KEYLENGTH);
 
-    encoded.clear();
-    StringSource(buffer, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
-    cout << "Buffer: " << encoded << endl;
+//    encoded.clear();
+//    StringSource(buffer, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
+//    cout << "Buffer: " << encoded << endl;
 
     *salt = rcry_utils::generate_random(8, true);
     byte *user_key = (byte *) rcry_utils::md_sha256_salted(*salt, passphrase->c_str(), false);
@@ -173,9 +173,9 @@ string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *tok
     /* Now manually overwrite the key! */
     memcpy(this->context_key, user_key, AES::MAX_KEYLENGTH);
 
-    encoded.clear();
-    StringSource(this->context_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
-    cout << "User key: " << encoded << endl;
+//    encoded.clear();
+//    StringSource(this->context_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
+//    cout << "User key: " << encoded << endl;
 
     /* Create a new context object for our crypto to work on */
     crycontext *context = new crycontext();
@@ -194,9 +194,9 @@ string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *tok
     string buffered_key = string((char *) buffer);
     string encrypted_key = this->encrypt_string(buffered_key, context);
 
-    encoded.clear();
-    StringSource(encrypted_key, true, new HexEncoder(new StringSink(encoded)));
-    cout << "Encrypted Key: " << encoded << endl;
+//    encoded.clear();
+//    StringSource(encrypted_key, true, new HexEncoder(new StringSink(encoded)));
+//    cout << "Encrypted Key: " << encoded << endl;
 
     return encoded;
 }

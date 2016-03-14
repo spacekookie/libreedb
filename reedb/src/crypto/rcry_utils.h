@@ -56,6 +56,7 @@ public:
     static char *generate_random(unsigned int length, bool clear);
     static void generate_super_rand(char *(*data), unsigned int length);
     static void generate_normal_rand(char *(*data), unsigned int length);
+    static void generate_weak_rand(char *(*data), unsigned int length);
     static char *generate_minitoken();
 
     static char *md_tiger2_salted(char *salt, const char *message, bool clear);
