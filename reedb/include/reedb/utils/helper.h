@@ -67,4 +67,8 @@ ree_os rdb_find_os();
 
 char *rdb_expand_path(const char *path);
 
+/* C like function you should use for UUIDs */
+// int rdb_uuid_generate(rdb_uuid *(*uuid), uuid_type type);
+
+
 #endif /* __RDB_UTILS_H__ */
