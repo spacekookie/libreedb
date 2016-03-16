@@ -51,6 +51,7 @@ void main(int argc, char **args) {
 
 More use cases of the native interface will be added. There is also a RESTful API available via reedbd-http.
 
+EDIT: I wrote a little blog article about the native interface [here])(http://spacekookie.de/dev-diary/hacking-on-reedb/). If you have questions - comment.
 
 License
 -------
