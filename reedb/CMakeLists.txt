@@ -6,11 +6,12 @@ set(CMAKE_BUILD_TYPE Debug)
 set(REEDB_SOURCE
     # Utilities
     src/utils/helper.c
-    src/utils/uuid.cpp
+    src/utils/files.c
+        src/utils/uuid.cpp
 
     # Core interface
     src/core.cpp
-        src/vaults.cpp
+    src/vaults.cpp
     #src/config.cpp
 
     # Crypto
@@ -32,17 +33,17 @@ add_library(reedb ${REEDB_SOURCE})
 # Dynamically linked libraries
 target_link_libraries(reedb
   
-  # Boost dependencies
-  boost_filesystem
-  boost_system
-  
-  # Crypto dependencies
-  cryptopp
-  gcrypt
-  
-  # Utils
-  protobuf
-  config++
+    # Boost dependencies
+    boost_filesystem
+    boost_system
+
+    # Crypto dependencies
+    cryptopp
+    gcrypt
+
+    # Utils
+    protobuf
+    config++
 )
 
 # Include the subdirectories to search for headers

@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string.h>
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -10,26 +12,13 @@ int uuid_helper::rdb_uuid_generate(rdb_uuid **uuid, uuid_type type) {
     (*uuid) = (struct rdb_uuid *) malloc(sizeof(struct rdb_uuid));
     (*uuid)->type = THREE;
 
-    char *A = rcry_utils::generate_random(4, true);
-    char *B = rcry_utils::generate_random(3, true);
-    char *C = rcry_utils::generate_random(3, true);
-    char *D = rcry_utils::generate_random(2, true);
-    char *E = rcry_utils::generate_random(2, true);
+    cout << "Generating shit" << endl;
 
-    strcpy((*uuid)->id, A);
-    strcat((*uuid)->id, "-");
+    char *A;
+    rcry_utils::generate_weak_rand(&A, 16);
 
-    strcat((*uuid)->id, B);
-    strcat((*uuid)->id, "-");
+    cout << "Done generating shit: " << A << endl;
 
-    strcat((*uuid)->id, C);
-    strcat((*uuid)->id, "-");
-
-    strcat((*uuid)->id, D);
-    strcat((*uuid)->id, "-");
-
-    strcat((*uuid)->id, E);
-
-    cout << "UUID: " << (*uuid)->id << endl;
+//    cout << "Raw token: " << A << "-" << B << "-" << C << "-" << D << "-" << D << "-" << E << endl;
     return 0;
 }

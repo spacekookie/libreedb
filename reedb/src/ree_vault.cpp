@@ -33,12 +33,13 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 
     /* Generate a UUID and initialise the crypto engine with said token */
     uuid_helper uh;
-    *uuid = uh.generate();
+    uh.rdb_uuid_generate(uuid, ONE);
     this->uuid = **uuid;
 
     /* Then generate and asign token */
     rdb_tokens_create(token, 0);
     this->token = **(token);
+
 
     this->name = name;
     this->path = path;
@@ -62,6 +63,7 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     string combined = name;
     combined.append(".vault");
 
+
     /* Expand our path, add the name as a folder and data dir */
     filesystem::path target(expantion.we_wordv[0]);
     target /= combined.c_str();
@@ -84,6 +86,7 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
         wordfree(&expantion);
         throw 1;
     }
+
 
     target /= "master.cfg";
     string config_path = target.c_str();
@@ -122,6 +125,7 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     engine->init(*token);
     engine->switch_context(*token);
 
+
     cout << "Encrypting generated key with user password and salt" << endl;
 
     /* Then retrieve the key in encrypted form to write it to disk */
@@ -132,66 +136,51 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     /* Release the crypto engine again */
     engine->switch_context(nullptr);
 
-    cout << "##############################" << endl << endl;
-    cout << "Encrypted key: " << encrypted_key << endl;
-    cout << "Password Salt: " << salt << endl;
-    cout << "Encryption IV: " << iv << endl << endl;
-    cout << "##############################" << endl << endl;
+
+    cout << "Preparing to dump encrypted key to disk..." << endl;
 
     /* Generate our keyfile name here so we can use it in the metadata header */
     char *sub_path = "/keystore/";
     char *master = rcry_utils::md_sha256("master", true);
-    cout << "About to concat a bunch of shit" << endl;
 
     size_t meta_size = 256;
     char concat[meta_size + strlen(encrypted_key.c_str())];
 
-    strcpy(concat, salt);   // Salt (Optional)
+    // <SALT>::<IV>::<USER>::<ZONE>::<DATA>
+    strcpy(concat, salt);               // Salt (Optional)
     strcat(concat, "::");
-    strcat(concat, iv);     // Encryption IV
+    strcat(concat, iv);                 // Encryption IV
     strcat(concat, "::");
-    strcat(concat, "{0}");     // User (Optional)
+    strcat(concat, "{0}");              // User (Optional)
     strcat(concat, "::");
-    strcat(concat, (char *) master);     // Encryption IV
+    strcat(concat, (char *) master);    // Encryption Zone
     strcat(concat, "::");
     strcat(concat, encrypted_key.c_str());
 
-    cout << "Writing: " << concat << endl;
-//
-////    wordexp_t grmpf;
-////    wordexp(path.c_str(), &expantion, 0);
-//
-//
-//    /* Expand our path, add the name as a folder and data dir */
-////    filesystem::path t(expantion.we_wordv[0]);
-////    t /= combined.c_str();
+    cout << "Writing...";
 
-    size_t path_size =
-            strlen(path.c_str()) + strlen(name.c_str()) + strlen(combined.c_str()) + strlen(sub_path) + strlen(master) + 16;
+    /* Expand our path, add the name as a folder and data dir */
+    size_t path_size = strlen(path.c_str()) + strlen(name.c_str())
+                       + strlen(combined.c_str()) + strlen(sub_path) + strlen(master) + 16;
+
     char key_path[sizeof(char) * path_size];
-    strcpy(key_path, "/home/spacekookie/Documents/default.vault");
+    strcpy(key_path, "/home/spacekookie/Documents/default.vault/");
     strcat(key_path, sub_path); // keystore/
     strcat(key_path, master);
     strcat(key_path, ".cey");
 
-    cout << "Target: " << key_path << endl;
-//
-    cout << "About to write" << endl;
-    cout << ">> " << concat << endl;
-    cout << "to: " << key_path << endl;
-
     FILE *f = fopen(key_path, "w+");
-    if (f == NULL) cout << "Error opening file!" << endl;
+    if (f == NULL) {
+        cout << "[ERROR] Opening file failed!" << endl;
+        // TODO: Attempt to undo creation process
+        return;
+    }
     fprintf(f, concat);
     fclose(f);
-    cout << "Done writing shit..." << endl;
+    cout << "done" << endl;
 
-    // get_encrypted_key(char *salt, rdb_token *token, string passphrase)
-    // rcry_engine::get_encrypted_key(unsigned char**, std::__cxx11::string&)
-
-
-    /* Write things to disk. Make it official! */
-    cout << " === DONE ===" << endl;
+    /* Log that we are done  */
+    cout << "Done creating vault " << (*uuid)->id << endl;
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {

@@ -3,57 +3,70 @@
 
 #include "reedb/crypto/token.h"
 
-extern "C" { 
+extern "C" {
 #include "reedb/utils/uuid.h"
 #include "reedb/utils/helper.h"
 }
 
 #include <string>
+#include <vector>
 #include <list>
 #include <map>
 
 using namespace std;
 
 /* Struct that */
-typedef struct vault_head {
+typedef struct {
     rdb_uuid *id;
     string *name, *path;
     unsigned int size;
     bool active;
-} vault_head;
+} vault_meta;
 
-typedef struct file_head {
+typedef struct {
     unsigned int revisions;
     string *category;
     string *title;
-    list<string> *tags;
-} file_head;
+    list <string> *tags; // Change to a vector?
+} file_meta;
 
-class rdb_vaults
-{
+class rdb_vaults {
 
 private:
-  
-    GETTER(string, id)
-  
+
+    /*  */
+GETTER(string, id)
+
 public:
 
     rdb_vaults();
+
     ~rdb_vaults();
 
-    list<vault_head> *list_vaults();
+    vector<vault_meta> *list_vaults();
 
-    void scope_vault(vault_head *head);
+    void scope_vault(vault_meta *head);
+
     void unscope_vault(rdb_uuid *id);
 
     /* Create a new vault with a name, a location path and a master passphrase */
-    vault_head *create(string name, string path, string passphrase);
+    vault_meta *create(string name, string path, string passphrase);
 
     /* Destroy a vault with a certain uuid. Requires an authentication token */
     void destroy(rdb_uuid *id, rdb_token *token);
 
     /* Closes a vault with a certain uuid. Requires an authentication token and requires the token to be accepted by the vault */
     void close(rdb_uuid *id, rdb_token *token);
+
+    /**
+     * Used to migrate the header format of vaults that are currently scoped by this interface.
+     * A meta_delta is basically the name of a meta-field that should be inserted mapped to
+     * its type.
+     * If a meta should be removed set the type to "-1".
+     *
+     * @param meta_delta: How the header set should be migrated.
+     */
+    void migrate_headers(map<string *, string *> meta_delta);
 
     /**
     * Authenticate a process for a vault and open it (if not already open).
@@ -77,7 +90,7 @@ public:
     * @param token: An authentication token for this vault
     * @param search: A search query in RQL (Reedb Query Language). If ReedbSQL is installed SQL can be used.
     */
-    list<file_head> query_headers(rdb_uuid *id, rdb_token *token, string search);
+    list <file_meta> query_headers(rdb_uuid *id, rdb_token *token, string search);
 
     /**
     * Get the current state of a file by iterating through all its revisions. Blanked
@@ -114,7 +127,7 @@ public:
     * @param file_id: The id of the file to insert into
     * @param fields: A list of fields to blank from a file
     */
-    void remove(rdb_uuid *id, rdb_token *token, string file_id, list<string> *fields);
+    void remove(rdb_uuid *id, rdb_token *token, string file_id, list <string> *fields);
 };
 
 #endif // VAULTS_H

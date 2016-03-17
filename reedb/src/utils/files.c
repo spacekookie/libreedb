@@ -9,8 +9,6 @@ int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *
     size_t path_size;
     char file_path[path_size * sizeof(char)];
 
-
-
     /* Concatinate the unique and data and seperate them via "::" that can be reparsed */
     size_t catsize = 2 + strlen(salt) + strlen(data) + strlen(iv);
     char concat[catsize * sizeof(char)];
@@ -21,7 +19,8 @@ int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *
     strcat(concat, data);
 
     // Data format is as following
-    // <SALT>::<IV>::<ZONE>::<USER>::<DATA>
+    // <SALT>::<IV>::<USER>::<ZONE>::<DATA>
+    // Optional fields are either "{}" or "{0}"
 
     FILE *fp;
     fp = fopen(file_path, "w+");
