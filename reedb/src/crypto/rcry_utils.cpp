@@ -52,25 +52,38 @@ char *rcry_utils::generate_random(unsigned int length, bool clear) {
     return rand;
 }
 
+/** Used for UUIDs randomness */
 void rcry_utils::generate_weak_rand(char **data, unsigned int length) {
-    (*data) = (char *) malloc(sizeof(char) * length);
-    (*data) = (char *) gcry_random_bytes(length, GCRY_WEAK_RANDOM);
-
     string encoded;
-    StringSource((byte *) rand, length, true, new HexEncoder(new StringSink(encoded)));
-    memcpy((*data), encoded.c_str(), sizeof(long) * length); // WHAT THE FUCK??
+    char *buffer = (char *) gcry_random_bytes(length, GCRY_WEAK_RANDOM);
+    StringSource((byte *) buffer, length, true, new HexEncoder(new StringSink(encoded)));
+    free(buffer);
+
+    (*data) = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
+    strcpy((*data), encoded.c_str());
 }
 
+/** Used for tokens & access keys */
 void rcry_utils::generate_normal_rand(char **data, unsigned int length) {
-    (*data) = (char *) malloc(sizeof(char) * length);
-    (*data) = (char *) gcry_random_bytes_secure(length, GCRY_STRONG_RANDOM);
+    string encoded;
+    char *buffer = (char *) gcry_random_bytes(length, GCRY_STRONG_RANDOM);
+    StringSource((byte *) buffer, length, true, new HexEncoder(new StringSink(encoded)));
+    free(buffer);
+
+    (*data) = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
+    strcpy((*data), encoded.c_str());
 }
 
+/** Used for permanent or semi-permanent cryptographic keys */
 void rcry_utils::generate_super_rand(char **data, unsigned int length) {
-    (*data) = (char *) malloc(sizeof(char) * length);
-    (*data) = (char *) gcry_random_bytes_secure(length, GCRY_VERY_STRONG_RANDOM);
+    string encoded;
+    char *buffer = (char *) gcry_random_bytes(length, GCRY_VERY_STRONG_RANDOM);
+    StringSource((byte *) buffer, length, true, new HexEncoder(new StringSink(encoded)));
+    free(buffer);
+    
+    (*data) = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
+    strcpy((*data), encoded.c_str());
 }
-
 
 char *rcry_utils::md_tiger2_salted(char *salt, const char *message, bool clear) {
     int digest_len = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
