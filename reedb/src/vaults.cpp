@@ -26,6 +26,12 @@ rdb_vaults::rdb_vaults() {
 
 rdb_vaults::~rdb_vaults() {
     std::cout << "Closing interface: " << this->id << endl;
+
+    // show content:
+    for (std::map<rdb_uuid *, ree_vault *>::iterator it = active_vaults->begin(); it != active_vaults->end(); ++it) {
+        it->second->close_vault();
+        delete (it->second);
+    }
 }
 
 vector<vault_meta> *rdb_vaults::list_vaults() {
@@ -52,6 +58,8 @@ vault_meta *rdb_vaults::create(string name, string path, string passphrase) {
     /* Then mark our vault as active so that other people can use it */
     (*active_vaults)[uuid] = vault;
 
+    vault_meta *to_return = new vault_meta(meta);
+    return to_return;
 }
 
 rdb_token rdb_vaults::authenticate(rdb_uuid *id, string passphrase, bool permanent) {

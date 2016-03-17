@@ -21,22 +21,24 @@ using namespace std;
 
 class ree_vault {
 private:
-  
-  /* Some metadata fields about the vault */
-  GETTER(rdb_uuid, uuid);
-  GETTER(string, name)
-  GETTER(string, path)
-  GETTER(size_t, file_count)
-  
-  /* File management fields */
-  map<string, datafile_h*> *headers;
-  map<string, datafile*> *files;
-  map<string, bool> *locks;
-  
-  /* Header fields */
-  map<string, void*> *h_fields;
-  rdb_token token;
-  
+
+    /* Some metadata fields about the vault */
+GETTER(rdb_uuid, uuid);
+GETTER(string, name)
+
+GETTER(string, path)
+
+GETTER(size_t, file_count)
+
+    /* File management fields */
+    map<string, datafile_h *> *headers;
+    map<string, datafile *> *files;
+    map<string, bool> *locks;
+
+    /* Header fields */
+    map<string, void *> *h_fields;
+    rdb_token token;
+
 public:
 
     /**
@@ -70,7 +72,7 @@ public:
 
     /* Makes sure that all files are closed and keys are dumped */
     ~ree_vault();
-    
+
     /**
      * Unlocks a vault that is already scoped and even loaded by a different
      * target. This is used to have multiple applications access the same
@@ -78,22 +80,26 @@ public:
      */
     char *(*unlockVault)(string passphrase);
 
+    /** This yields a token to the vault and makes it invalid for future operations. */
+    void yield_token(rdb_token *token);
+
     /**
-     * Lock a vault with an access token even if there are other
-     * applications currently using it.
+     * This function closes all vaults after letting insert operations finish
+     * and read operations time-out. All tokens authenticated for this vault
+     * previously will be revoked.
      */
-    void lock_vault(char *token);
-    
+    void close_vault();
+
     /**** FILE OPERATION FUNCTIONS ****/
-    
+
     void read_file(string name);
-    
+
     void add_file(string name);
-    
+
     void remove_file(string name);
-    
+
     void update_file(string name, string data);
-    
+
     /** 
      * Search through the vault with RQL. If search is NULL all 
      * headers will be returned
@@ -103,12 +109,12 @@ public:
      * 
      * @returns list<datafile_h>: selection of headers
      */
-    list<datafile_h> search_headers(string search);
-  
+    list <datafile_h> search_headers(string search);
+
     /** Adds the ability to add custom fields to the header */
-    void add_hfields(string name, void* type);
+    void add_hfields(string name, void *type);
+
     void remove_hfields(string name);
-    
 };
 
 #endif //REE_VAULT_H

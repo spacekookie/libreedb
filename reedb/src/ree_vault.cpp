@@ -187,5 +187,10 @@ ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {
 }
 
 void ree_vault::close_vault() {
+    cout << "\t> " << "Closing vault " << this->uuid.id << "...";
+    cout.flush();
 
+    // Do cleanup
+
+    cout << "[DONE]" << endl;
 }

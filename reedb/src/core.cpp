@@ -20,67 +20,69 @@
 // Public facing reedb includes
 #include "reedb/core.h"
 
-//
+// Runtime dependencies
 #include <iostream>
-#include <reedb/vaults.h>
 #include <map>
+
+// Internal system dependencies
+#include <reedb/vaults.h>
+#include "crypto/rcry_engine.h"
+#include "crypto/rcry_utils.h"
+
+// TODO: Make it a vector<rcry_engine *> for multi threaded fun.
+static rcry_engine *master_crypto;
+static rcry_utils *cry_utils;
 
 using namespace std;
 
-reedb::reedb()
-{
-  this->finalised = false;
-  cout << "Preparing to start a new Reedb instance..." << endl;
-  
-  if(verbose) cout << "Defining sane defaults...";
-  
-  /* Populate sane defaults */
-  this->daemon = false;
-  this->verbose = true;
-  
-  /* Some verbose loging */
-  if(verbose) cout << "done" << endl;
-  if(verbose) cout << "Waiting for finialisation..." << endl;
+reedb::reedb() {
+    this->finalised = false;
+    cout << "Preparing to start a new Reedb instance...";
+
+    /* Populate sane defaults */
+    this->daemon = false;
+    this->verbose = true;
+
+    /* Some verbose loging */
 }
 
-reedb::~reedb()
-{
-  cout << "=== Running cleanup ===" << endl;
-  
-  for(rdb_vaults* interface : this->vault_interfaces) {
-    delete(interface);
-  }
-}
+reedb::~reedb() {
+    cout << "=== Running cleanup ===" << endl;
 
-bool reedb::isReady()
-{
-  return finalised;
-}
-
-void reedb::register_vinterface(rdb_vaults* interface)
-{
-  string interface_id = interface->get_id();
-  for(rdb_vaults* rv : this->vault_interfaces) {
-    if(rv->get_id() == interface_id) {
-      cout << "[ERROR] This interface is already registered! Skipping..." << endl;
-      return;
+    for (rdb_vaults *interface : this->vault_interfaces) {
+        delete (interface);
     }
-  }
-  if(this->verbose) cout << "Adding interface with id " << interface_id << " to reedb instance..." << endl;
-  this->vault_interfaces.push_back(interface);
+
+    delete (master_crypto);
 }
 
-void reedb::finalise()
-{
-  if(verbose) cout << "Checking user settings and starting Reedb" << endl;
-
-  /* From now on it's ready to be used */
-  this->finalised = true;
+bool reedb::isReady() {
+    return finalised;
 }
 
-void reedb::terminate()
-{
-  cout << "Instance " << this << " is being terminated. All active vaults_interface are closed and dropped..." << endl;
-  
-  delete(this);
+void reedb::register_vinterface(rdb_vaults *interface) {
+    string interface_id = interface->get_id();
+    for (rdb_vaults *rv : this->vault_interfaces) {
+        if (rv->get_id() == interface_id) {
+            cout << "[ERROR] This interface is already registered! Skipping..." << endl;
+            return;
+        }
+    }
+    if (this->verbose) cout << "Adding interface with id " << interface_id << " to reedb instance..." << endl;
+    this->vault_interfaces.push_back(interface);
+}
+
+void reedb::finalise() {
+    if (verbose) cout << "Checking user settings and starting Reedb" << endl;
+
+    /* Create a master crypto engine */
+    master_crypto = new rcry_engine();
+
+    /* From now on it's ready to be used */
+    this->finalised = true;
+}
+
+void reedb::terminate() {
+    cout << "Instance " << this << " is being terminated. All active vaults_interface to be closed..." << endl;
+    delete (this);
 }
