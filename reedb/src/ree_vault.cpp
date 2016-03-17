@@ -31,21 +31,21 @@ using namespace libconfig;
 ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path,
                      string passphrase) {
 
-    /* Generate a UUID and initialise the crypto engine with said token */
+    /* Generate UUID and store it in the vault metadata. TODO: Should this be moved? */
     uuid_helper uh;
     uh.rdb_uuid_generate(uuid, ONE);
-    this->uuid = **uuid;
+    this->uuid = (**uuid);
 
-    /* Then generate and asign token */
+    /* Then generate and copy token into vault */
     rdb_tokens_create(token, 0);
-    this->token = **(token);
+    this->token = (**token);
 
-
+    /* Assign name, path and size metadata */
     this->name = name;
     this->path = path;
     this->file_count = 0;
 
-    cout << "Creating a new vault. From scratch" << endl;
+    cout << "Creating new vault with id " << this->uuid.id << " from scratch." << endl;
 
     this->headers = new map<string, datafile_h *>();
     this->files = new map<string, datafile *>();
@@ -67,6 +67,7 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     /* Expand our path, add the name as a folder and data dir */
     filesystem::path target(expantion.we_wordv[0]);
     target /= combined.c_str();
+    string full_path = target.c_str();
 
     target /= "datastore";
     created = filesystem::create_directories(target);
@@ -135,8 +136,6 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 
     /* Release the crypto engine again */
     engine->switch_context(nullptr);
-
-
     cout << "Preparing to dump encrypted key to disk..." << endl;
 
     /* Generate our keyfile name here so we can use it in the metadata header */
@@ -157,14 +156,14 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     strcat(concat, "::");
     strcat(concat, encrypted_key.c_str());
 
-    cout << "Writing...";
+    cout << "Writing key...";
 
     /* Expand our path, add the name as a folder and data dir */
     size_t path_size = strlen(path.c_str()) + strlen(name.c_str())
                        + strlen(combined.c_str()) + strlen(sub_path) + strlen(master) + 16;
 
     char key_path[sizeof(char) * path_size];
-    strcpy(key_path, "/home/spacekookie/Documents/default.vault/");
+    strcpy(key_path, full_path.c_str());
     strcat(key_path, sub_path); // keystore/
     strcat(key_path, master);
     strcat(key_path, ".cey");
@@ -184,5 +183,9 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {
+
+}
+
+void ree_vault::close_vault() {
 
 }
