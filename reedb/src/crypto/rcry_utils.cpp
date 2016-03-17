@@ -27,7 +27,7 @@ char *rcry_utils::generate_minitoken() {
     char *token;
 
     /* Use gcrypt random number generator */
-    token = (char *) gcry_random_bytes_secure(32, GCRY_STRONG_RANDOM);
+    token = (char *) gcry_random_bytes(32, GCRY_STRONG_RANDOM);
 
     /* Use Crypto++ utilities because they are very convenient */
     string encoded; // TODO: Write your own so we can ditch crypto++ ?
@@ -41,7 +41,7 @@ char *rcry_utils::generate_minitoken() {
 char *rcry_utils::generate_random(unsigned int length, bool clear) {
     // void * gcry_random_bytes_secure (size_t nbytes, enum gcry_random_level level)
     char *rand = (char *) malloc(sizeof(char) * length);
-    rand = (char *) gcry_random_bytes_secure(length, GCRY_STRONG_RANDOM);
+    rand = (char *) gcry_random_bytes(length, GCRY_STRONG_RANDOM);
 
     if (clear) {
         string encoded;
@@ -54,7 +54,11 @@ char *rcry_utils::generate_random(unsigned int length, bool clear) {
 
 void rcry_utils::generate_weak_rand(char **data, unsigned int length) {
     (*data) = (char *) malloc(sizeof(char) * length);
-    (*data) = (char *) gcry_random_bytes_secure(length, GCRY_WEAK_RANDOM);
+    (*data) = (char *) gcry_random_bytes(length, GCRY_WEAK_RANDOM);
+
+    string encoded;
+    StringSource((byte *) rand, length, true, new HexEncoder(new StringSink(encoded)));
+    memcpy((*data), encoded.c_str(), sizeof(long) * length); // WHAT THE FUCK??
 }
 
 void rcry_utils::generate_normal_rand(char **data, unsigned int length) {

@@ -155,27 +155,19 @@ string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *tok
     string encoded;
 
     /* Check that we're actually allowed to access this token by comparing it to the current context */
-    // map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
-    // if (token == nullptr) goto release;
-    // if ((*this->context_map)[token] != context_key) goto release;
+    map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+//    if (token == nullptr) goto release;
+//    if ((*this->context_map)[token] != context_key) goto release;
 
     /* Save the current key, generate a salt and salt-hash the current user passphrase */
     byte buffer[AES::MAX_KEYLENGTH];
     memcpy(buffer, this->context_key, AES::MAX_KEYLENGTH);
-
-//    encoded.clear();
-//    StringSource(buffer, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
-//    cout << "Buffer: " << encoded << endl;
 
     *salt = rcry_utils::generate_random(8, true);
     byte *user_key = (byte *) rcry_utils::md_sha256_salted(*salt, passphrase->c_str(), false);
 
     /* Now manually overwrite the key! */
     memcpy(this->context_key, user_key, AES::MAX_KEYLENGTH);
-
-//    encoded.clear();
-//    StringSource(this->context_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
-//    cout << "User key: " << encoded << endl;
 
     /* Create a new context object for our crypto to work on */
     crycontext *context = new crycontext();
@@ -194,11 +186,10 @@ string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *tok
     string buffered_key = string((char *) buffer);
     string encrypted_key = this->encrypt_string(buffered_key, context);
 
-//    encoded.clear();
-//    StringSource(encrypted_key, true, new HexEncoder(new StringSink(encoded)));
-//    cout << "Encrypted Key: " << encoded << endl;
-
     return encoded;
+
+//    release:
+    /* We only reach this when an invalid token was used */
 }
 
 void rcry_engine::master_keygen(byte *key, rdb_uuid *uuid) {
