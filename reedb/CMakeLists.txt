@@ -24,13 +24,15 @@ set(REEDB_SOURCE
         src/crypto/token.cpp
         src/crypto/rcry_utils.cpp
         src/crypto/rcry_engine.cpp
+        src/crypto/rcry_helper.h
 
         # Data storage
         src/ree_vault.cpp
         src/datafile.cpp
 
         # Protocol buffer auto generated
-        src/datafile.pb.cc)
+        src/datafile.pb.cc
+        src/crypto/rcry_helper.cpp)
 
 # Define our library in cmake
 add_library(reedb ${REEDB_SOURCE})

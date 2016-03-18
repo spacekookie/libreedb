@@ -22,16 +22,13 @@
 
 // Runtime dependencies
 #include <iostream>
+#include <vector>
 #include <map>
 
 // Internal system dependencies
 #include <reedb/vaults.h>
 #include "crypto/rcry_engine.h"
-#include "crypto/rcry_utils.h"
-
-// TODO: Make it a vector<rcry_engine *> for multi threaded fun.
-static rcry_engine *master_crypto;
-static rcry_utils *cry_utils;
+#include "crypto/rcry_helper.h"
 
 using namespace std;
 
@@ -42,8 +39,6 @@ reedb::reedb() {
     /* Populate sane defaults */
     this->daemon = false;
     this->verbose = true;
-
-    /* Some verbose loging */
 }
 
 reedb::~reedb() {
@@ -52,8 +47,6 @@ reedb::~reedb() {
     for (rdb_vaults *interface : this->vault_interfaces) {
         delete (interface);
     }
-
-    delete (master_crypto);
 }
 
 bool reedb::isReady() {
@@ -75,8 +68,18 @@ void reedb::register_vinterface(rdb_vaults *interface) {
 void reedb::finalise() {
     if (verbose) cout << "Checking user settings and starting Reedb" << endl;
 
-    /* Create a master crypto engine */
-    master_crypto = new rcry_engine();
+    /* Make sure that the singleton context exists  */
+    rcry_context *context = rcry_context::instance();
+    int count = context->get_count_incr();
+
+    rcry_engine **engines = (rcry_engine **) malloc(sizeof(rcry_engine *) * 4);
+
+    /* Create an engine and actually save it */
+    rcry_engine *e = new rcry_engine();
+    engines[count] = e;
+
+    /* Transfer our pointer-pointer into the context */
+    context->rcry_context_update(engines);
 
     /* From now on it's ready to be used */
     this->finalised = true;
