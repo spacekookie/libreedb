@@ -83,11 +83,10 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
         filesystem::create_directories(target);
         target.remove_leaf();
     } else {
-        cout << "Creating vault path went wront!" << endl;
+        cout << "[ERROR] A vault already exists at that location!" << endl;
         wordfree(&expantion);
         throw 1;
     }
-
 
     target /= "master.cfg";
     string config_path = target.c_str();
@@ -183,6 +182,10 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {
+
+}
+
+ree_vault::~ree_vault() {
 
 }
 

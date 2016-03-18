@@ -1,13 +1,15 @@
 #ifndef VAULTS_H
 #define VAULTS_H
 
-#include "reedb/crypto/token.h"
-
-extern "C" {
-#include "reedb/utils/uuid.h"
+extern "C" { // C includes
 #include "reedb/utils/helper.h"
 }
 
+// Utility Reedb includes
+#include "reedb/utils/uuid.h"
+#include "reedb/crypto/token.h"
+
+// Runtime includes
 #include <string>
 #include <vector>
 #include <list>
@@ -15,7 +17,7 @@ extern "C" {
 
 using namespace std;
 
-/* Struct that */
+/* Contains metadata about a vault returned to the dev */
 typedef struct {
     rdb_uuid *id;
     string *name, *path;
@@ -23,11 +25,12 @@ typedef struct {
     bool active;
 } vault_meta;
 
+/* Contains metadata fields about a file */
 typedef struct {
     unsigned int revisions;
     string *category;
     string *title;
-    list <string> *tags; // Change to a vector?
+    list<string *> *tags;
 } file_meta;
 
 class rdb_vaults {
@@ -42,6 +45,9 @@ public:
     rdb_vaults();
 
     ~rdb_vaults();
+
+    /* Used to register rcry_engine on this interface */
+    // void register_rcry(rcry_context *content);
 
     vector<vault_meta> *list_vaults();
 

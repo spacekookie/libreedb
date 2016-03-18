@@ -6,15 +6,17 @@
 #include <list>
 #include <map>
 
-// Internal Reedb includes
 #include "datafile.h"
-
-#include "crypto/rcry_engine.h"
-#include "reedb/crypto/token.h"
 #include "reedb/utils/uuid.h"
+
+// Internal crypto includes
+#include "reedb/crypto/token.h"
+#include "crypto/rcry_engine.h"
+#include "crypto/rcry_utils.h"
 
 extern "C" {
 #include "reedb/utils/helper.h"
+#include "utils/files.h"
 }
 
 using namespace std;
