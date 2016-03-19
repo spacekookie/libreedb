@@ -42,13 +42,9 @@ int main(int argc, char **args) {
     rdb->register_vinterface(v);
 
     /* Create a vault and then query its state */
-    vault_meta *vault = v->create("default", "~/Documents/", "foobar32");
-
-    cout << "Name: " << *vault->name << endl;
-    cout << "ID: " << vault->id->id << endl;
-    cout << "Size: " << vault->size << endl;
-    cout << "Path: " << *vault->path << endl;
-    cout << "Active: " << vault->active << endl;
+    string passphrase = "foobar32";
+    vault_meta *vault = v->create("default", "~/Documents/", passphrase);
+    rdb_token token = v->authenticate(vault->id, passphrase);
 
     rdb->terminate();
     return 0;

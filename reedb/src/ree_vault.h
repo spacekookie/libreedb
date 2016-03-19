@@ -24,11 +24,13 @@ using namespace std;
 class ree_vault {
 private:
 
-    /* Some metadata fields about the vault */
+/* Name of the vault as a GETTER Macro */
 GETTER(string, name)
 
+/* Path of the vault as a GETTER Macro */
 GETTER(string, path)
 
+/* Current vault file count asa GETTER macro */
 GETTER(size_t, file_count)
 
     /* File management fields */
@@ -42,7 +44,14 @@ GETTER(size_t, file_count)
     /* The ID of the engine currently handling this vault */
     int engine_id;
 
+    /* The token required for the crypto engine */
     rcry_token *token;
+    char *pw_hash;
+
+    /* Primary meta salt and IV */
+    char *salt;
+    char *iv;
+
 
 public:
 
@@ -83,7 +92,7 @@ public:
      * target. This is used to have multiple applications access the same
      * vault.
      */
-    char *(*unlockVault)(string passphrase);
+    int unlockVault(string passphrase);
 
     /** This yields a token to the vault and makes it invalid for future operations. */
     void yield_token(rcry_token *token);

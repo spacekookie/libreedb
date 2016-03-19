@@ -213,7 +213,6 @@ void rcry_engine::master_keygen(byte *key, rdb_uuid *uuid) {
 }
 
 bool rcry_engine::confirm_passphrase(char **salt, char **iv, char *encrypted, std::string *passphrase) {
-//
 //    /* Hash our passphrase with the predetermined salt */
 //    byte *user_key = (byte *) rcry_utils::md_sha256_salted(*salt, passphrase->c_str(), false);
 //
@@ -233,6 +232,5 @@ bool rcry_engine::confirm_passphrase(char **salt, char **iv, char *encrypted, st
 //    StringSource((byte *) (*iv), AES::BLOCKSIZE, true, new HexEncoder(new StringSink(encoded)));
 //    memcpy((char *) (*iv), encoded.c_str(), AES::BLOCKSIZE * sizeof(char));
 //
-
     return false;
 }

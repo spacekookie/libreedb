@@ -17,6 +17,7 @@
 #include <libconfig.h++>
 
 // Cryptography includes
+#include "crypto/rcry_context.h"
 #include "crypto/rcry_engine.h"
 #include "crypto/rcry_token.h"
 #include "crypto/rcry_utils.h"
@@ -45,7 +46,9 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     /* Now things required for quick header caching */
     this->h_fields = new map<string, void *>();
 
-    /** CREATE DIRECTORIES **/
+    ////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////// Create directory tree for keystore, datastore, etc.
+    ////////////////////////////////////////////////////////////////////////////////////
 
     wordexp_t expantion;
     wordexp(path.c_str(), &expantion, 0);
@@ -78,38 +81,9 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
         throw 1;
     }
 
-    target /= "master.cfg";
-    string config_path = target.c_str();
-    wordfree(&expantion);
-
-    /* Now write our default configuration to disk */
-    Config cfg;
-
-    /* Get root setting and add sub-settings */
-    Setting &root = cfg.getRoot();
-
-    auto time = std::chrono::system_clock::now();
-
-    char *hostname = new char[128];
-    gethostname(hostname, 128);
-
-    char *username = new char[128];
-    getlogin_r(username, 128);
-
-    root.add("creation_date", Setting::TypeInt64) = time.time_since_epoch().count();
-    root.add("last_updated", Setting::TypeInt64) = time.time_since_epoch().count();
-    root.add("creation_machine", Setting::TypeString) = hostname;
-    root.add("updating_machine", Setting::TypeString) = hostname;
-    root.add("creation_user", Setting::TypeString) = username;
-    root.add("updating_user", Setting::TypeString) = username;
-
-    cout << "Writing config to file..." << endl;
-
-    /** Then write our configuration */
-    cfg.writeFile(config_path.c_str());
-
-    delete (hostname);
-    delete (username);
+    ////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////// Prepare the crypto initialisation & key generation
+    ////////////////////////////////////////////////////////////////////////////////////
 
     /* Initialise the crypto engine for this vault */
     rcry_token *token;
@@ -124,12 +98,14 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     cout << "Encrypting generated key with user password and salt" << endl;
 
     /* Then retrieve the key in encrypted form to write it to disk */
-    char *salt;
-    char *iv;
-    string encrypted_key = engine->get_encrypted_key(&salt, &iv, token, &passphrase);
+    string encrypted_key = engine->get_encrypted_key(&this->salt, &this->iv, token, &passphrase);
 
     /* Release the crypto engine again */
     engine->switch_context(nullptr);
+
+    /* Hash the passphrase and store it in the vault for quick passphrase comparison */
+    this->pw_hash = rcry_utils::md_sha256_salted(salt, passphrase.c_str(), true);
+
     cout << "Preparing to dump encrypted key to disk..." << endl;
 
     /* Generate our keyfile name here so we can use it in the metadata header */
@@ -140,9 +116,9 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     char concat[meta_size + strlen(encrypted_key.c_str())];
 
     // <SALT>::<IV>::<USER>::<ZONE>::<DATA>
-    strcpy(concat, salt);               // Salt (Optional)
+    strcpy(concat, this->salt);         // Salt (Optional)
     strcat(concat, "::");
-    strcat(concat, iv);                 // Encryption IV
+    strcat(concat, this->iv);           // Encryption IV
     strcat(concat, "::");
     strcat(concat, "{0}");              // User (Optional)
     strcat(concat, "::");
@@ -172,6 +148,44 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     fclose(f);
     cout << "done" << endl;
 
+    ////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////// Create a master config & write that to directory
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    target /= "master.cfg";
+    string config_path = target.c_str();
+    wordfree(&expantion);
+
+    /* Now write our default configuration to disk */
+    Config cfg;
+
+    /* Get root setting and add sub-settings */
+    Setting &root = cfg.getRoot();
+
+    auto time = std::chrono::system_clock::now();
+
+    char *hostname = new char[128];
+    gethostname(hostname, 128);
+
+    char *username = new char[128];
+    getlogin_r(username, 128);
+
+    root.add("creation_date", Setting::TypeInt64) = time.time_since_epoch().count();
+    root.add("last_updated", Setting::TypeInt64) = time.time_since_epoch().count();
+    root.add("creation_machine", Setting::TypeString) = hostname;
+    root.add("updating_machine", Setting::TypeString) = hostname;
+    root.add("creation_user", Setting::TypeString) = username;
+    root.add("updating_user", Setting::TypeString) = username;
+    root.add("khash", Setting::TypeString) = this->pw_hash;
+
+    cout << "Writing config to file..." << endl;
+
+    /** Then write our configuration */
+    cfg.writeFile(config_path.c_str());
+
+    delete (hostname);
+    delete (username);
+
     /* Log that we are done  */
     cout << "Done creating vault!" << endl;
 }
@@ -191,4 +205,19 @@ void ree_vault::close_vault() {
     // Do cleanup
 
     cout << "[DONE]" << endl;
+}
+
+int ree_vault::unlockVault(string passphrase) {
+
+    cout << "About to check passphrase" << endl;
+
+    char *to_consider = rcry_utils::md_sha256_salted(this->salt, passphrase.c_str(), true);
+
+    if (strcmp(to_consider, this->pw_hash) == 0) {
+        cout << "Password hash matches. Accepting token authentication..." << endl;
+        return 0;
+    } else {
+        cout << "Password hash test failed. Token authentication rejected!" << endl;
+        return 6;
+    }
 }
