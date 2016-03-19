@@ -18,6 +18,7 @@
 
 // Cryptography includes
 #include "crypto/rcry_engine.h"
+#include "crypto/rcry_token.h"
 #include "crypto/rcry_utils.h"
 
 extern "C" {
@@ -28,24 +29,14 @@ using namespace std;
 using namespace boost;
 using namespace libconfig;
 
-ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path,
-                     string passphrase) {
+#include <gcrypt.h>
 
-    /* Generate UUID and store it in the vault metadata. TODO: Should this be moved? */
-    uuid_helper uh;
-    uh.rdb_uuid_generate(uuid, ONE);
-    this->uuid = (**uuid);
-
-    /* Then generate and copy token into vault */
-    rdb_tokens_create(token, 0);
-    this->token = (**token);
+ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passphrase) {
 
     /* Assign name, path and size metadata */
     this->name = name;
     this->path = path;
     this->file_count = 0;
-
-    cout << "Creating new vault with id " << this->uuid.id << " from scratch." << endl;
 
     this->headers = new map<string, datafile_h *>();
     this->files = new map<string, datafile *>();
@@ -62,7 +53,6 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     bool created = true;
     string combined = name;
     combined.append(".vault");
-
 
     /* Expand our path, add the name as a folder and data dir */
     filesystem::path target(expantion.we_wordv[0]);
@@ -122,16 +112,21 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     delete (username);
 
     /* Initialise the crypto engine for this vault */
-    engine->init(*token);
-    engine->switch_context(*token);
+    rcry_token *token;
+    rcry_token_helper::create(&token, 0);
 
+    /* Copy the pointer into our vault so we can access crypto after we leave this function :) */
+    this->token = token;
+
+    engine->init(token);
+    engine->switch_context(token);
 
     cout << "Encrypting generated key with user password and salt" << endl;
 
     /* Then retrieve the key in encrypted form to write it to disk */
     char *salt;
     char *iv;
-    string encrypted_key = engine->get_encrypted_key(&salt, &iv, *token, &passphrase);
+    string encrypted_key = engine->get_encrypted_key(&salt, &iv, token, &passphrase);
 
     /* Release the crypto engine again */
     engine->switch_context(nullptr);
@@ -178,7 +173,7 @@ ree_vault::ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine
     cout << "done" << endl;
 
     /* Log that we are done  */
-    cout << "Done creating vault " << (*uuid)->id << endl;
+    cout << "Done creating vault!" << endl;
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {
@@ -190,7 +185,7 @@ ree_vault::~ree_vault() {
 }
 
 void ree_vault::close_vault() {
-    cout << "\t> " << "Closing vault " << this->uuid.id << "...";
+    cout << "\t> " << "Closing vault";
     cout.flush();
 
     // Do cleanup

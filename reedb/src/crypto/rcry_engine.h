@@ -22,7 +22,7 @@
 #define REEDB_RCRYENGINE_H
 
 #include "reedb/utils/uuid.h"
-#include "reedb/crypto/token.h"
+#include "rcry_token.h"
 
 extern "C" {
 #include "reedb/utils/helper.h"
@@ -49,8 +49,6 @@ typedef struct crycontext {
     bool clear;
 } crycontext;
 
-typedef rdb_token rcry_token;
-
 /**
  * Main crypto interface for Reedb. Is instantiated once and can handle
  * crypto for multiple vaults_interface. Vaults get assigned tokens and UUIDs needed
@@ -62,7 +60,7 @@ typedef rdb_token rcry_token;
 class rcry_engine {
 
 private:
-    std::map<rdb_token *, byte[AES::MAX_KEYLENGTH]> *context_map;
+    std::map<rcry_token *, byte[AES::MAX_KEYLENGTH]> *context_map;
     crycontext *context;
     byte context_key[AES::MAX_KEYLENGTH];
     bool cry_lock = false;
@@ -76,7 +74,7 @@ public:
 
     int query_id();
 
-    void switch_context(rdb_token *token);
+    void switch_context(rcry_token *token);
 
     /**
     * Generate a master key for a vault with a specific token.
@@ -128,7 +126,7 @@ public:
      * @param token: Your current token, just for security!
      * @param passphrase: The user passphrase used to encrypt the vault key.
      */
-    std::string get_encrypted_key(char *(*salt), char *(*iv), rdb_token *token, std::string *passphrase);
+    std::string get_encrypted_key(char *(*salt), char *(*iv), rcry_token *token, std::string *passphrase);
 
     /**
     * Initialise a vault on this crypto engine by giving it a master key
@@ -138,7 +136,7 @@ public:
     *
     * @param token: A token the key gets bound to
     */
-    void init(rdb_token *token);
+    void init(rcry_token *token);
 
     /**
      * Alpha support function! Please don't ignore warnings thrown by this function.
@@ -148,7 +146,7 @@ public:
      * @param salt: The salt used to hash the user passphrase.
      * @param passphrase: The user passphrase to decrypt the key
      */
-    void init(rdb_token *token, std::string encrypted_key, char *iv, char *salt, std::string passphrase);
+    void init(rcry_token *token, std::string encrypted_key, char *iv, char *salt, std::string passphrase);
 
     /** Hand in your token */
     void close();

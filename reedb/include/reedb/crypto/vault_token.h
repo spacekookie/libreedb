@@ -29,14 +29,12 @@ typedef struct rdb_token {
   unsigned int	timed;
 } rdb_token;
 
-class token_helper {
+class vault_token_helper {
 public:
-  rdb_token create(unsigned int timed);
-  void destroy(rdb_token *token);
+    static void create(rdb_token *(*token), unsigned int timed);
+    static void destroy(rdb_token *token);
+
 };
 
-void rdb_tokens_create(rdb_token *(*token), unsigned int timed);
-
-void rdb_tokens_destroy(rdb_token *token);
 
 #endif /* SRC_TOKEN_H_ */

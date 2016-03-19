@@ -7,7 +7,7 @@ extern "C" { // C includes
 
 // Utility Reedb includes
 #include "reedb/utils/uuid.h"
-#include "reedb/crypto/token.h"
+#include "reedb/crypto/vault_token.h"
 
 // Runtime includes
 #include <string>

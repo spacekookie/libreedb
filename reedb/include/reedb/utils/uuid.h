@@ -15,7 +15,7 @@ class uuid_helper {
 public:
 
     /* C like function you should use for UUIDs */
-    int rdb_uuid_generate(rdb_uuid *(*uuid), uuid_type type);
+    static int rdb_uuid_generate(rdb_uuid *(*uuid), uuid_type type);
 
 };
 

@@ -10,8 +10,8 @@
 #include "reedb/utils/uuid.h"
 
 // Internal crypto includes
-#include "reedb/crypto/token.h"
 #include "crypto/rcry_engine.h"
+#include "crypto/rcry_token.h"
 #include "crypto/rcry_utils.h"
 
 extern "C" {
@@ -25,7 +25,6 @@ class ree_vault {
 private:
 
     /* Some metadata fields about the vault */
-GETTER(rdb_uuid, uuid);
 GETTER(string, name)
 
 GETTER(string, path)
@@ -39,7 +38,11 @@ GETTER(size_t, file_count)
 
     /* Header fields */
     map<string, void *> *h_fields;
-    rdb_token token;
+
+    /* The ID of the engine currently handling this vault */
+    int engine_id;
+
+    rcry_token *token;
 
 public:
 
@@ -59,7 +62,7 @@ public:
      * @param passphrase: Master lock passphrase for the data
      *
      */
-    ree_vault(rdb_token *(*token), rdb_uuid *(*uuid), rcry_engine *engine, string name, string path, string passphrase);
+    ree_vault(rcry_engine *engine, string name, string path, string passphrase);
 
     /**
      * Only creates a new vault object from an existing vault that was
@@ -83,7 +86,7 @@ public:
     char *(*unlockVault)(string passphrase);
 
     /** This yields a token to the vault and makes it invalid for future operations. */
-    void yield_token(rdb_token *token);
+    void yield_token(rcry_token *token);
 
     /**
      * This function closes all vaults after letting insert operations finish

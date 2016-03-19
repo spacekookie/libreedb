@@ -21,10 +21,10 @@ set(REEDB_SOURCE
         src/utils/uuid.cpp
 
         # Crypto
-        src/crypto/token.cpp
+        src/crypto/vault_token.cpp
         src/crypto/rcry_utils.cpp
         src/crypto/rcry_engine.cpp
-        src/crypto/rcry_helper.h
+        src/crypto/rcry_context.h
 
         # Data storage
         src/ree_vault.cpp
@@ -32,7 +32,7 @@ set(REEDB_SOURCE
 
         # Protocol buffer auto generated
         src/datafile.pb.cc
-        src/crypto/rcry_helper.cpp)
+        src/crypto/rcry_context.cpp src/crypto/rcry_token.cpp src/crypto/rcry_token.h)
 
 # Define our library in cmake
 add_library(reedb ${REEDB_SOURCE})

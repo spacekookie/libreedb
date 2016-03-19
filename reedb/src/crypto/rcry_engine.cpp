@@ -63,13 +63,13 @@ int my_id;
 
 rcry_engine::rcry_engine(int id) {
     cout << "Creating rcry_engine with ID " << id << endl;
-    this->context_map = new map<rdb_token *, byte[AES::MAX_KEYLENGTH]>();
+    this->context_map = new map<rcry_token *, byte[AES::MAX_KEYLENGTH]>();
     my_id = id;
 }
 
 int rcry_engine::query_id() { return my_id; }
 
-void rcry_engine::init(rdb_token *token) {
+void rcry_engine::init(rcry_token *token) {
     /* Generate STRONG_RANDOM key of size 32 byte */
     char *random = (char *) gcry_random_bytes_secure(AES::MAX_KEYLENGTH, GCRY_STRONG_RANDOM);
 
@@ -130,8 +130,8 @@ char *rcry_engine::encrypt(void *data, crycontext *context) {
 /** Simple utility function to decrypt a C++ string */
 //   string *decrypt_string(string *data);
 
-void rcry_engine::switch_context(rdb_token *token) {
-    map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+void rcry_engine::switch_context(rcry_token *token) {
+    map<rcry_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
 
     if (token == nullptr) goto release;
 
@@ -157,11 +157,11 @@ void rcry_engine::switch_context(rdb_token *token) {
     cout << "Crypto Engine now released for new token" << endl;
 }
 
-string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *token, string *passphrase) {
+string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rcry_token *token, string *passphrase) {
     string encoded;
 
     /* Check that we're actually allowed to access this token by comparing it to the current context */
-    map<rdb_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+    map<rcry_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
 //    if (token == nullptr) goto release;
 //    if ((*this->context_map)[token] != context_key) goto release;
 

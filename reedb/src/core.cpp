@@ -28,7 +28,7 @@
 // Internal system dependencies
 #include <reedb/vaults.h>
 #include "crypto/rcry_engine.h"
-#include "crypto/rcry_helper.h"
+#include "crypto/rcry_context.h"
 
 using namespace std;
 
@@ -75,7 +75,7 @@ void reedb::finalise() {
     rcry_engine **engines = (rcry_engine **) malloc(sizeof(rcry_engine *) * 4);
 
     /* Create an engine and actually save it */
-    rcry_engine *e = new rcry_engine();
+    rcry_engine *e = new rcry_engine(count);
     engines[count] = e;
 
     /* Transfer our pointer-pointer into the context */

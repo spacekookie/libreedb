@@ -1,7 +1,9 @@
-#include <reedb/vaults.h>
 #include <iostream>
 
-#include "crypto/rcry_engine.h"
+#include <reedb/crypto/vault_token.h>
+#include <reedb/vaults.h>
+
+#include "crypto/rcry_context.h"
 #include "ree_vault.h"
 
 extern "C" {
@@ -12,16 +14,11 @@ extern "C" {
 static map<rdb_uuid *, ree_vault *> *active_vaults;
 static vector<vault_meta> *scoped_vaults;
 
-/* Pointer storage for main crypto engine */
-static rcry_engine *engine;
-
 rdb_vaults::rdb_vaults() {
     this->id = "AAA";
 
     active_vaults = new map<rdb_uuid *, ree_vault *>();
     scoped_vaults = new vector<vault_meta>();
-
-    engine = new rcry_engine();
 }
 
 rdb_vaults::~rdb_vaults() {
@@ -39,12 +36,25 @@ vector<vault_meta> *rdb_vaults::list_vaults() {
 }
 
 vault_meta *rdb_vaults::create(string name, string path, string passphrase) {
+
+    cout << "Creating a new vault with name " << name << " and path " << path << endl;
+
     /* Create a token and UUID reference */
     rdb_token *token;
+    vault_token_helper::create(&token, 0);
+
+    cout << "Done with token!" << endl;
+
     rdb_uuid *uuid;
+    uuid_helper::rdb_uuid_generate(&uuid, ONE);
+
+    cout << "Done with UUID" << endl;
+
+    rcry_engine *engine = new rcry_engine(55);
+    rcry_context::instance()->add_engine(engine);
 
     /* Then pass everything we need down to the constructor */
-    ree_vault *vault = new ree_vault(&token, &uuid, engine, name, path, passphrase);
+    ree_vault *vault = new ree_vault(engine, name, path, passphrase);
 
     /* Create a vault meta to be scoped publicly */
     vault_meta meta;
