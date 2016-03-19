@@ -70,9 +70,11 @@ private:
 public:
 
     /** Empty constructor that generates everything from scratch */
-    rcry_engine();
+    rcry_engine(int id);
 
     rcry_engine(std::list<rdb_uuid> *ids);
+
+    int query_id();
 
     void switch_context(rdb_token *token);
 

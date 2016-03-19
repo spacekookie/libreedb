@@ -59,9 +59,15 @@ using CryptoPP::CBC_Mode;
 
 using namespace std;
 
-rcry_engine::rcry_engine() {
+int my_id;
+
+rcry_engine::rcry_engine(int id) {
+    cout << "Creating rcry_engine with ID " << id << endl;
     this->context_map = new map<rdb_token *, byte[AES::MAX_KEYLENGTH]>();
+    my_id = id;
 }
+
+int rcry_engine::query_id() { return my_id; }
 
 void rcry_engine::init(rdb_token *token) {
     /* Generate STRONG_RANDOM key of size 32 byte */
@@ -180,7 +186,7 @@ string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rdb_token *tok
     /* Then clean it up for future generations */
     encoded.clear();
     StringSource((byte *) (*iv), AES::BLOCKSIZE, true, new HexEncoder(new StringSink(encoded)));
-    memcpy((char *)(*iv), encoded.c_str(), AES::BLOCKSIZE * sizeof(char));
+    memcpy((char *) (*iv), encoded.c_str(), AES::BLOCKSIZE * sizeof(char));
 
     /* Now go and encrypt our buffer with the new context key */
     string buffered_key = string((char *) buffer);

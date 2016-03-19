@@ -37,8 +37,13 @@ public:
 
     int get_count();
 
+    /** Quick and dirty, get the engine with a certain ID */
+    rcry_engine *get_engine_with_id(int id);
+
     /* Make sure that the context is set to ready */
     bool is_ready();
+
+    void add_engine(rcry_engine *engine);
 };
 
 #endif
