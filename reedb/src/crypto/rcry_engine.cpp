@@ -211,3 +211,28 @@ void rcry_engine::master_keygen(byte *key, rdb_uuid *uuid) {
     /* ...then generate random noise in it*/
     prng.GenerateBlock(key, AES::MAX_KEYLENGTH);
 }
+
+bool rcry_engine::confirm_passphrase(char **salt, char **iv, char *encrypted, std::string *passphrase) {
+//
+//    /* Hash our passphrase with the predetermined salt */
+//    byte *user_key = (byte *) rcry_utils::md_sha256_salted(*salt, passphrase->c_str(), false);
+//
+//    /* Then overwrite the key TODO: Change this to work via a context switch */
+//    memcpy(this->context_key, user_key, AES::MAX_KEYLENGTH);
+//
+//    /* Create a new context object for our crypto to work on */
+//    crycontext *context = new crycontext();
+//    context->size = AES::MAX_KEYLENGTH;
+//
+//    /* Now generate an IV and store it in the context */
+//    rcry_utils::generate_normal_rand(iv, AES::BLOCKSIZE * sizeof(char));
+//    memcpy(context->iv, *iv, AES::BLOCKSIZE);
+//
+//    /* Then clean it up for future generations */
+//    string encoded;
+//    StringSource((byte *) (*iv), AES::BLOCKSIZE, true, new HexEncoder(new StringSink(encoded)));
+//    memcpy((char *) (*iv), encoded.c_str(), AES::BLOCKSIZE * sizeof(char));
+//
+
+    return false;
+}

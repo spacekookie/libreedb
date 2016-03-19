@@ -129,6 +129,20 @@ public:
     std::string get_encrypted_key(char *(*salt), char *(*iv), rcry_token *token, std::string *passphrase);
 
     /**
+     * Support function that checks a user passphrase by attempting to decrypt the master
+     * key. Throws an exception if the decryption failed to indicate that the passphrase
+     * was wrong.
+     *
+     * === Currently not implemented ===
+     *
+     * @param salt
+     * @param iv
+     * @param encrypted
+     * @param passphrase
+     */
+    bool confirm_passphrase(char *(*salt), char *(*iv), char *encrypted, std::string *passphrase);
+
+    /**
     * Initialise a vault on this crypto engine by giving it a master key
     * and binding it to a token. A vault can then switch crypto context
     * by providing it's token to the engine and then doing operations in

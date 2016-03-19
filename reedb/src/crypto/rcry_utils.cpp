@@ -124,21 +124,16 @@ char *rcry_utils::md_sha256_salted(char *salt, const char *message, bool clear) 
     strcat(salty_message, message);
     unsigned int msg_len = strlen(salty_message);
 
-//    cout << "Salted msg: " << salty_message << endl;
-//    cout << "Msg length: " << msg_len << endl;
-
-    // Apply hash in the buffer
-    gcry_md_hash_buffer(GCRY_MD_SHA256, digest, salty_message, msg_len);
-
-    cout << "Done with hashing..." << endl;
+    gcry_md_hash_buffer(GCRY_MD_SHA256, digest, message, strlen(message));
 
     if (clear) {
         string encoded;
         StringSource((byte *) digest, sizeof(char) * digest_len, true, new HexEncoder(new StringSink(encoded)));
-        // StringSource(digest, true, new HexEncoder(new StringSink(encoded)));
-        cout << "Encoded: " << encoded << endl;
-        memcpy(digest, encoded.c_str(), sizeof(long) * digest_len); // WHAT THE FUCK??
-        cout << "Copied : " << digest << endl;
+        free(digest);
+
+        char *new_digest = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
+        strcpy(new_digest, encoded.c_str());
+        return new_digest;
     }
 
     free(salty_message);
