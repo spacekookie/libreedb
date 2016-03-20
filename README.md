@@ -10,7 +10,7 @@ Build
 
 Compilation dependencies
 
-`gcc cmake libgcrypt libcrypto++ libmicrohttp libboost`
+`gcc cmake libgcrypt libmicrohttp libcrypto++ libboost`
 
 An out-of-source build is recommended
 
@@ -20,40 +20,75 @@ cmake ..
 cmake --build .
 ```
 
-A static object of the library will be compiled as well as the reedbd-http extention
+A static object of the library will be compiled as well as the reedbd-http extention.
 
 
 How to use
 ----------
 
+libreedb provides high level functions to interact with reedb databases. The following section will go into some examples, however do note that this is by no means a complete collection. For more information, please check the wiki.
+
+**Reedb initialisation**
+
 ```C++
-void main(int argc, char **args) {
+/* Create a Reedb context */
+reedb *rdb = new reedb();
+rdb->set_os(LINUX);
+rdb->set_verbose(true);
+rdb->finalise();
 
-    /* Create a reedb handler object */
-    reedb *rdb = new reedb();
-    rdb->set_os(LINUX);
-    rdb->set_distro(FEDORA);
-    rdb->set_verbose(true);
-    rdb->finalise();
-
-    /* Create a vault interface. Interfaces can handle a number of vaults */
-    rdb_vaults *v = new rdb_vaults();
-    rdb->register_vinterface(v);
-
-    /* Create a new vault with name, location and default master passphrase */
-    v->create("default", "~/Documents/", "foobar32");
-
-    /* Shut it down */
-    rdb->terminate();
-    return 0;
-}
+/* Create a vaults interface and attach it to the context */
+rdb_vaults *v = new rdb_vaults();
+rdb->register_vinterface(v);
 ```
 
-More use cases of the native interface will be added. There is also a RESTful API available via reedbd-http.
+**Creation and destruct operations**
 
-EDIT: I wrote a little blog article about the native interface [http://spacekookie.de/dev-diary/hacking-on-reedb/](here). If you have questions - comment.
+```C++
+vault_meta *vault = v->create("default", "~/Documents/", "foobar32");
+
+/* Destruction of a vault */
+v->destroy(vault->id, ...);
+```
+
+**Second stage user authentication**
+
+```C++
+rdb_token token = v->authenticate(vault->uuid, "foobar32");
+```
+
+**Data insertion and update**
+
+The following code outlines data insertions. Via the C++ interface a map is used to transmit a key-value store into a dataset. Update functions work analogue to insert. The map can be cleared after the insert - values are copied out.
+
+```C++
+map<string, string> data = map<string, string>();
+data["Field A"] = "foobar32"; // Ironically saving the vault pw in itself
+data["Field B"] = "My Username";
+v->insert(vault->id, &token, "My File", &data);
+```
+
+**Vault file meta updates**
+
+You can adjust the meta fields available for filters in datafiles. This can be done via the meta migrate function.
+
+```C++
+map<string, string> metas = map<string, string>();
+// ... Look into wiki for details
+v->migrate_headers(&metas);
+```
+
+These were just some basic use cases for libreedb. For more details please check the documentation on the wiki.
+
+Testing
+-------
+
+Yea, I should write some tests... :)
 
 License
 -------
 
-Reedb is licensed under the LGPL v3.0. It is free software and comes with no warranty of usefulness.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the Lesser GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
