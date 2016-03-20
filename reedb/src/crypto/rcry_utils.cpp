@@ -89,22 +89,25 @@ char *rcry_utils::md_tiger2_salted(char *salt, const char *message, bool clear) 
     int digest_len = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
 
     // Malloc some space for a digest and a salty message. The latter one gets freed later.
-    char *digest = (char *) malloc(digest_len);
-    char *salty_message = (char *) malloc(strlen(salt) + strlen(message) + 2);
+    char *digest = (char *) malloc(sizeof(char) * digest_len);
+    char *salty_message = (char *) malloc(strlen((char *) salt) + strlen(message) + 2);
 
     // Concatinate our salt with the message and a wonderful seperator named "::"
     strcpy(salty_message, salt);
     strcat(salty_message, "::");
     strcat(salty_message, message);
-    unsigned int in_len = strlen(salty_message);
+    unsigned int msg_len = strlen(salty_message);
 
-    // Apply a hash buffer
-    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, salty_message, in_len);
+    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, message, strlen(message));
 
     if (clear) {
         string encoded;
-        StringSource((byte *) digest, digest_len, true, new HexEncoder(new StringSink(encoded)));
-        memcpy(digest, encoded.c_str(), sizeof(long) * digest_len); // WHAT THE FUCK??
+        StringSource((byte *) digest, sizeof(char) * digest_len, true, new HexEncoder(new StringSink(encoded)));
+        free(digest);
+
+        char *new_digest = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
+        strcpy(new_digest, encoded.c_str());
+        return new_digest;
     }
 
     free(salty_message);
@@ -144,21 +147,18 @@ char *rcry_utils::md_blake_salted(char *salt, const char *message, bool clear) {
 
 char *rcry_utils::md_tiger2(const char *message, bool clear) {
 
-    // Malloc some space for a digest and a salty message. The latter one gets freed later.
     int digest_len = gcry_md_get_algo_dlen(GCRY_MD_TIGER2);
     char *digest = (char *) malloc(sizeof(char) * digest_len);
-    int in_len = strlen(message);
-
-    // Apply a hash buffer
-    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, message, in_len);
+    gcry_md_hash_buffer(GCRY_MD_TIGER2, digest, message, strlen(message));
 
     if (clear) {
         string encoded;
-        // StringSource((byte *) digest, sizeof(char) * digest_len, true, new HexEncoder(new StringSink(encoded)));
-        StringSource(digest, true, new HexEncoder(new StringSink(encoded)));
-        cout << "Encoded: " << encoded << endl;
-        memcpy(digest, encoded.c_str(), sizeof(char) * digest_len); // WHAT THE FUCK??
-        cout << "Copied : " << digest << endl;
+        StringSource((byte *) digest, sizeof(char) * digest_len, true, new HexEncoder(new StringSink(encoded)));
+        free(digest);
+
+        char *new_digest = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
+        strcpy(new_digest, encoded.c_str());
+        return new_digest;
     }
 
     return digest;
