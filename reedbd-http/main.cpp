@@ -26,6 +26,9 @@
 #include <reedb/core.h>
 #include <reedb/vaults.h>
 
+#include <map>
+#include <string>
+
 using namespace std;
 
 #include <gcrypt.h>
@@ -45,6 +48,15 @@ int main(int argc, char **args) {
     string passphrase = "foobar32";
     vault_meta *vault = v->create("default", "~/Documents/", passphrase);
     rdb_token token = v->authenticate(vault->id, passphrase);
+
+    map<string, string> data = map<string, string>();
+    data["Field A"] = "foobar32"; // Ironically saving the vault pw in itself
+    data["Field B"] = "My Username";
+    v->insert(vault->id, &token, "My File", &data);
+
+    map<string, string> metas = map<string, string>();
+    // ... Look into wiki for details
+    v->migrate_headers(&metas);
 
     rdb->terminate();
     return 0;

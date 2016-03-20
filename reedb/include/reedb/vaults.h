@@ -72,7 +72,7 @@ public:
      *
      * @param meta_delta: How the header set should be migrated.
      */
-    void migrate_headers(map<string *, string *> meta_delta);
+    void migrate_headers(map<string, string> *meta_delta);
 
     /**
     * Authenticate a process for a vault and open it (if not already open).
