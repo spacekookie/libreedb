@@ -1,6 +1,8 @@
 #ifndef RDBDATAFILE_H
 #define RDBDATAFILE_H
 
+#include <crypto/rcry_engine.h>
+
 #include <string>
 #include <vector>
 #include <map>
@@ -92,6 +94,9 @@ private:
     string path;
     int version;
     bool locked;
+
+    /* A reference to the crypto engine responsible for this file */
+    rcry_engine *engine;
 
     /* Database metadata for queries */
     string *category;

@@ -37,7 +37,6 @@ datafile::datafile(string name, string parent) {
 
     /* Set cache mode to hotdrop so we can use the file immediately */
     this->cache(HOTDROP);
-    this->write();
 
     std::cout << "File dump complete. Ready to cache it from disk..." << endl;
 }
@@ -48,6 +47,7 @@ void datafile::populate() {
 
 void datafile::write() {
 
+    /* First we have to make the data usable to us */
 }
 
 void datafile::cache(const cache_mode mode) {
