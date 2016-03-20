@@ -6,8 +6,8 @@
 #include <list>
 #include <map>
 
-#include "datafile.h"
 #include "reedb/utils/uuid.h"
+#include "datafile.h"
 
 // Internal crypto includes
 #include "crypto/rcry_engine.h"
@@ -24,14 +24,14 @@ using namespace std;
 class ree_vault {
 private:
 
-/* Name of the vault as a GETTER Macro */
-GETTER(string, name)
+    /* Name of the vault as a GETTER Macro */
+    GETTER(string, name)
 
-/* Path of the vault as a GETTER Macro */
-GETTER(string, path)
+    /* Path of the vault as a GETTER Macro */
+    GETTER(string, path)
 
-/* Current vault file count asa GETTER macro */
-GETTER(size_t, file_count)
+    /* Current vault file count asa GETTER macro */
+    GETTER(size_t, file_count)
 
     /* File management fields */
     map<string, datafile_h *> *headers;
@@ -51,7 +51,6 @@ GETTER(size_t, file_count)
     /* Primary meta salt and IV */
     char *salt;
     char *iv;
-
 
 public:
 
@@ -106,13 +105,15 @@ public:
 
     /**** FILE OPERATION FUNCTIONS ****/
 
+    bool check_file_existance(string name);
+
     void read_file(string name);
 
     void add_file(string name);
 
     void remove_file(string name);
 
-    void update_file(string name, string data);
+    void update_file(string name, map<string, string> *content);
 
     /** 
      * Search through the vault with RQL. If search is NULL all 

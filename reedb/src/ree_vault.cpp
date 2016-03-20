@@ -36,7 +36,6 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
 
     /* Assign name, path and size metadata */
     this->name = name;
-    this->path = path;
     this->file_count = 0;
 
     this->headers = new map<string, datafile_h *>();
@@ -61,6 +60,9 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     filesystem::path target(expantion.we_wordv[0]);
     target /= combined.c_str();
     string full_path = target.c_str();
+
+    // Save the full path
+    this->path = full_path;
 
     target /= "datastore";
     created = filesystem::create_directories(target);
@@ -220,4 +222,24 @@ int ree_vault::unlockVault(string passphrase) {
         cout << "Password hash test failed. Token authentication rejected!" << endl;
         return 6;
     }
+}
+
+bool ree_vault::check_file_existance(string name) {
+    return (*headers)[name] ? true : false;
+}
+
+void ree_vault::add_file(string name) {
+
+    /* Create datafile and datafile header */
+    filesystem::path target(this->path);
+    target /= "/datastore/";
+
+    datafile *d = new datafile(name, target.string());
+    // datafile_h *dh = new datafile_h();
+
+    /*  */
+}
+
+void ree_vault::update_file(string name, map<string, string> *content) {
+
 }
