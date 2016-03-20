@@ -6,10 +6,16 @@
 #include <vector>
 #include <map>
 
-#include <string.h> // C string support
-#include <string> // C++ strings
-
 #include <crypto/rcry_utils.h>
+#include <string.h>
+#include <sstream>
+#include <string>
+
+// Boost serialisation includes
+#include <boost/serialization/map.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
 
 using namespace std;
 
@@ -52,4 +58,25 @@ void datafile::write() {
 
 void datafile::cache(const cache_mode mode) {
 
+}
+
+map<int, int> deserialise(string s) {
+
+}
+
+string datafile::serialise(map<string, string> data) {
+    stringstream ss;
+    boost::archive::text_oarchive oarch(ss);
+    oarch << data;
+    return ss.str();
+}
+
+map<string, string> datafile::deserialise(string data) {
+    map<string, string> new_map;
+    stringstream ss;
+    ss.str(data);
+
+    boost::archive::text_iarchive iarch(ss);
+    iarch >> new_map;
+    return new_map;
 }

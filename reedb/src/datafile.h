@@ -82,10 +82,11 @@ public:
      */
     void close();
 
-    /**
-     * Deletes this datafile, scrubs it from disk and removes the encryption
-     * keys from the keystore.
-     */
+    /** Serialise a map of stuff into a string */
+    string serialise(map<string, string> data);
+
+    /** Deserialise a string back into a map of stuff */
+    map<string, string> deserialise(string data);
 
 private:
 
