@@ -3,6 +3,7 @@
 #include "reedb/vaults.h"
 #include "ree_vault.h"
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -22,7 +23,11 @@ static map<rdb_uuid *, ree_vault *> *active_vaults;
 static vector<vault_meta> *scoped_vaults;
 
 rdb_vaults::rdb_vaults() {
-    this->id = "AAA";
+
+    /* Give the interface a random ID */
+    char *buf;
+    rcry_utils::generate_weak_rand(&buf, 4);
+    this->id = string(buf);
 
     token_map = new map<rdb_uuid *, vector<rdb_token *> *>();
     active_vaults = new map<rdb_uuid *, ree_vault *>();
@@ -32,7 +37,6 @@ rdb_vaults::rdb_vaults() {
 rdb_vaults::~rdb_vaults() {
     std::cout << "Closing interface: " << this->id << endl;
 
-    // show content:
     for (std::map<rdb_uuid *, ree_vault *>::iterator it = active_vaults->begin(); it != active_vaults->end(); ++it) {
         it->second->close_vault();
         delete (it->second);
@@ -90,12 +94,8 @@ rdb_token rdb_vaults::authenticate(rdb_uuid *uuid, string passphrase, bool perma
             rdb_token *token;
             vault_token_helper::create(&token, 0);
 
-            cout << "Done with token generation: " << token->contents << endl;
-
             /* Assign the token to the vault ID */
             (*token_map)[uuid]->push_back(token);
-
-            cout << "Done with pushing" << endl;
 
             /* Then return it to the user */
             rdb_token user;
@@ -110,4 +110,33 @@ rdb_token rdb_vaults::authenticate(rdb_uuid *uuid, string passphrase, bool perma
         cout << "Error: " << e.what() << " occured!" << endl;
         cout << "Was your passphrase wrong?" << endl;
     }
+}
+
+void rdb_vaults::insert(rdb_uuid *id, rdb_token *token, string file_id, map<string, string> *content) {
+
+    // TODO: Make this function a bit nicer
+    bool accepted = false;
+
+    /** Go and check every token for equal contents */
+    for (rdb_token *t : *(*token_map)[id])
+        if (strcmp(t->contents, token->contents) == 0) accepted = true;
+
+    /* Make sure that we throw out any intruder */
+    if (!accepted) {
+        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        return;
+    }
+
+    /* Create the file if it doesn't exists */
+    if (!(*active_vaults)[id]->check_file_existance(file_id)) {
+
+        (*active_vaults)[id]->add_file(file_id);
+        cout << "Adding file '" << file_id << "'..." << endl;
+    }
+
+    /* Then either write into the new or existing file. But we don't care anymore at this point */
+    (*active_vaults)[id]->update_file(file_id, content);
+
+    cout << "[SUCCESS] File insertion complete" << endl;
+
 }

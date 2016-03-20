@@ -88,6 +88,16 @@ public:
     rdb_token authenticate(rdb_uuid *id, string passphrase, bool permanent = false);
 
     /**
+     * Function to yield in a token that you previously requested. It will throw a warning if
+     * the token had already timed out previously. Will free the token pointer provided to the user
+     *
+     * @param id: The uuid of the vault you want to yield your token to
+     * @param token: The token you want to yield. It will be freed.
+     *                  Do not use it afterwards!
+     */
+    rdb_token yield_token(rdb_uuid *id, rdb_token *token);
+
+    /**
     * Search a vault like you would any database. A header query will search
     * the header parts of each datafile. For a successful header query
     *
