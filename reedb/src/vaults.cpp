@@ -140,3 +140,43 @@ void rdb_vaults::insert(rdb_uuid *id, rdb_token *token, string file_id, map<stri
     cout << "[SUCCESS] File insertion complete" << endl;
 
 }
+
+void rdb_vaults::destroy(rdb_uuid *id, rdb_token *token) {
+    // TODO: Make this function a bit nicer
+    bool accepted = false;
+
+    /** Go and check every token for equal contents */
+    for (rdb_token *t : *(*token_map)[id])
+        if (strcmp(t->contents, token->contents) == 0) accepted = true;
+
+    /* Make sure that we throw out any intruder */
+    if (!accepted) {
+        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        return;
+    }
+
+    cout << "Not implemented!" << endl;
+}
+
+void rdb_vaults::remove(rdb_uuid *id, rdb_token *token, string file_id, list <string> *fields) {
+    // TODO: Make this function a bit nicer
+    bool accepted = false;
+
+    /** Go and check every token for equal contents */
+    for (rdb_token *t : *(*token_map)[id])
+        if (strcmp(t->contents, token->contents) == 0) accepted = true;
+
+    /* Make sure that we throw out any intruder */
+    if (!accepted) {
+        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        return;
+    }
+
+    /* Log and throw an error if the file doesn't exists */
+    if (!(*active_vaults)[id]->check_file_existance(file_id)) {
+        cout << "[ERROR] File '" << file_id << "' doesn't exists..." << endl;
+        return;
+    }
+
+    // (*active_vaults)[id];
+}

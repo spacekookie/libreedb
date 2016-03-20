@@ -21,4 +21,11 @@ typedef enum {
  */
 int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *subcat, char *name, rdb_file_t type);
 
+/**
+ * @param name
+ * @param path
+ * @param data
+ */
+int rdb_files_dfdump(char *name, char path, char *data);
+
 #endif //REEDB_FILES_H

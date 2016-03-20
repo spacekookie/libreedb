@@ -1,7 +1,10 @@
 #include "files.h"
 
 #include <stdio.h>
+#include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
 int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *subcat, char *name, rdb_file_t type) {
 
@@ -28,4 +31,31 @@ int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *
     fclose(fp);
 
     return 0;
+}
+
+void rdb_write_dataf(const char *data, const char *filename) {
+    FILE *fp;
+
+    char fn[strlen(filename) + 4];
+    strcpy(fn, filename);
+    strcat(fn, ".rdf");
+
+    fp = fopen(fn, "w+");
+    fprintf(fp, data);
+    fclose(fp);
+}
+
+char *rdb_read_dataf(const char *filename) {
+    char ch;
+
+    char fn[strlen(filename) + 4];
+    strcpy(fn, filename);
+    strcat(fn, ".rdf");
+
+    int fd = open(fn, O_RDONLY);
+    int len = lseek(fd, 0, SEEK_END);
+
+    /* Read data via management memory space */
+    char *data = (char *) mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
+    return data;
 }
