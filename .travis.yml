@@ -50,7 +50,6 @@ addons:
       - gcc-5
       - g++-5
       - clang
-      - libstdc++-5-dev
       # - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
