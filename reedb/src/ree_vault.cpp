@@ -234,9 +234,10 @@ void ree_vault::add_file(string name) {
     filesystem::path target(this->path);
     target /= "/datastore/";
 
+    /** Create a new file with name and full path to dir */
     datafile *d = new datafile(name, target.string());
     // datafile_h *dh = new datafile_h();
-
+    
     /*  */
 }
 

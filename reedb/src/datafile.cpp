@@ -54,6 +54,7 @@ void datafile::populate() {
 void datafile::write() {
 
     /* First we have to make the data usable to us */
+    
 }
 
 void datafile::cache(const cache_mode mode) {
