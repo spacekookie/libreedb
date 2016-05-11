@@ -1,7 +1,7 @@
 ![Reedb Logo](https://raw.githubusercontent.com/reepass/reedb/develop/extras/logo.png)
 
 [![Coverity Status](https://scan.coverity.com/projects/6872/badge.svg)](https://scan.coverity.com/projects/reepass-reedb)
-[![Build Status](https://travis-ci.org/reepass/reedb.svg?branch=master)](https://travis-ci.org/reepass/reedb)
+[![Build Status](https://travis-ci.org/reepass/libreedb.svg?branch=master)](https://travis-ci.org/reepass/libreedb)
 
 :lock: Fully encrypted, document-oriented database with per-user encryption, nested ciphers and zones to allow for selective sharing, rights management and even revocation of rights.
 
