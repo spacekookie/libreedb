@@ -7,9 +7,11 @@
 #include <map>
 
 #include <crypto/rcry_utils.h>
-#include <string.h>
 #include <sstream>
 #include <string>
+
+#include <malloc.h>
+#include <string.h>
 
 // Boost serialisation includes
 #include <boost/serialization/map.hpp>
@@ -25,7 +27,7 @@ datafile::datafile(string name, string parent) {
     this->name = name;
 
     char *buffer = rcry_utils::md_sha256(name.c_str(), true);
-    for (int i = 0; buffer[i] != '\0'; i++) {
+    for (int i = 0; i < strlen(buffer); i++) {
         buffer[i] = tolower(buffer[i]);
     }
 
@@ -35,8 +37,7 @@ datafile::datafile(string name, string parent) {
     free(buffer);
 
     cout << "File path: " << this->path << endl;
-
-    std::cout << "Just created a new datafile" << endl;
+    cout << "Just created a new datafile" << endl;
 
     /* Then populate them */
     this->populate();
@@ -49,6 +50,11 @@ datafile::datafile(string name, string parent) {
 
 void datafile::populate() {
     this->data = new vector<map<string, void *> *>;
+
+    /** Create a new revision of sample data */
+    map<string, void*> *data = new map<string, void*>();
+    (*data)["Sample"] = new string("This is some sample data");
+    this->data->push_back(data);
 }
 
 void datafile::write() {
