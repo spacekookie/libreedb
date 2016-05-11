@@ -48,6 +48,9 @@ addons:
       - gcc-4.8
       - g++-4.8
       - clang
+      - libboost-serialization
+      - libboost-filesystem
+      - libboost-system
 #      - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
