@@ -24,10 +24,10 @@ rm -rf $PWD/_build
 echo "Aliasing cmake..."
 REE_CMAKE=$PWD/my_cmake/bin/cmake
 
-# Set up g++ 4.8 because Ubuntu LTS is a piece of shit
+# Set up g++ 5 because Ubuntu LTS is a piece of shit
 echo "Setting up new GCC compilers NOW..."
-export CXX="g++-4.8 -std=c++11"
-export CC="gcc-4.8 -std=c99"
+export CXX="g++-5 -std=c++11"
+export CC="gcc-5 -std=c99"
 
 # Updated now!
 $CXX --version

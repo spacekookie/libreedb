@@ -30,8 +30,8 @@ before_install:
   - pwd
   - free -tm
   - make --version
-  - export CXX="g++-4.8 -std=c++11"
-  - export CC="gcc-4.8 -std=c99"
+  - export CXX="g++-5 -std=c++11"
+  - export CC="gcc-5 -std=c99"
   - $CC --version
   - $CXX --version
   - sudo add-apt-repository ppa:apokluda/boost1.53 --yes
