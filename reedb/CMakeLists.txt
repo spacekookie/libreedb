@@ -32,7 +32,11 @@ set(REEDB_SOURCE
 
         # Protocol buffer auto generated
         src/datafile.pb.cc
-        src/crypto/rcry_context.cpp src/crypto/rcry_token.cpp src/crypto/rcry_token.h include/reedb/utils/prettyprint.h)
+        src/crypto/rcry_context.cpp
+        src/crypto/rcry_token.cpp
+        src/crypto/rcry_token.h
+        include/reedb/utils/prettyprint.h
+        )
 
 # Define our library in cmake
 add_library(reedb ${REEDB_SOURCE})

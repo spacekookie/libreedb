@@ -1,7 +1,7 @@
 set -e  # exit on error.
 set -x  # echo commands.
 
-echo "##################### PREPARING ENVIRONMENT BECAUSE FUCK TRAVIS! ######################"
+"##################### PREPARING ENVIRONMENT BECAUSE FUCK TRAVIS! ######################"
 
 # - libgcrypt-dev   # C crypto - secure RAM
 # - libcryptopp-dev # C++ crypto - ciphers & keygen
@@ -22,4 +22,16 @@ wget --no-check-certificate https://www.cryptopp.com/cryptopp563.zip -O cryptopp
 mkdir ./_my_cryptopp && unzip cryptopp.zip -d ./_my_cryptopp
 cd ./_my_cryptopp && make && sudo make install
 
-echo "########### LIBRARY PREPERATION DONE ###########"
+# Download and install libboost-filesystem
+wget --no-check-certificate http://ftp.de.debian.org/debian/pool/main/b/boost-defaults/libboost-filesystem-dev_1.58.0.1_amd64.deb -O boost-filesystem-dev.deb
+sudo dpkg -i ./boost-filesystem-dev.deb
+
+# Download and install libbost-serialisation
+wget --no-check-certificate http://ftp.de.debian.org/debian/pool/main/b/boost-defaults/libboost-serialization-dev_1.58.0.1_amd64.deb -O boost-serialisation.deb
+sudo dpkg -i ./boost-serialisation.deb
+
+# Download and install libbost-serialisation
+wget --no-check-certificate http://ftp.de.debian.org/debian/pool/main/b/boost-defaults/libboost-system-dev_1.58.0.1_amd64.deb -O boost-system.deb
+sudo dpkg -i ./boost-system.deb
+
+"##################### LIBRARY PREPERATION DONE #####################"
