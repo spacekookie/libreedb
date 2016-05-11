@@ -47,9 +47,7 @@ addons:
       - gcc-4.8
       - g++-4.8
       - clang
-      - libgcrypt-dev       # C crypto - secure RAM
-      - libcryptopp-dev     # C++ crypto - ciphers & keygen
-      - libmicrohttpd-dev   # Micro C HTTP server
+#      - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
   coverity_scan:
@@ -57,6 +55,6 @@ addons:
       name: "reepass/reedb"
       description: "Fully encrypted document-oriented database"
     notification_email: sabel.katharina@gmail.com
-    build_command_prepend: "./get_cmake.sh && mkdir _build && cd _build && ../../my_cmake/bin/cmake .."
+    build_command_prepend: "./get_cmake.sh && ./prep_env.sh && mkdir _build && cd _build && ../../my_cmake/bin/cmake .."
     build_command: "../../my_cmake/bin/cmake --build ."
     branch_pattern: develop
