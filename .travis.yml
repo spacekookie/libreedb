@@ -8,7 +8,7 @@ language: cpp
 compiler: g++
 
 # Fixes issue with disallowed packages
-sudo: false
+sudo: true
 
 # Stop spamming me please...
 notifications:
@@ -18,6 +18,7 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
+   # Secure key in public repo. Much security. Such awesome. Wow!
    - secure: "X6Vs5IfJBseYJoirGHQIigEbYE6k8gdl9fCP9SyW+ErDACFRCusWjHMkUjVEmfbcqaUtBetQcsKZip7twHNCgxvxzydXOa30jn4tzBkkVIcUgSw5Zd3nruUy6D3pdNuf0/5YhZYH2nL9slU81kgApqD9kg2o/Fkw27mqdNAk/6g="
 
 compiler:
