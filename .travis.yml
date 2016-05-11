@@ -47,15 +47,10 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-4.8
-      - g++-4.8
+      - gcc-5
+      - g++-5
       - clang
-      - libboost-system1.53-dev
-      - libboost-regex1.53-dev
-      - libboost-filesystem1.53-dev
-      # - libboost-serialization
-      # - libboost-filesystem
-      # - libboost-system
+      - libstdc++-5-dev
       # - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
