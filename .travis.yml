@@ -34,6 +34,8 @@ before_install:
   - export CC="gcc-4.8 -std=c99"
   - $CC --version
   - $CXX --version
+  - sudo add-apt-repository ppa:apokluda/boost1.53 --yes
+  - sudo apt-get update
 
 # Run the Build script
 script:
@@ -48,10 +50,13 @@ addons:
       - gcc-4.8
       - g++-4.8
       - clang
-      - libboost-serialization
-      - libboost-filesystem
-      - libboost-system
-#      - libmicrohttpd-dev   # Micro C HTTP server
+      - libboost-system1.53-dev
+      - libboost-regex1.53-dev
+      - libboost-filesystem1.53-dev
+      # - libboost-serialization
+      # - libboost-filesystem
+      # - libboost-system
+      # - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
   coverity_scan:
