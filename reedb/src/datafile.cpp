@@ -3,27 +3,33 @@
 
 /* Some system requirements for data storage and file access*/
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <map>
 
-#include <crypto/rcry_utils.h>
-#include <sstream>
-#include <string>
+#include "crypto/rcry_utils.h"
+#include "protos/rdb_data.pb.h"
 
+// C runtimes
 #include <malloc.h>
 #include <string.h>
 
-// Boost serialisation includes
+// Boost serialisation includes (TO BE DELETED)
 #include <boost/serialization/map.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
-
 using namespace std;
+using namespace reedb_proto;
 
 datafile::datafile(string name, string parent) {
 
     /* Asign data to fields */
+    this->data = new rdb_data();
+    this->data->set_name(name);
+
+    // FIXME Is this still required?
     this->name = name;
 
     char *buffer = rcry_utils::md_sha256(name.c_str(), true);
@@ -49,17 +55,19 @@ datafile::datafile(string name, string parent) {
 }
 
 void datafile::populate() {
-    this->data = new vector<map<string, void *> *>;
+    rdb_data::revision *revision = this->data->add_revs();
+    revision->set_rev_no(0);
 
-    /** Create a new revision of sample data */
-    map<string, void*> *data = new map<string, void*>();
-    (*data)["Sample"] = new string("This is some sample data");
-    this->data->push_back(data);
+    /** Create a string key-value pair in our revision */
+    rdb_data::string_pair *pair = revision->add_sentry();
+    pair->set_key("Sample");
+    pair->set_val("This is some sample data");
 }
 
 void datafile::write() {
 
     /* First we have to make the data usable to us */
+
     
 }
 

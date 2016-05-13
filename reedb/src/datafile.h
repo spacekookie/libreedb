@@ -1,11 +1,13 @@
 #ifndef RDBDATAFILE_H
 #define RDBDATAFILE_H
 
-#include <crypto/rcry_engine.h>
-
 #include <string>
+
 #include <vector>
 #include <map>
+
+#include "crypto/rcry_engine.h"
+#include "protos/rdb_data.pb.h"
 
 using namespace std;
 
@@ -104,7 +106,8 @@ private:
     string *tags;
 
     /* Vector of data maps. Each version creates a new map */
-    std::vector<std::map<string, void *> *> *data;
+    //std::vector<std::map<string, void *> *> *data;
+    reedb_proto::rdb_data *data;
 
     /* @return If file is locked */
     bool isLocked();

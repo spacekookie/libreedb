@@ -22,83 +22,123 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-#include <map>
-#include <sstream>
-#include <stdio.h>
-#include <string.h>
+//#include "reedb/core.h"
+//#include "reedb/vaults.h"
+//
+//#include <map>
+//#include <string>
 
-#include <fcntl.h>
-#include <sys/mman.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include "addressbook.pb.h"
 
-#include <boost/serialization/map.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-
-#include <reedb/utils/prettyprint.h>
-
+using namespace tutorial;
 using namespace std;
 
-string serialise(map<int, int> m) {
-    stringstream ss;
-    boost::archive::text_oarchive oarch(ss);
-    oarch << m;
-    return ss.str();
+// This function fills in a Person message based on user input.
+void PromptForAddress(tutorial::Person* person) {
+    cout << "Enter person ID number: ";
+    int id;
+    cin >> id;
+    person->set_id(id);
+    cin.ignore(256, '\n');
+
+    cout << "Enter name: ";
+    getline(cin, *person->mutable_name());
+
+    cout << "Enter email address (blank for none): ";
+    string email;
+    getline(cin, email);
+    if (!email.empty()) {
+        person->set_email(email);
+    }
+
+    while (true) {
+        cout << "Enter a phone number (or leave blank to finish): ";
+        string number;
+        getline(cin, number);
+        if (number.empty()) {
+            break;
+        }
+
+        tutorial::Person::PhoneNumber* phone_number = person->add_phone();
+        phone_number->set_number(number);
+
+        cout << "Is this a mobile, home, or work phone? ";
+        string type;
+        getline(cin, type);
+        if (type == "mobile") {
+            phone_number->set_type(tutorial::Person::MOBILE);
+        } else if (type == "home") {
+            phone_number->set_type(tutorial::Person::HOME);
+        } else if (type == "work") {
+            phone_number->set_type(tutorial::Person::WORK);
+        } else {
+            cout << "Unknown phone type.  Using default." << endl;
+        }
+    }
 }
 
-map<int, int> deserialise(string s) {
-    map<int, int> new_map;
-    stringstream ss;
-    ss.str(s);
+// Main function:  Reads the entire address book from a file,
+//   adds one person based on user input, then writes it back out to the same
+//   file.
+int main(int argc, char* argv[]) {
+    // Verify that the version of the library that we linked against is
+    // compatible with the version of the headers we compiled against.
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-    boost::archive::text_iarchive iarch(ss);
-    iarch >> new_map;
-    return new_map;
+    if (argc != 2) {
+        cerr << "Usage:  " << argv[0] << " ADDRESS_BOOK_FILE" << endl;
+        return -1;
+    }
+
+    AddressBook ab;
+    Person *p = ab.add_person();
+    p->set_id(0);
+    p->set_name("Katharina Sabel");
+    p->set_email("katharina.sabel@mailbox.org");
+    Person::PhoneNumber *p_phone = p->add_phone();
+    p_phone->set_number("+4917670422074");
+    p_phone->set_type(Person_PhoneType_MOBILE);
+
+    {
+        // Read the existing address book.
+        fstream input(argv[1], ios::in | ios::binary);
+        if (!input) {
+            cout << argv[1] << ": File not found.  Creating a new file." << endl;
+        } else if (!ab.ParseFromIstream(&input)) {
+            cerr << "Failed to parse address book." << endl;
+            return -1;
+        }
+    }
+
+    // Add an address.
+    // PromptForAddress(address_book.add_person());
+
+    {
+        // Write the new address book back to disk.
+        fstream output(argv[1], ios::out | ios::trunc | ios::binary);
+        if (!ab.SerializeToOstream(&output)) {
+            cerr << "Failed to write address book." << endl;
+            return -1;
+        }
+    }
+
+    // Optional:  Delete all global objects allocated by libprotobuf.
+    google::protobuf::ShutdownProtobufLibrary();
+
+    return 0;
 }
 
-void write(const char *data, const char *filename) {
-    FILE *fp;
-    fp = fopen(filename, "w+");
-    fprintf(fp, data);
-    fclose(fp);
-}
-
-char *read(const char *filename) {
-    char ch;
-    int fd = open(filename, O_RDONLY);
-    int len = lseek(fd, 0, SEEK_END);
-
-    /* Read data via management memory space */
-    char *data = (char *) mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
-    return data;
-}
-
-#define DEMONAME "/home/spacekookie/file.rdf"
-
-int main() {
-    std::map<int, int> foo = {{1, 2},
-                              {2, 1}};
-
-    string buffer = serialise(foo);
-    cout << "Buffer: " << buffer << endl;
-    write(buffer.c_str(), DEMONAME);
-
-    // Idle
-
-    char *recovered = read(DEMONAME);
-    cout << "Recovered: " << recovered << endl;
-
-    map<int, int> ret = deserialise(string(recovered));
-    cout << ret << endl;
-
-    std::cout << (foo == ret) << std::endl;
-}
-
+//    // First create our reedb core
 //    reedb *rdb = new reedb();
 //    rdb->set_os(LINUX);
 //    rdb->set_distro(FEDORA);
 //    rdb->set_verbose(true);
 //    rdb->finalise();
 //
+//    // Then attach a new vaults interface to it
 //    rdb_vaults *v = new rdb_vaults();
 //    rdb->register_vinterface(v);
 //
@@ -112,4 +152,6 @@ int main() {
 //    data["Field B"] = "My Username";
 //    v->insert(vault->id, &token, "Example", &data);
 //
+//    // Just exit everything
 //    rdb->terminate();
+// }

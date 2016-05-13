@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 2.8.11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
 
+# Setup protobuf support for reedb
+INCLUDE(FindProtobuf)
+#FIND_PACKAGE(Protobuf REQUIRED)
+#INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
+#PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HEADER src/protos/rdb_data.proto)
+
 # Set our source file scope for the library
 set(REEDB_SOURCE
 
@@ -26,9 +32,11 @@ set(REEDB_SOURCE
         src/crypto/rcry_engine.cpp
         src/crypto/rcry_context.h
 
-        # Data storage
+        # Data storage (+ protobuf support)
         src/ree_vault.cpp
         src/datafile.cpp
+        src/datafile.pb.cc
+        src/datafile.pb.h
 
         # Protocol buffer auto generated
         src/datafile.pb.cc

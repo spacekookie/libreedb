@@ -9,6 +9,7 @@ compiler: g++
 
 # Fixes issue with disallowed packages
 sudo: true
+dist: trusty
 
 # Stop spamming me please...
 notifications:

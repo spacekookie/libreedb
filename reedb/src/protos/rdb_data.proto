@@ -1,7 +1,7 @@
 syntax = "proto2";
 package reedb_proto;
 
-message proto_file {
+message rdb_data {
   
   // An entry type for strings
   message string_pair {
@@ -18,8 +18,8 @@ message proto_file {
   // A revision contains however many numbers of string and num pairs
   message revision {
     required int32 rev_no = 1;
-    repeated string_pair entry = 2;
-    repeated num_pair entry = 2;
+    repeated string_pair sentry = 2;
+    repeated num_pair nentry = 3;
   }
   
   // A datafile has a name and a category
