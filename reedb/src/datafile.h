@@ -6,7 +6,9 @@
 #include <vector>
 #include <map>
 
+#include "crypto/rcry_token.h"
 #include "crypto/rcry_engine.h"
+
 #include "protos/rdb_data.pb.h"
 
 using namespace std;
@@ -62,7 +64,7 @@ public:
      * @param name Name of the file (in cleartext)
      * @param oldFile Contents on the old file as binary buffer
      */
-    datafile(string name, map<string, string> *oldFile);
+    datafile(string name, reedb_proto::rdb_data *old_file);
 
     /**
      *
@@ -79,16 +81,25 @@ public:
      */
     void cache(const cache_mode mode);
 
+
+    /**
+     * Fills the protocol buffer, pipes the bytestream through the
+     * crypto engine and then dumps that to disk as base64 encoded
+     */
+    void write(rcry_token *token);
+
+    map<string, string> *read(rcry_token *token);
+
     /**
      * Closes the file and uncaches it.
      */
     void close();
 
     /** Serialise a map of stuff into a string */
-    string serialise(map<string, string> data);
+    string serialise(reedb_proto::rdb_data *proto);
 
     /** Deserialise a string back into a map of stuff */
-    map<string, string> deserialise(string data);
+    reedb_proto::rdb_data *deserialise(string data);
 
 private:
 
@@ -117,13 +128,6 @@ private:
      * that can get thrown.
      */
     void populate();
-
-    /**
-     * Fills the protocol buffer, pipes the bytestream through the
-     * crypto engine and then dumps that to disk as base64 encoded
-     */
-    void write();
-
 };
 
 #endif // RDBDATAFILE_H

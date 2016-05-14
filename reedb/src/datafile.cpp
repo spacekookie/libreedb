@@ -54,6 +54,10 @@ datafile::datafile(string name, string parent) {
     std::cout << "File dump complete. Ready to cache it from disk..." << endl;
 }
 
+datafile::datafile(string name, reedb_proto::rdb_data *old_file) {
+    cout << "Preparing an existing datafile for transactions..." << endl;
+}
+
 void datafile::populate() {
     rdb_data::revision *revision = this->data->add_revs();
     revision->set_rev_no(0);
@@ -64,34 +68,45 @@ void datafile::populate() {
     pair->set_val("This is some sample data");
 }
 
-void datafile::write() {
+void datafile::write(rcry_token *token)
+{
 
     /* First we have to make the data usable to us */
+    string data = serialise(this->data);
 
-    
+    /** Go and encrypt the data */
+    engine->switch_context(token);
+}
+
+map<string, string> *datafile::read(rcry_token *token)
+{
+
 }
 
 void datafile::cache(const cache_mode mode) {
 
 }
 
-map<int, int> deserialise(string s) {
+string datafile::serialise(rdb_data *proto)
+{
+    /** Get the size and store it */
+    int size = proto->ByteSize();
 
+    /** Allocate the neccessary memory and write our proto into it */
+    void *buffer = malloc(size + sizeof(long));
+    proto->SerializeToArray(buffer + (sizeof(int)), size);
+
+    /** Now write the size to the front so we can get our proto back later */
+    ((int*) buffer)[0] = size;
+    return string((char*) buffer );
 }
 
-string datafile::serialise(map<string, string> data) {
-    stringstream ss;
-    boost::archive::text_oarchive oarch(ss);
-    oarch << data;
-    return ss.str();
-}
-
-map<string, string> datafile::deserialise(string data) {
-    map<string, string> new_map;
-    stringstream ss;
-    ss.str(data);
-
-    boost::archive::text_iarchive iarch(ss);
-    iarch >> new_map;
-    return new_map;
+rdb_data *datafile::deserialise(string data) {
+//    map<string, string> new_map;
+//    stringstream ss;
+//    ss.str(data);
+//
+//    boost::archive::text_iarchive iarch(ss);
+//    iarch >> new_map;
+//    return new_map;
 }
