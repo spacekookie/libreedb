@@ -49,6 +49,11 @@ typedef struct crycontext {
     bool clear;
 } crycontext;
 
+typedef struct rcry_queue_user {
+    rcry_token *self;
+    rcry_queue_user *next;
+};
+
 /**
  * Main crypto interface for Reedb. Is instantiated once and can handle
  * crypto for multiple vaults_interface. Vaults get assigned tokens and UUIDs needed
@@ -61,6 +66,12 @@ class rcry_engine {
 
 private:
     std::map<rcry_token *, byte[AES::MAX_KEYLENGTH]> *context_map;
+
+    /** Necessary for registered batch jobs */
+    struct rcry_queue_user *user_queue;
+    rcry_token *curr_user;
+
+    /** Current context for everything to use*/
     crycontext *context;
     byte context_key[AES::MAX_KEYLENGTH];
     bool cry_lock = false;
@@ -73,6 +84,25 @@ public:
     rcry_engine(std::list<rdb_uuid> *ids);
 
     int query_id();
+
+    /**
+     * This function prepares the crypt engine for continuous and parallel use
+     * between different encryption/ decryption targets. Before switching context
+     * the engine should be "enqueued" which means that a token registers itself for
+     * incoming jobs.
+     *
+     * The token will hold a lock for n milliseconds before the first operation needs
+     * to have occured.
+     *
+     * If complete locking failed it can be called with "block" enabled which means another
+     * user will hang until the first is done.
+     *
+     * @param block: Whether or not this function should be a blocking call
+     * @returns unsigned int: Return value to indicate how many people are in queue before
+     *                              or what errors occured while enqueueing.
+     *
+     */
+    unsigned int enqueue_jobs(bool block);
 
     void switch_context(rcry_token *token);
 
@@ -108,12 +138,12 @@ public:
     /**
     * Encrypt in the current context with the current key scoped
     */
-    char *encrypt(void *data, crycontext *context);
+    char *encrypt(void *data, rcry_token *token);
 
     /**
     * Decrypt in the current context with the current key scoped
     */
-    char *decrypt(void *data, crycontext *context);
+    char *decrypt(void *data, rcry_token *token);
 
     /**
      * Alpha support function needed to get the key from the crypto engine

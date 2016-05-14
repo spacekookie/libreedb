@@ -3,52 +3,44 @@
 //
 
 #include "rcry_engine.h"
-#include <iostream>
-#include <cryptopp/aes.h>
 
+#include <iostream>
+#include <malloc.h>
+#include <cryptopp/aes.h>
 using CryptoPP::AES;
 
 #include <cryptopp/osrng.h>
 #include <cryptopp/base64.h>
-
 using CryptoPP::Base64Encoder;
 using CryptoPP::AutoSeededRandomPool;
 
 #include <iostream>
-
 using std::cout;
 using std::cerr;
 using std::endl;
 
 #include <string>
-
 using std::string;
 
 #include <cstdlib>
-
 using std::exit;
 
 #include <cryptopp/cryptlib.h>
-
 using CryptoPP::Exception;
 
 #include <cryptopp/hex.h>
-
 using CryptoPP::HexEncoder;
 using CryptoPP::HexDecoder;
 
 #include <cryptopp/filters.h>
-
 using CryptoPP::StringSink;
 using CryptoPP::StringSource;
 using CryptoPP::StreamTransformationFilter;
 
 #include <cryptopp/aes.h>
-
 using CryptoPP::AES;
 
 #include <cryptopp/ccm.h>
-
 using CryptoPP::CBC_Mode;
 
 #include "assert.h"
@@ -105,30 +97,66 @@ string rcry_engine::encrypt_string(string data, crycontext *context) {
 string rcry_engine::decrypt_string(string data, crycontext *context) {
     string encoded, recovered;
 
-//    StringSource(data, true, new HexEncoder(new StringSink(encoded)));
-//    cout << "cipher text: " << encoded << endl;
-
     try {
         CBC_Mode<AES>::Decryption d;
         d.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
         StringSource s(data, true, new StreamTransformationFilter(d, new StringSink(recovered)));
 
-        cout << "Recovered Text: " << recovered << endl;
-
     } catch (const CryptoPP::Exception &e) {
         cerr << e.what() << endl;
-        exit(1);
+        return NULL;
     }
     return recovered;
 
 }
 
-char *rcry_engine::encrypt(void *data, crycontext *context) {
-    return nullptr;
+/** Returns a base64 encoded array of cipher text */
+char* rcry_engine::encrypt(void *data, rcry_token *token) {
+    string cipherbuf, encoded, recovered;
+
+    try {
+
+        string buffer = string((char*) data);
+
+        CBC_Mode<AES>::Encryption e;
+        e.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
+        StringSource s(buffer, true, new StreamTransformationFilter(e, new StringSink(cipher)));
+
+        encoded.clear();
+        StringSource(cipherbuf, true, new HexEncoder(new StringSink(encoded)));
+    }
+    catch (const CryptoPP::Exception &e) {
+        cerr << e.what() << endl;
+        return NULL;
+    }
+
+    /** Copy the information over into a permanent array */
+    char *cipher = (char*) malloc(sizeof(char) * strlen(cipherbuf.c_str()));
+    strcpy(cipher, cipherbuf.c_str());
+
+    return cipher;
 }
 
-/** Simple utility function to decrypt a C++ string */
-//   string *decrypt_string(string *data);
+char* rcry_engine::decrypt(void *data, rcry_token *token) {
+    string encoded, recbuffer;
+    string buffer = string((char*) data);
+
+    try {
+        CBC_Mode<AES>::Decryption d;
+        d.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
+        StringSource s(buffer, true, new StreamTransformationFilter(d, new StringSink(recbuffer)));
+
+    } catch (const CryptoPP::Exception &e) {
+        cerr << e.what() << endl;
+        return NULL;
+    }
+
+    /** Copy the data over into a permanent array */
+    char *recovered = (char*) malloc(sizeof(char) * strlen(recbuffer.c_str()));
+    strcpy(recovered, recbuffer.c_str());
+
+    return recovered;
+}
 
 void rcry_engine::switch_context(rcry_token *token) {
     map<rcry_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
