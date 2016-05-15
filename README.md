@@ -2,6 +2,7 @@
 
 [![Coverity Status](https://scan.coverity.com/projects/6872/badge.svg)](https://scan.coverity.com/projects/reepass-reedb)
 [![Build Status](https://travis-ci.org/reepass/libreedb.svg?branch=master)](https://travis-ci.org/reepass/libreedb)
+[![Build Status](https://codeship.com/projects/414c23f0-fa36-0133-64c5-46c303037c21/status?branch=develop)](https://codeship.com/projects/414c23f0-fa36-0133-64c5-46c303037c21/status?branch=develop)
 
 :lock: Fully encrypted, document-oriented database with per-user encryption, nested ciphers and zones to allow for selective sharing, rights management and even revocation of rights.
 
