@@ -8,8 +8,13 @@
 #include <vector>
 #include <map>
 
-#include "crypto/rcry_utils.h"
 #include "protos/rdb_data.pb.h"
+#include "crypto/rcry_utils.h"
+
+extern "C"
+{
+#include "utils/files.h"
+}
 
 // C runtimes
 #include <malloc.h>
@@ -50,8 +55,6 @@ datafile::datafile(string name, string parent) {
 
     /* Set cache mode to hotdrop so we can use the file immediately */
     this->cache(HOTDROP);
-
-    std::cout << "File dump complete. Ready to cache it from disk..." << endl;
 }
 
 datafile::datafile(string name, reedb_proto::rdb_data *old_file) {
@@ -59,23 +62,39 @@ datafile::datafile(string name, reedb_proto::rdb_data *old_file) {
 }
 
 void datafile::populate() {
-    rdb_data::revision *revision = this->data->add_revs();
+    cout << "Populating datafile...";
+
+    data->set_name(this->name);
+    data->set_category("SOMETHING");
+
+    rdb_data::revision *revision = data->add_revs();
     revision->set_rev_no(0);
 
     /** Create a string key-value pair in our revision */
     rdb_data::string_pair *pair = revision->add_sentry();
     pair->set_key("Sample");
     pair->set_val("This is some sample data");
+
+    cout << "done" << endl;
 }
 
 void datafile::write(rcry_token *token)
 {
 
+    cout << "Writing datafile..." << endl;
+
     /* First we have to make the data usable to us */
-    string data = serialise(this->data);
+    void *data = serialise(this->data);
 
     /** Go and encrypt the data */
-    engine->switch_context(token);
+    engine->start_batch(token, false);
+    char *encrypted = engine->encrypt(data, token);
+    engine->end_batch(token);
+
+    /** Then dump the data to disk */
+    rdb_files_dfdump(this->path.c_str(), this->name.c_str(), encrypted);
+
+
 }
 
 map<string, string> *datafile::read(rcry_token *token)
@@ -87,21 +106,30 @@ void datafile::cache(const cache_mode mode) {
 
 }
 
-string datafile::serialise(rdb_data *proto)
+void *datafile::serialise(rdb_data *proto)
 {
+    cout << "Serialising datafile...";
+
     /** Get the size and store it */
     int size = proto->ByteSize();
 
     /** Allocate the neccessary memory and write our proto into it */
-    void *buffer = malloc(size + sizeof(long));
+    void *buffer = malloc(size + sizeof(int));
     proto->SerializeToArray(buffer + (sizeof(int)), size);
 
     /** Now write the size to the front so we can get our proto back later */
     ((int*) buffer)[0] = size;
-    return string((char*) buffer );
+
+    cout << "done" << endl;
+    return buffer;
 }
 
-rdb_data *datafile::deserialise(string data) {
+rdb_data *datafile::deserialise(void *data) {
+    int size = ((int*) data)[0];
+
+//    this->data = new rdb_data();
+//    this->data->ParseFromArray(data + sizeof(int), size);
+
 //    map<string, string> new_map;
 //    stringstream ss;
 //    ss.str(data);

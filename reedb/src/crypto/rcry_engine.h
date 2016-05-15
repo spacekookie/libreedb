@@ -53,9 +53,9 @@ typedef struct crycontext {
 } crycontext;
 
 typedef struct rcry_batch {
+    unsigned int num_id;
     rcry_token *self;
-    rcry_batch *next;
-};
+} rcry_batch;
 
 /**
  * Main crypto interface for Reedb. Is instantiated once and can handle
@@ -71,8 +71,7 @@ private:
     std::map<rcry_token *, byte[AES::MAX_KEYLENGTH]> *context_map;
 
     /** Necessary for registered batch jobs */
-    struct rcry_batch *batch_queue;
-    rcry_token *curr_batch;
+    std::vector<rcry_batch> *batch_queue;
 
     /** Current context for everything to use*/
     crycontext *context;
@@ -129,7 +128,7 @@ public:
      *
      * Finish your batch jobs! Letting them time out will reduce your tokens NICENESS.
      */
-    unsigned int finish_batch(rcry_token *token);
+    unsigned int end_batch(rcry_token *token);
 
     /**
     * Generate a master key for a vault with a specific token.

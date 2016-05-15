@@ -47,6 +47,7 @@ using CryptoPP::CBC_Mode;
 #include <iterator>
 
 #include "rcry_utils.h"
+#include "rcry_token.h"
 #include <gcrypt.h>
 
 using namespace std;
@@ -159,55 +160,89 @@ char* rcry_engine::decrypt(void *data, rcry_token *token) {
 
 unsigned int rcry_engine::start_batch(rcry_token *token, bool block) {
 
+    cout << "Registering a batch job on cry_engine " << my_id << endl;
+
+    rcry_batch *batch = new rcry_batch();
+    batch->num_id = 42;
+    batch->self = token;
+
+    this->switch_context(token);
+    return 0;
+
     /** This means there is no currently queued job*/
-    if(!this->batch_queue)
-    {
-        this->batch_queue = new rcry_batch();
-        this->batch_queue->self = token;
+//    if(this->batch_queue == nullptr)
+//    {
+//        this->batch_queue = new rcry_batch();
+//        this->batch_queue->self = token;
+//
+//        /** Now actually do the context switch because it's our turn! */
+//        this->switch_context(token);
+//        return 0;
+//
+//    /** Walk down the queue and put this batch at the end. Then either wait or return */
+//    } else {
+//        unsigned int ctr = 0;
+//
+//        while(this->batch_queue)
+//        {
+//            /** If the next slot is free */
+//            if(!this->batch_queue->next)
+//            {
+//                this->batch_queue->next = new rcry_batch();
+//                this->batch_queue->next->self = token;
+//
+//                /** Break out the loop */
+//                break;
+//            }
+//
+//            /** Increment the "waiting before" counter */
+//            ctr++;
+//        }
+//
+//        if(block)
+//        {
+//            while(this->batch_queue->self != token)
+//            {
+//                // Sleep for a bit
+//            }
+//
+//            /** SUCCESS! It's our turn now! */
+//            this->switch_context(token);
+//
+//        /** Just return queue length (before self) */
+//        } else {
+//            return ctr;
+//        }
+//    }
+}
 
-        /** Now actually do the context switch because it's our turn! */
-        this->switch_context(token);
-        return 0;
+unsigned int rcry_engine::end_batch(rcry_token *token) {
+    cout << "Finishing up batch job...";
 
-    /** Walk down the queue and put this batch at the end. Then either wait or return */
-    } else {
-        unsigned int ctr = 0;
-
-        while(this->batch_queue)
-        {
-            /** If the next slot is free */
-            if(!this->batch_queue->next)
-            {
-                this->batch_queue->next = new rcry_batch();
-                this->batch_queue->next->self = token;
-
-                /** Break out the loop */
-                break;
-            }
-
-            /** Increment the "waiting before" counter */
-            ctr++;
-        }
-
-        if(block)
-        {
-            while(this->batch_queue->self != token)
-            {
-                // Sleep for a bit
-            }
-
-            /** SUCCESS! It's our turn now! */
-            this->switch_context(token);
-
-        /** Just return queue length (before self) */
-        } else {
-            return ctr;
-        }
-    }
+//    if(this->batch_queue->self == token)
+//    {
+        this->switch_context(NULL);
+//    } else {
+//        cout << "[ERROR] " << endl;
+//    }
+    cout << "done" << endl;
 }
 
 void rcry_engine::switch_context(rcry_token *token) {
+    cout << "[WARN] Using dangerous function! Support will be removed "
+                    "in the future. Use `start_batch`, `end_batch` instead!" << endl;
+
+    cout << "FOOOBARRRR!" << my_id << endl;
+
+    cout << "Context map size: " << this->context_map->size() << endl;
+    for(auto iterator = this->context_map->begin(); iterator != this->context_map->end(); iterator++)
+    {
+        cout << "[Item]: " << iterator->first->contents << "::" << iterator->second << endl;
+    }
+
     map<rcry_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
+
+    cout << "lalala!" << endl;
 
     if (token == nullptr) goto release;
 

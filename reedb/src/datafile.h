@@ -96,10 +96,10 @@ public:
     void close();
 
     /** Serialise a map of stuff into a string */
-    string serialise(reedb_proto::rdb_data *proto);
+    void *serialise(reedb_proto::rdb_data *proto);
 
     /** Deserialise a string back into a map of stuff */
-    reedb_proto::rdb_data *deserialise(string data);
+    reedb_proto::rdb_data *deserialise(void *data);
 
 private:
 
