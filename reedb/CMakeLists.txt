@@ -33,13 +33,11 @@ set(REEDB_SOURCE
         src/crypto/rcry_context.h
 
         # Data storage (+ protobuf support)
+        src/protos/rdb_data.pb.cc
+        src/protos/rdb_data.pb.h
         src/ree_vault.cpp
         src/datafile.cpp
-        src/datafile.pb.cc
-        src/datafile.pb.h
 
-        # Protocol buffer auto generated
-        src/datafile.pb.cc
         src/crypto/rcry_context.cpp
         src/crypto/rcry_token.cpp
         src/crypto/rcry_token.h

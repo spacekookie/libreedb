@@ -37,6 +37,9 @@ using CryptoPP::AES;
 #include <list>
 #include <string>
 
+/** Time required to start a job or next batch job */
+#define RCRY_LOCK_TIMEOUT 250
+
 typedef enum crytarget_t {
     FILE_P,           // Indicates that a datafile struct is present
     STRING,           // Indicates that it's a simple string encryption.
@@ -49,9 +52,9 @@ typedef struct crycontext {
     bool clear;
 } crycontext;
 
-typedef struct rcry_queue_user {
+typedef struct rcry_batch {
     rcry_token *self;
-    rcry_queue_user *next;
+    rcry_batch *next;
 };
 
 /**
@@ -68,12 +71,14 @@ private:
     std::map<rcry_token *, byte[AES::MAX_KEYLENGTH]> *context_map;
 
     /** Necessary for registered batch jobs */
-    struct rcry_queue_user *user_queue;
-    rcry_token *curr_user;
+    struct rcry_batch *batch_queue;
+    rcry_token *curr_batch;
 
     /** Current context for everything to use*/
     crycontext *context;
     byte context_key[AES::MAX_KEYLENGTH];
+
+    /** Locks the engine for exactly one job. Lock times out after N milliseconds */
     bool cry_lock = false;
 
 public:
@@ -86,25 +91,45 @@ public:
     int query_id();
 
     /**
-     * This function prepares the crypt engine for continuous and parallel use
-     * between different encryption/ decryption targets. Before switching context
-     * the engine should be "enqueued" which means that a token registers itself for
-     * incoming jobs.
+     * Prepare the crypto engine for a batch of jobs in continous and paralell use
+     * from different encryption/ decryption targets.
      *
-     * The token will hold a lock for n milliseconds before the first operation needs
-     * to have occured.
+     * A token for the engine needs to be provided to start a batch. Said token will
+     * then be registered in a batch-queue. Previous batches will be finished
+     * before new ones are started.
      *
-     * If complete locking failed it can be called with "block" enabled which means another
-     * user will hang until the first is done.
+     * Calling this function can either be an INFO or BLOCKING call. INFO mode (block: false)
+     * returns the number of job batches in the queue while BLOCKING will halt and wait
+     * until the batch was successfully started.
      *
+     *
+     * @param token: The token for which a batch job should be created
      * @param block: Whether or not this function should be a blocking call
      * @returns unsigned int: Return value to indicate how many people are in queue before
      *                              or what errors occured while enqueueing.
      *
      */
-    unsigned int enqueue_jobs(bool block);
+    unsigned int start_batch(rcry_token *token, bool block);
 
+    /**
+     * Switch the engine into a different state for other tokens.
+     *
+     * !!! ALPHA SUPPORT FUNCTION !!!
+     * This function allows for quick manual context switching inside the crypto engine.
+     * It can do massive damage when called from a paralell thread or in the middle of another operation.
+     *
+     * This function will be removed! DO NOT IGNORE WARNINGS THROWN BY THIS FUNCTION!
+     * Thanks
+     */
     void switch_context(rcry_token *token);
+
+    /**
+     * Tells the crypto engine that the current batch for the provided token
+     * has ended and it can be freed again for new operations.
+     *
+     * Finish your batch jobs! Letting them time out will reduce your tokens NICENESS.
+     */
+    unsigned int finish_batch(rcry_token *token);
 
     /**
     * Generate a master key for a vault with a specific token.

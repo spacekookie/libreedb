@@ -5,8 +5,7 @@ set(CMAKE_BUILD_TYPE Debug)
 project(reedb)
 add_subdirectory(reedb)
 
-set(DAEMON_SOURCE reedbd-http/main.cpp
-                  reedbd-http/addressbook.pb.cc)
+set(DAEMON_SOURCE reedbd-http/main.cpp)
 add_executable(reedbd-http ${DAEMON_SOURCE})
 
 # Library dependencies for the http extention

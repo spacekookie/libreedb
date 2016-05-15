@@ -115,12 +115,11 @@ char* rcry_engine::encrypt(void *data, rcry_token *token) {
     string cipherbuf, encoded, recovered;
 
     try {
-
         string buffer = string((char*) data);
 
         CBC_Mode<AES>::Encryption e;
         e.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
-        StringSource s(buffer, true, new StreamTransformationFilter(e, new StringSink(cipher)));
+        StringSource s(buffer, true, new StreamTransformationFilter(e, new StringSink(cipherbuf)));
 
         encoded.clear();
         StringSource(cipherbuf, true, new HexEncoder(new StringSink(encoded)));
@@ -156,6 +155,55 @@ char* rcry_engine::decrypt(void *data, rcry_token *token) {
     strcpy(recovered, recbuffer.c_str());
 
     return recovered;
+}
+
+unsigned int rcry_engine::start_batch(rcry_token *token, bool block) {
+
+    /** This means there is no currently queued job*/
+    if(!this->batch_queue)
+    {
+        this->batch_queue = new rcry_batch();
+        this->batch_queue->self = token;
+
+        /** Now actually do the context switch because it's our turn! */
+        this->switch_context(token);
+        return 0;
+
+    /** Walk down the queue and put this batch at the end. Then either wait or return */
+    } else {
+        unsigned int ctr = 0;
+
+        while(this->batch_queue)
+        {
+            /** If the next slot is free */
+            if(!this->batch_queue->next)
+            {
+                this->batch_queue->next = new rcry_batch();
+                this->batch_queue->next->self = token;
+
+                /** Break out the loop */
+                break;
+            }
+
+            /** Increment the "waiting before" counter */
+            ctr++;
+        }
+
+        if(block)
+        {
+            while(this->batch_queue->self != token)
+            {
+                // Sleep for a bit
+            }
+
+            /** SUCCESS! It's our turn now! */
+            this->switch_context(token);
+
+        /** Just return queue length (before self) */
+        } else {
+            return ctr;
+        }
+    }
 }
 
 void rcry_engine::switch_context(rcry_token *token) {
