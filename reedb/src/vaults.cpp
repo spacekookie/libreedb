@@ -155,7 +155,7 @@ map<string, string> *rdb_vaults::query_file(rdb_uuid *id, rdb_token *token, stri
     }
 
     /** Check that the file exists first */
-    if (!(*active_vaults)[id]->check_file_existance(query)) {
+    if ((*active_vaults)[id]->check_file_existance(query)) {
 
         (*active_vaults)[id]->read_file(query);
     } else {

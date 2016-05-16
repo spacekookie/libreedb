@@ -106,6 +106,21 @@ map<string, string> *datafile::read(rcry_engine *engine, rcry_token *token)
 
     /** Then deserialise the data */
     this->data = deserialise(encoded);
+
+    /** Transpose protobuf to C++ std map */
+    map<string, string> *carry = new map<string, string>();
+
+    /** Iterate over revisions in proto ... */
+    for(auto &iter : this->data->revs())
+    {
+        /** For every string entry in said revision ... */
+        for(auto &entry : iter.sentry())
+        {
+            (*carry)[entry.key()] = entry.val();
+            cout << "[" << entry.key() << ", " << entry.val() << "]" << endl;
+        }
+    }
+    return carry;
 }
 
 /** Loads in data from an open file to the header */

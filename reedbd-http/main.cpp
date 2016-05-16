@@ -52,10 +52,22 @@ int main(void)
     vault_meta *vault = v->create("default", "~/Documents/", passphrase);
     rdb_token token = v->authenticate(vault->id, passphrase);
 
+    string filename = "Example";
     map<string, string> data = map<string, string>();
     data["Field A"] = "foobar32"; // Ironically saving the vault pw in itself
     data["Field B"] = "My Username";
-    v->insert(vault->id, &token, "Example", &data);
+    v->insert(vault->id, &token, filename, &data);
+
+    map<string, string> *recovered;
+    v->query_file(vault->id, &token, filename);
+
+    cout << "========== Recovered Data ==========" << endl;
+    for(auto &iter : *recovered)
+    {
+        cout << "[" << iter.first << "] -> [" << iter.second << "]" << endl;
+    }
+
+    cout << "====================" << endl;
 
     // Just exit everything
     rdb->terminate();

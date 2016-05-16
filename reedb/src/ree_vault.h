@@ -108,7 +108,7 @@ public:
 
     bool check_file_existance(string name);
 
-    void read_file(string name);
+    map<string, string> *read_file(string name);
 
     void add_file(string name);
 

@@ -273,15 +273,21 @@ void ree_vault::update_file(string name, map<string, string> *content) {
 
 }
 
-void ree_vault::read_file(string name) {
+map<string, string> *ree_vault::read_file(string name) {
+    if((*files)[name])
+    {
+        /** Read data from file and move it over to map */
+        (*files)[name]->read(this->engine, this->token);
+    }
+
+
 //    if(!(*files)[name])
 //    {
 //        cout << "[ERROR] File not found!" << endl;
 //    }
 //
-//    auto data = new map<string, string>();
 //
-//    /** Read data from file and move it over to map */
-//    (*files)[name]->read(this->engine, this->token);
+//
+//    /
 //
 }
