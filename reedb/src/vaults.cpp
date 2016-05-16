@@ -137,7 +137,7 @@ void rdb_vaults::insert(rdb_uuid *id, rdb_token *token, string file_id, map<stri
     /* Then either write into the new or existing file. But we don't care anymore at this point */
     (*active_vaults)[id]->update_file(file_id, content);
 
-    cout << "[SUCCESS] File insertion complete" << endl;
+    cout << "File insertion complete" << endl;
 
 }
 
