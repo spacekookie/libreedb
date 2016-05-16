@@ -116,7 +116,7 @@ public:
     * @param token: An authentication token for this vault
     * @param query: The name or id of the file to query from
     */
-    map<string, string> query_file(rdb_uuid *id, rdb_token *token, string query);
+    map<string, string> *query_file(rdb_uuid *id, rdb_token *token, string query);
 
     //TODO: Add `void query_file_rev(...); `
 

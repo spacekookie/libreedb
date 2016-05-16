@@ -61,8 +61,6 @@ void rdb_write_dataf(const char *data, const char *filename) {
 }
 
 char *rdb_read_dataf(const char *filename) {
-    char ch;
-
     char fn[strlen(filename) + 4];
     strcpy(fn, filename);
     strcat(fn, ".rdf");
@@ -73,4 +71,13 @@ char *rdb_read_dataf(const char *filename) {
     /* Read data via management memory space */
     char *data = (char *) mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
     return data;
+}
+
+int rdb_files_dfread(const char *path, char *data)
+{
+    int fd = open(path, O_RDONLY);
+    int len = lseek(fd, 0, SEEK_END);
+
+    /* Read data via management memory space */
+    data = (char *) mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
 }

@@ -28,4 +28,6 @@ int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *
  */
 int rdb_files_dfdump(const char *path, char *data);
 
+int rdb_files_dfread(const char *path, char *data);
+
 #endif //REEDB_FILES_H

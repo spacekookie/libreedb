@@ -65,6 +65,7 @@ datafile::datafile(string name, reedb_proto::rdb_data *old_file) {
 void datafile::populate() {
     cout << "Populating datafile...";
 
+
     data->set_name(this->name);
     data->set_category("SOMETHING");
 
@@ -79,19 +80,15 @@ void datafile::populate() {
     cout << "done" << endl;
 }
 
-void datafile::write(rcry_engine *engine, rcry_token *token)
-{
-
-    cout << "Writing datafile with token: " << token->contents << endl;
+void datafile::write(rcry_engine *engine, rcry_token *token) {
+    cout << "Writing datafile" << endl;
 
     /* First we have to make the data usable to us */
-    void *data = serialise(this->data);
-
-    cout << "Data we print: " << (char*) data << endl;
+    string data = serialise(this->data);
 
     /** Go and encrypt the data */
     engine->start_batch(token, false);
-    char *encrypted = engine->encrypt(data, token);
+    char *encrypted = engine->encrypt((void*) data.c_str(), token);
     engine->end_batch(token);
 
     /** Then dump the data to disk */
@@ -100,42 +97,68 @@ void datafile::write(rcry_engine *engine, rcry_token *token)
 
 map<string, string> *datafile::read(rcry_engine *engine, rcry_token *token)
 {
+    char *raw;
+    rdb_files_dfread(this->path.c_str(), raw);
 
+    /** Decrypt the data */
+    engine->start_batch(token, false);
+    char *encoded = engine->decrypt(raw, token);
+
+    /** Then deserialise the data */
+    this->data = deserialise(encoded);
+}
+
+/** Loads in data from an open file to the header */
+void datafile::populate_header(datafile_h *dh) {
+    dh = new datafile_h();
+
+    dh->category = this->data->category();
+    dh->name = new string(this->name);
+    dh->tags = (string*) malloc(sizeof(std::string*));
+    dh->version = this->version;
+    dh->locked = false;
+}
+
+void datafile::close() {
+    delete this->data;
+}
+
+void datafile::insertData(reedb_proto::rdb_data::revision *rev, string key, string val) {
+    if(this->data)
+    {
+        rdb_data::string_pair *pair = rev->add_sentry();
+        pair->set_key(key);
+        pair->set_val(val);
+    }
+}
+
+reedb_proto::rdb_data::revision* datafile::incr_revision() {
+    if(this->data)
+    {
+        rdb_data::revision *r = this->data->add_revs();
+        int revisions = this->data->revs_size();
+        r->set_rev_no(revisions);
+        return r;
+    } else {
+        cout << "[ERROR] Unencrypted datafile cache not available!" << endl;
+    }
 }
 
 void datafile::cache(const cache_mode mode) {
 
 }
 
-void *datafile::serialise(rdb_data *proto)
-{
+string datafile::serialise(rdb_data *proto) {
     cout << "Serialising datafile...";
-
-    /** Get the size and store it */
-    int size = proto->ByteSize();
-
-    /** Allocate the neccessary memory and write our proto into it */
-    void *buffer = malloc(size + sizeof(int));
-    proto->SerializeToArray(buffer + (sizeof(int)), size);
-
-    /** Now write the size to the front so we can get our proto back later */
-    ((int*) buffer)[0] = size;
-
-    cout << "done" << endl;
-    return buffer;
+    return proto->SerializeAsString();
 }
 
-rdb_data *datafile::deserialise(void *data) {
-    int size = ((int*) data)[0];
+rdb_data *datafile::deserialise(string data) {
+    cout << "Deserialising datafile...";
 
-//    this->data = new rdb_data();
-//    this->data->ParseFromArray(data + sizeof(int), size);
+    rdb_data *d = new rdb_data();
+    d->ParseFromString(data);
+    cout << "done" << endl;
 
-//    map<string, string> new_map;
-//    stringstream ss;
-//    ss.str(data);
-//
-//    boost::archive::text_iarchive iarch(ss);
-//    iarch >> new_map;
-//    return new_map;
+    return d;
 }

@@ -141,6 +141,28 @@ void rdb_vaults::insert(rdb_uuid *id, rdb_token *token, string file_id, map<stri
 
 }
 
+map<string, string> *rdb_vaults::query_file(rdb_uuid *id, rdb_token *token, string query) {
+    bool accepted = false;
+
+    /** Go and check every token for equal contents */
+    for (rdb_token *t : *(*token_map)[id])
+        if (strcmp(t->contents, token->contents) == 0) accepted = true;
+
+    /* Make sure that we throw out any intruder */
+    if (!accepted) {
+        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        return nullptr;
+    }
+
+    /** Check that the file exists first */
+    if (!(*active_vaults)[id]->check_file_existance(query)) {
+
+        (*active_vaults)[id]->read_file(query);
+    } else {
+        cout << "[ERROR] Query unsuccessful. No files found!" << endl;
+    }
+}
+
 void rdb_vaults::destroy(rdb_uuid *id, rdb_token *token) {
     // TODO: Make this function a bit nicer
     bool accepted = false;

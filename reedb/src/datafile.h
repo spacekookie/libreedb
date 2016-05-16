@@ -67,9 +67,16 @@ public:
     datafile(string name, reedb_proto::rdb_data *old_file);
 
     /**
-     *
+     * Before an insert this function should be called to add a new revision to
+     * the proto data tree and return it's pointer.
      */
-    void insertData(string data);
+    reedb_proto::rdb_data::revision *incr_revision();
+
+    /**
+     * Inserts a key-value pair into a revision. For a multi-key-val insert this
+     * function can be called in a loop.
+     */
+    void insertData(reedb_proto::rdb_data::revision *rev, string key, string val);
 
     /**
      *
@@ -90,16 +97,18 @@ public:
 
     map<string, string> *read(rcry_engine *engine, rcry_token *token);
 
+    void populate_header(datafile_h *dh);
+
     /**
      * Closes the file and uncaches it.
      */
     void close();
 
     /** Serialise a map of stuff into a string */
-    void *serialise(reedb_proto::rdb_data *proto);
+    string serialise(reedb_proto::rdb_data *proto);
 
     /** Deserialise a string back into a map of stuff */
-    reedb_proto::rdb_data *deserialise(void *data);
+    reedb_proto::rdb_data *deserialise(string data);
 
 private:
 

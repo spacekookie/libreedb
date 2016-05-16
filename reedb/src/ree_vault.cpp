@@ -22,6 +22,8 @@
 #include "crypto/rcry_token.h"
 #include "crypto/rcry_utils.h"
 
+#include "protos/rdb_data.pb.h"
+
 extern "C" {
 #include "reedb/utils/helper.h"
 }
@@ -236,13 +238,50 @@ void ree_vault::add_file(string name) {
 
     /** Create a new file with name and full path to dir */
     datafile *d = new datafile(name, file_target.string());
+    (*files)[name] = d;
 
     /** Dump the file to disk */
     d->write(this->engine, this->token);
 
-    // datafile_h *dh = new datafile_h();
+    /** Create a header entry for the new file and cache it */
+    datafile_h *dh;
+    d->populate_header(dh);
+    (*headers)[name] = dh;
+
+    /** At this point the cleartext data doesn't exist anymore */
+    //    d->close();
+    //    delete d;
 }
 
 void ree_vault::update_file(string name, map<string, string> *content) {
+    if(!(*files)[name])
+    {
+        cout << "[ERROR] File not found!" << endl;
+    }
 
+    cout << "Inserting data into data file" << endl;
+
+    reedb_proto::rdb_data::revision *r = (*files)[name]->incr_revision();
+    for(auto &iter : *content)
+    {
+        cout << "Key: " << iter.first << " value: " << iter.second << endl;
+        (*files)[name]->insertData(r, iter.first, iter.second);
+    }
+
+    /** Make sure to sync the changes to disk */
+    (*files)[name]->write(this->engine, this->token);
+
+}
+
+void ree_vault::read_file(string name) {
+//    if(!(*files)[name])
+//    {
+//        cout << "[ERROR] File not found!" << endl;
+//    }
+//
+//    auto data = new map<string, string>();
+//
+//    /** Read data from file and move it over to map */
+//    (*files)[name]->read(this->engine, this->token);
+//
 }
