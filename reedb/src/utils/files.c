@@ -33,18 +33,11 @@ int rdb_files_crydump(char *salt, char *iv, char *data, char *vault_path, char *
     return 0;
 }
 
-int rdb_files_dfdump(const char *name, const char *path, char *data)
+int rdb_files_dfdump(const char *path, char *data)
 {
     printf("Writing datafile...");
-    /* Expand our path, add the name as a folder and data dir */
-    size_t path_size = strlen(path) + strlen(name);
-    char file_path[sizeof(char) * path_size];
 
-    strcpy(file_path, path);
-    strcat(file_path, name);
-    strcat(file_path, ".rdf");
-
-    FILE *f = fopen(file_path, "w+");
+    FILE *f = fopen(path, "w+");
     if (f == NULL) {
         printf("FAILED\n");
         return 55;
@@ -52,7 +45,7 @@ int rdb_files_dfdump(const char *name, const char *path, char *data)
 
     fprintf(f, data);
     fclose(f);
-    printf("done\n");
+    printf("DONE\n");
 }
 
 void rdb_write_dataf(const char *data, const char *filename) {

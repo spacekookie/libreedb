@@ -24,6 +24,7 @@ extern "C"
 #include <boost/serialization/map.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <crypto/rcry_token.h>
 
 using namespace std;
 using namespace reedb_proto;
@@ -78,13 +79,15 @@ void datafile::populate() {
     cout << "done" << endl;
 }
 
-void datafile::write(rcry_token *token)
+void datafile::write(rcry_engine *engine, rcry_token *token)
 {
 
-    cout << "Writing datafile..." << endl;
+    cout << "Writing datafile with token: " << token->contents << endl;
 
     /* First we have to make the data usable to us */
     void *data = serialise(this->data);
+
+    cout << "Data we print: " << (char*) data << endl;
 
     /** Go and encrypt the data */
     engine->start_batch(token, false);
@@ -92,12 +95,10 @@ void datafile::write(rcry_token *token)
     engine->end_batch(token);
 
     /** Then dump the data to disk */
-    rdb_files_dfdump(this->path.c_str(), this->name.c_str(), encrypted);
-
-
+    rdb_files_dfdump(this->path.c_str(), encrypted);
 }
 
-map<string, string> *datafile::read(rcry_token *token)
+map<string, string> *datafile::read(rcry_engine *engine, rcry_token *token)
 {
 
 }

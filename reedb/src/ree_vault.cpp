@@ -32,7 +32,7 @@ using namespace libconfig;
 
 #include <gcrypt.h>
 
-ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passphrase) {
+ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase) {
 
     /* Assign name, path and size metadata */
     this->name = name;
@@ -80,7 +80,7 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     } else {
         cout << "[ERROR] A vault already exists at that location!" << endl;
         wordfree(&expantion);
-        throw 1;
+        return;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -88,11 +88,11 @@ ree_vault::ree_vault(rcry_engine *engine, string name, string path, string passp
     ////////////////////////////////////////////////////////////////////////////////////
 
     /* Initialise the crypto engine for this vault */
-    rcry_token *token;
-    rcry_token_helper::create(&token, 0);
+    rcry_token_helper::create(&this->token, 0);
 
     /* Copy the pointer into our vault so we can access crypto after we leave this function :) */
-    this->token = token;
+
+    this->engine = e;
 
     engine->init(token);
     engine->switch_context(token);
@@ -231,14 +231,16 @@ bool ree_vault::check_file_existance(string name) {
 void ree_vault::add_file(string name) {
 
     /* Create datafile and datafile header */
-    filesystem::path target(this->path);
-    target /= "/datastore/";
+    filesystem::path file_target(this->path);
+    file_target /= "/datastore/";
 
     /** Create a new file with name and full path to dir */
-    datafile *d = new datafile(name, target.string());
+    datafile *d = new datafile(name, file_target.string());
+
+    /** Dump the file to disk */
+    d->write(this->engine, this->token);
+
     // datafile_h *dh = new datafile_h();
-    
-    /*  */
 }
 
 void ree_vault::update_file(string name, map<string, string> *content) {

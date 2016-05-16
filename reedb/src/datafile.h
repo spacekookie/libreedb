@@ -86,9 +86,9 @@ public:
      * Fills the protocol buffer, pipes the bytestream through the
      * crypto engine and then dumps that to disk as base64 encoded
      */
-    void write(rcry_token *token);
+    void write(rcry_engine *engine, rcry_token *token);
 
-    map<string, string> *read(rcry_token *token);
+    map<string, string> *read(rcry_engine *engine, rcry_token *token);
 
     /**
      * Closes the file and uncaches it.
@@ -108,9 +108,6 @@ private:
     string path;
     int version;
     bool locked;
-
-    /* A reference to the crypto engine responsible for this file */
-    rcry_engine *engine;
 
     /* Database metadata for queries */
     string *category;

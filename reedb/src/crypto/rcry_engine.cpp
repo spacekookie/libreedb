@@ -72,7 +72,6 @@ void rcry_engine::init(rcry_token *token) {
 
 /** Simple utility function to encrypt a C++ string */
 string rcry_engine::encrypt_string(string data, crycontext *context) {
-    string plain = "Hello Reedb! :)";
     string cipher, encoded, recovered;
 
     try {
@@ -225,24 +224,14 @@ unsigned int rcry_engine::end_batch(rcry_token *token) {
 //    } else {
 //        cout << "[ERROR] " << endl;
 //    }
-    cout << "done" << endl;
 }
+
 
 void rcry_engine::switch_context(rcry_token *token) {
     cout << "[WARN] Using dangerous function! Support will be removed "
                     "in the future. Use `start_batch`, `end_batch` instead!" << endl;
 
-    cout << "FOOOBARRRR!" << my_id << endl;
-
-    cout << "Context map size: " << this->context_map->size() << endl;
-    for(auto iterator = this->context_map->begin(); iterator != this->context_map->end(); iterator++)
-    {
-        cout << "[Item]: " << iterator->first->contents << "::" << iterator->second << endl;
-    }
-
     map<rcry_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
-
-    cout << "lalala!" << endl;
 
     if (token == nullptr) goto release;
 

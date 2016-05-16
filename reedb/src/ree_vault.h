@@ -43,6 +43,7 @@ private:
 
     /* The ID of the engine currently handling this vault */
     int engine_id;
+    rcry_engine *engine;
 
     /* The token required for the crypto engine */
     rcry_token *token;
