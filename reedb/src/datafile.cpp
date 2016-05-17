@@ -65,19 +65,17 @@ datafile::datafile(string name, reedb_proto::rdb_data *old_file) {
 void datafile::populate() {
     cout << "Populating datafile...";
 
-
     data->set_name(this->name);
     data->set_category("SOMETHING");
-
-    rdb_data::revision *revision = data->add_revs();
-    revision->set_rev_no(0);
-
-    /** Create a string key-value pair in our revision */
-    rdb_data::string_pair *pair = revision->add_sentry();
-    pair->set_key("Sample");
-    pair->set_val("This is some sample data");
-
     cout << "done" << endl;
+
+    //    rdb_data::revision *revision = data->add_revs();
+    //    revision->set_rev_no(0);
+    //
+    //    /** Create a string key-value pair in our revision */
+    //    rdb_data::string_pair *pair = revision->add_sentry();
+    //    pair->set_key("Sample");
+    //    pair->set_val("This is some sample data");
 }
 
 void datafile::write(rcry_engine *engine, rcry_token *token) {
@@ -97,15 +95,21 @@ void datafile::write(rcry_engine *engine, rcry_token *token) {
 
 map<string, string> *datafile::read(rcry_engine *engine, rcry_token *token)
 {
-    char *raw;
-    rdb_files_dfread(this->path.c_str(), raw);
+    cout << "Reading from datafile..." << endl;
 
-    /** Decrypt the data */
-    engine->start_batch(token, false);
-    char *encoded = engine->decrypt(raw, token);
+    if(!this->data)
+    {
+        cout << "\t" << "Cache empty: loading from backing storage..." << endl;
+        char *raw;
+        rdb_files_dfread(this->path.c_str(), raw);
 
-    /** Then deserialise the data */
-    this->data = deserialise(encoded);
+        /** Decrypt the data */
+        engine->start_batch(token, false);
+        char *encoded = engine->decrypt(raw, token);
+
+        /** Then deserialise the data */
+        this->data = deserialise(encoded);
+    }
 
     /** Transpose protobuf to C++ std map */
     map<string, string> *carry = new map<string, string>();
@@ -114,12 +118,9 @@ map<string, string> *datafile::read(rcry_engine *engine, rcry_token *token)
     for(auto &iter : this->data->revs())
     {
         /** For every string entry in said revision ... */
-        for(auto &entry : iter.sentry())
-        {
-            (*carry)[entry.key()] = entry.val();
-            cout << "[" << entry.key() << ", " << entry.val() << "]" << endl;
-        }
+        for(auto &entry : iter.sentry()) (*carry)[entry.key()] = entry.val();
     }
+
     return carry;
 }
 
@@ -165,15 +166,17 @@ void datafile::cache(const cache_mode mode) {
 
 string datafile::serialise(rdb_data *proto) {
     cout << "Serialising datafile...";
-    return proto->SerializeAsString();
+    string s = proto->SerializeAsString();
+
+    cout << "done" << endl;
+    return s;
 }
 
 rdb_data *datafile::deserialise(string data) {
     cout << "Deserialising datafile...";
-
     rdb_data *d = new rdb_data();
     d->ParseFromString(data);
-    cout << "done" << endl;
 
+    cout << "done" << endl;
     return d;
 }

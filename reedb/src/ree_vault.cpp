@@ -12,6 +12,8 @@
 // Time, machines and username
 #include <unistd.h>
 #include <chrono>
+#include <string>
+#include <map>
 
 // Config handling
 #include <libconfig.h++>
@@ -264,7 +266,6 @@ void ree_vault::update_file(string name, map<string, string> *content) {
     reedb_proto::rdb_data::revision *r = (*files)[name]->incr_revision();
     for(auto &iter : *content)
     {
-        cout << "Key: " << iter.first << " value: " << iter.second << endl;
         (*files)[name]->insertData(r, iter.first, iter.second);
     }
 
@@ -277,17 +278,6 @@ map<string, string> *ree_vault::read_file(string name) {
     if((*files)[name])
     {
         /** Read data from file and move it over to map */
-        (*files)[name]->read(this->engine, this->token);
+        return (*files)[name]->read(this->engine, this->token);
     }
-
-
-//    if(!(*files)[name])
-//    {
-//        cout << "[ERROR] File not found!" << endl;
-//    }
-//
-//
-//
-//    /
-//
 }

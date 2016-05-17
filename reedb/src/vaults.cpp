@@ -154,10 +154,13 @@ map<string, string> *rdb_vaults::query_file(rdb_uuid *id, rdb_token *token, stri
         return nullptr;
     }
 
+    cout << "Token was accepted for file queury" << endl;
+
     /** Check that the file exists first */
     if ((*active_vaults)[id]->check_file_existance(query)) {
 
-        (*active_vaults)[id]->read_file(query);
+        return (*active_vaults)[id]->read_file(query);
+
     } else {
         cout << "[ERROR] Query unsuccessful. No files found!" << endl;
     }

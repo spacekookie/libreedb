@@ -58,8 +58,7 @@ int main(void)
     data["Field B"] = "My Username";
     v->insert(vault->id, &token, filename, &data);
 
-    map<string, string> *recovered;
-    v->query_file(vault->id, &token, filename);
+    map<string, string> *recovered = v->query_file(vault->id, &token, filename);
 
     cout << "========== Recovered Data ==========" << endl;
     for(auto &iter : *recovered)

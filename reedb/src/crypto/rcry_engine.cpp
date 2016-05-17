@@ -107,7 +107,6 @@ string rcry_engine::decrypt_string(string data, crycontext *context) {
         return NULL;
     }
     return recovered;
-
 }
 
 /** Returns a base64 encoded array of cipher text */
@@ -216,7 +215,7 @@ unsigned int rcry_engine::start_batch(rcry_token *token, bool block) {
 }
 
 unsigned int rcry_engine::end_batch(rcry_token *token) {
-    cout << "Finishing up batch job...";
+    cout << "Finishing up batch job..." << endl;
 
 //    if(this->batch_queue->self == token)
 //    {
@@ -248,7 +247,7 @@ void rcry_engine::switch_context(rcry_token *token) {
         return;
     }
 
-    cout << "[ERROR]" << endl << "Token not found!" << endl;
+    cout << "[ERROR]" << endl << " Token not found!" << endl;
     return;
 
     release:
