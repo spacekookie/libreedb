@@ -29,28 +29,21 @@ before_install:
   - uname -a
   - cat /etc/os-release
   - pwd
-  - free -tm
-  - make --version
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
   - sudo apt-get install g++-4.8
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
   - sudo apt-get install libstdc++-4.8-dev
-  - which g++
-  - g++ -v
   - export CXX="g++-4.8 -std=c++11"
   - export CC="gcc-4.8 -std=c99"
-  - $CC --version
-  - $CXX --version
-  - lscpu
   - wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz
   - tar -xzvf protobuf-2.6.1.tar.gz
   - cd protobuf-2.6.1 && ./configure --prefix=/usr && make && sudo make install
 
 # Run the Build script
 script:
-  - ./travis.sh
+  - pwd && ls -lh . && ./travis.sh
 
 # Install required packages
 addons:
@@ -60,15 +53,13 @@ addons:
     packages:
       - gcc-4.8
       - g++-4.8
-      - clang
-      # - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
-  coverity_scan:
-    project:
-      name: "reepass/reedb"
-      description: "Fully encrypted document-oriented database"
-    notification_email: sabel.katharina@gmail.com
-    build_command_prepend: "./get_cmake.sh && ./prep_env.sh && mkdir _build && cd _build && ../../my_cmake/bin/cmake .."
-    build_command: "../../my_cmake/bin/cmake --build ."
-    branch_pattern: develop
+# coverity_scan:
+#   project:
+#     name: "reepass/reedb"
+#     description: "Fully encrypted document-oriented database"
+#   notification_email: sabel.katharina@gmail.com
+#   build_command_prepend: "./get_cmake.sh && ./prep_env.sh && mkdir _build && cd _build && ../../# my_cmake/bin/cmake .."
+#   build_command: "../../my_cmake/bin/cmake --build ."
+#   branch_pattern: develop
