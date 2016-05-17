@@ -26,6 +26,7 @@ compiler:
   - gcc
 
 before_install:
+  - ls -lh ~
   - uname -a
   - cat /etc/os-release
   - pwd
