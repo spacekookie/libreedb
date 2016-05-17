@@ -48,8 +48,7 @@ datafile::datafile(string name, string parent) {
 
     free(buffer);
 
-    cout << "File path: " << this->path << endl;
-    cout << "Just created a new datafile" << endl;
+    if (RDB_DEBUG) cout << "Just created a new datafile" << endl;
 
     /* Then populate them */
     this->populate();
@@ -59,15 +58,12 @@ datafile::datafile(string name, string parent) {
 }
 
 datafile::datafile(string name, reedb_proto::rdb_data *old_file) {
-    cout << "Preparing an existing datafile for transactions..." << endl;
+    if (RDB_DEBUG) cout << "Preparing an existing datafile for transactions..." << endl;
 }
 
 void datafile::populate() {
-    cout << "Populating datafile...";
-
     data->set_name(this->name);
     data->set_category("SOMETHING");
-    cout << "done" << endl;
 
     //    rdb_data::revision *revision = data->add_revs();
     //    revision->set_rev_no(0);
@@ -79,7 +75,7 @@ void datafile::populate() {
 }
 
 void datafile::write(rcry_engine *engine, rcry_token *token) {
-    cout << "Writing datafile" << endl;
+    if (RDB_DEBUG) cout << "Writing datafile" << endl;
 
     /* First we have to make the data usable to us */
     string data = serialise(this->data);
@@ -95,11 +91,11 @@ void datafile::write(rcry_engine *engine, rcry_token *token) {
 
 map<string, string> *datafile::read(rcry_engine *engine, rcry_token *token)
 {
-    cout << "Reading from datafile..." << endl;
+    if (RDB_DEBUG) cout << "Reading from datafile..." << endl;
 
     if(!this->data)
     {
-        cout << "\t" << "Cache empty: loading from backing storage..." << endl;
+        if (RDB_DEBUG) cout << "\t" << "Cache empty: loading from backing storage..." << endl;
         char *raw;
         rdb_files_dfread(this->path.c_str(), raw);
 
@@ -156,7 +152,7 @@ reedb_proto::rdb_data::revision* datafile::incr_revision() {
         r->set_rev_no(revisions);
         return r;
     } else {
-        cout << "[ERROR] Unencrypted datafile cache not available!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Unencrypted datafile cache not available!" << endl;
     }
 }
 
@@ -165,18 +161,18 @@ void datafile::cache(const cache_mode mode) {
 }
 
 string datafile::serialise(rdb_data *proto) {
-    cout << "Serialising datafile...";
+    if (RDB_DEBUG) cout << "Serialising datafile...";
     string s = proto->SerializeAsString();
 
-    cout << "done" << endl;
+    if (RDB_DEBUG) cout << "done" << endl;
     return s;
 }
 
 rdb_data *datafile::deserialise(string data) {
-    cout << "Deserialising datafile...";
+    if (RDB_DEBUG) cout << "Deserialising datafile...";
     rdb_data *d = new rdb_data();
     d->ParseFromString(data);
 
-    cout << "done" << endl;
+    if (RDB_DEBUG) cout << "done" << endl;
     return d;
 }

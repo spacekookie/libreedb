@@ -82,7 +82,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
         filesystem::create_directories(target);
         target.remove_leaf();
     } else {
-        cout << "[ERROR] A vault already exists at that location!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] A vault already exists at that location!" << endl;
         wordfree(&expantion);
         return;
     }
@@ -101,7 +101,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
     engine->init(token);
     engine->switch_context(token);
 
-    cout << "Encrypting generated key with user password and salt" << endl;
+    if (RDB_DEBUG) cout << "Encrypting generated key with user password and salt" << endl;
 
     /* Then retrieve the key in encrypted form to write it to disk */
     string encrypted_key = engine->get_encrypted_key(&this->salt, &this->iv, token, &passphrase);
@@ -112,7 +112,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
     /* Hash the passphrase and store it in the vault for quick passphrase comparison */
     this->pw_hash = rcry_utils::md_sha256_salted(salt, passphrase.c_str(), true);
 
-    cout << "Preparing to dump encrypted key to disk..." << endl;
+    if (RDB_DEBUG) cout << "Preparing to dump encrypted key to disk..." << endl;
 
     /* Generate our keyfile name here so we can use it in the metadata header */
     char *sub_path = "/keystore/";
@@ -132,7 +132,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
     strcat(concat, "::");
     strcat(concat, encrypted_key.c_str());
 
-    cout << "Writing key...";
+    if (RDB_DEBUG) cout << "Writing key...";
 
     /* Expand our path, add the name as a folder and data dir */
     size_t path_size = strlen(path.c_str()) + strlen(name.c_str())
@@ -146,13 +146,13 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
 
     FILE *f = fopen(key_path, "w+");
     if (f == NULL) {
-        cout << "[ERROR] Opening file failed!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Opening file failed!" << endl;
         // TODO: Attempt to undo creation process
         return;
     }
     fprintf(f, concat);
     fclose(f);
-    cout << "done" << endl;
+    if (RDB_DEBUG) cout << "done" << endl;
 
     ////////////////////////////////////////////////////////////////////////////////////
     ///////////////////// Create a master config & write that to directory
@@ -184,7 +184,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
     root.add("updating_user", Setting::TypeString) = username;
     root.add("khash", Setting::TypeString) = this->pw_hash;
 
-    cout << "Writing config to file..." << endl;
+    if (RDB_DEBUG) cout << "Writing config to file..." << endl;
 
     /** Then write our configuration */
     cfg.writeFile(config_path.c_str());
@@ -193,7 +193,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
     delete (username);
 
     /* Log that we are done  */
-    cout << "Done creating vault!" << endl;
+    if (RDB_DEBUG) cout << "Done creating vault!" << endl;
 }
 
 ree_vault::ree_vault(rdb_uuid uuid, string path, string passphrase) {
@@ -205,25 +205,25 @@ ree_vault::~ree_vault() {
 }
 
 void ree_vault::close_vault() {
-    cout << "\t> " << "Closing vault";
+    if (RDB_DEBUG) cout << "\t> " << "Closing vault";
     cout.flush();
 
     // Do cleanup
 
-    cout << "[DONE]" << endl;
+    if (RDB_DEBUG) cout << "[DONE]" << endl;
 }
 
 int ree_vault::unlockVault(string passphrase) {
 
-    cout << "About to check passphrase" << endl;
+    if (RDB_DEBUG) cout << "About to check passphrase" << endl;
 
     char *to_consider = rcry_utils::md_sha256_salted(this->salt, passphrase.c_str(), true);
 
     if (strcmp(to_consider, this->pw_hash) == 0) {
-        cout << "Password hash matches. Accepting token authentication..." << endl;
+        if (RDB_DEBUG) cout << "Password hash matches. Accepting token authentication..." << endl;
         return 0;
     } else {
-        cout << "Password hash test failed. Token authentication rejected!" << endl;
+        if (RDB_DEBUG) cout << "Password hash test failed. Token authentication rejected!" << endl;
         return 6;
     }
 }
@@ -258,10 +258,10 @@ void ree_vault::add_file(string name) {
 void ree_vault::update_file(string name, map<string, string> *content) {
     if(!(*files)[name])
     {
-        cout << "[ERROR] File not found!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] File not found!" << endl;
     }
 
-    cout << "Inserting data into data file" << endl;
+    if (RDB_DEBUG) cout << "Inserting data into data file" << endl;
 
     reedb_proto::rdb_data::revision *r = (*files)[name]->incr_revision();
     for(auto &iter : *content)

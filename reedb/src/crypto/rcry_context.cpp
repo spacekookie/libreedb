@@ -2,6 +2,8 @@
 #include "rcry_engine.h"
 #include <iostream>
 
+using namespace std;
+
 rcry_context *rcry_context::self;
 
 rcry_context::~rcry_context() { }
@@ -32,6 +34,6 @@ rcry_engine *rcry_context::get_engine_with_id(int id) {
 
 void rcry_context::add_engine(rcry_engine *engine) {
     engines[count] = engine;
-    std::cout << "Added engine id: " << engines[count]->query_id() << std::endl;
+    if (RDB_DEBUG) cout << "Added engine id: " << engines[count]->query_id() << std::endl;
     count++;
 }

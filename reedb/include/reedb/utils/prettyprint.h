@@ -22,6 +22,8 @@
 #include <utility>
 #include <valarray>
 
+using namespace std;
+
 namespace pretty_print {
     namespace detail {
         // SFINAE type trait to detect whether T::const_iterator exists.
@@ -355,7 +357,7 @@ namespace pretty_print {
 
     // Type-erasing helper class for easy use of custom delimiters.
     // Requires TCharTraits = std::char_traits<TChar> and TChar = char or wchar_t, and MyDelims needs to be defined for TChar.
-    // Usage: "cout << pretty_print::custom_delims<MyDelims>(x)".
+    // Usage: "if (RDB_DEBUG) cout << pretty_print::custom_delims<MyDelims>(x)".
 
     struct custom_delims_base {
         virtual ~custom_delims_base() { }
@@ -397,7 +399,7 @@ namespace pretty_print {
 
 
     // A wrapper for a C-style array given as pointer-plus-size.
-    // Usage: std::cout << pretty_print_array(arr, n) << std::endl;
+    // Usage: if (RDB_DEBUG) cout << pretty_print_array(arr, n) << std::endl;
 
     template<typename T>
     struct array_wrapper_n {
@@ -417,7 +419,7 @@ namespace pretty_print {
 
 
     // A wrapper for hash-table based containers that offer local iterators to each bucket.
-    // Usage: std::cout << bucket_print(m, 4) << std::endl;  (Prints bucket 5 of container m.)
+    // Usage: if (RDB_DEBUG) cout << bucket_print(m, 4) << std::endl;  (Prints bucket 5 of container m.)
 
     template<typename T>
     struct bucket_print_wrapper {

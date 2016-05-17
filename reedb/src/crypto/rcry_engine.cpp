@@ -14,17 +14,6 @@ using CryptoPP::AES;
 using CryptoPP::Base64Encoder;
 using CryptoPP::AutoSeededRandomPool;
 
-#include <iostream>
-using std::cout;
-using std::cerr;
-using std::endl;
-
-#include <string>
-using std::string;
-
-#include <cstdlib>
-using std::exit;
-
 #include <cryptopp/cryptlib.h>
 using CryptoPP::Exception;
 
@@ -44,18 +33,24 @@ using CryptoPP::AES;
 using CryptoPP::CBC_Mode;
 
 #include "assert.h"
+
 #include <iterator>
+#include <map>
+#include <iostream>
+#include <string>
+#include <cstdlib>
 
 #include "rcry_utils.h"
 #include "rcry_token.h"
 #include <gcrypt.h>
 
 using namespace std;
+using namespace CryptoPP;
 
 int my_id;
 
 rcry_engine::rcry_engine(int id) {
-    cout << "Creating rcry_engine with ID " << id << endl;
+    if (RDB_DEBUG) cout << "Creating rcry_engine with ID " << id << endl;
     this->context_map = new map<rcry_token *, byte[AES::MAX_KEYLENGTH]>();
     my_id = id;
 }
@@ -76,7 +71,7 @@ string rcry_engine::encrypt_string(string data, crycontext *context) {
 
     try {
         //        StringSource(data, true, new HexEncoder(new StringSink(encoded)));
-        //        cout << "plain text: " << encoded << endl;
+        //        if (RDB_DEBUG) cout << "plain text: " << encoded << endl;
 
         CBC_Mode<AES>::Encryption e;
         e.SetKeyWithIV(this->context_key, sizeof(this->context_key), context->iv);
@@ -84,7 +79,7 @@ string rcry_engine::encrypt_string(string data, crycontext *context) {
 
         encoded.clear();
         StringSource(cipher, true, new HexEncoder(new StringSink(encoded)));
-        //        cout << "Encrypted: " << encoded << endl;
+        //        if (RDB_DEBUG) cout << "Encrypted: " << encoded << endl;
     }
     catch (const CryptoPP::Exception &e) {
         cerr << e.what() << endl;
@@ -158,7 +153,8 @@ char* rcry_engine::decrypt(void *data, rcry_token *token) {
 
 unsigned int rcry_engine::start_batch(rcry_token *token, bool block) {
 
-    cout << "Registering a batch job on cry_engine " << my_id << endl;
+    if (RDB_DEBUG) cout << "Registering a batch job on cry_engine " << my_id << endl;
+    if (RDB_DEBUG) cout << RDB_DEBUG << endl;
 
     rcry_batch *batch = new rcry_batch();
     batch->num_id = 42;
@@ -215,26 +211,26 @@ unsigned int rcry_engine::start_batch(rcry_token *token, bool block) {
 }
 
 unsigned int rcry_engine::end_batch(rcry_token *token) {
-    cout << "Finishing up batch job..." << endl;
+    if (RDB_DEBUG) cout << "Finishing up batch job..." << endl;
 
 //    if(this->batch_queue->self == token)
 //    {
         this->switch_context(NULL);
 //    } else {
-//        cout << "[ERROR] " << endl;
+//        if (RDB_DEBUG) cout << "[ERROR] " << endl;
 //    }
 }
 
 
 void rcry_engine::switch_context(rcry_token *token) {
-    cout << "[WARN] Using dangerous function! Support will be removed "
+    if (RDB_DEBUG) cout << "[WARN] Using dangerous function! Support will be removed "
                     "in the future. Use `start_batch`, `end_batch` instead!" << endl;
 
     map<rcry_token *, byte[AES::MAX_KEYLENGTH]>::iterator it = (*this->context_map).find(token);
 
     if (token == nullptr) goto release;
 
-    cout << "Checking for token availability...";
+    if (RDB_DEBUG) cout << "Checking for token availability...";
     if (it != (*this->context_map).end()) {
         this->cry_lock = true;
         memcpy(this->context_key, (*this->context_map)[token], AES::MAX_KEYLENGTH);
@@ -243,17 +239,17 @@ void rcry_engine::switch_context(rcry_token *token) {
         // encoded.clear();
         // StringSource(this->context_key, AES::MAX_KEYLENGTH, true, new HexEncoder(new StringSink(encoded)));
 
-        cout << "done!" << endl;
+        if (RDB_DEBUG) cout << "done!" << endl;
         return;
     }
 
-    cout << "[ERROR]" << endl << " Token not found!" << endl;
+    if (RDB_DEBUG) cout << "[ERROR]" << endl << " Token not found!" << endl;
     return;
 
     release:
     this->cry_lock = false;
     memset(this->context_key, 0, AES::MAX_KEYLENGTH);
-    cout << "Crypto Engine now released for new token" << endl;
+    if (RDB_DEBUG) cout << "Crypto Engine now released for new token" << endl;
 }
 
 string rcry_engine::get_encrypted_key(char *(*salt), char *(*iv), rcry_token *token, string *passphrase) {
@@ -303,7 +299,7 @@ void rcry_engine::master_keygen(byte *key, rdb_uuid *uuid) {
     /* Malloc the keysize first and check it was successful... */
     key = (byte *) malloc(AES::MAX_KEYLENGTH);
     if ((*key) == NULL) {
-        std::cout << "Failed to malloc key size!" << std::endl;
+        if (RDB_DEBUG) cout << "Failed to malloc key size!" << std::endl;
         throw 0;
     }
 

@@ -35,7 +35,7 @@ rdb_vaults::rdb_vaults() {
 }
 
 rdb_vaults::~rdb_vaults() {
-    std::cout << "Closing interface: " << this->id << endl;
+    if (RDB_DEBUG) cout << "Closing interface: " << this->id << endl;
 
     for (std::map<rdb_uuid *, ree_vault *>::iterator it = active_vaults->begin(); it != active_vaults->end(); ++it) {
         it->second->close_vault();
@@ -49,7 +49,7 @@ vector<vault_meta> *rdb_vaults::list_vaults() {
 
 vault_meta *rdb_vaults::create(string name, string path, string passphrase) {
 
-    cout << "Creating a new vault with name " << name << " and path " << path << endl;
+    if (RDB_DEBUG) cout << "Creating a new vault with name " << name << " and path " << path << endl;
 
     rdb_uuid *uuid;
     uuid_helper::rdb_uuid_generate(&uuid, ONE);
@@ -88,7 +88,7 @@ rdb_token rdb_vaults::authenticate(rdb_uuid *uuid, string passphrase, bool perma
         int val = (*active_vaults)[uuid]->unlockVault(passphrase);
 
         if (val == 0) {
-            cout << "Authentication successful!" << endl;
+            if (RDB_DEBUG) cout << "Authentication successful!" << endl;
 
             /* Then generate an access token and return it to the user */
             rdb_token *token;
@@ -102,13 +102,13 @@ rdb_token rdb_vaults::authenticate(rdb_uuid *uuid, string passphrase, bool perma
             user = *token;
             return user;
         } else {
-            cout << "Authentication failed because of error code " << val << endl;
-            cout << "Check previous logging to get error details?" << endl;
+            if (RDB_DEBUG) cout << "Authentication failed because of error code " << val << endl;
+            if (RDB_DEBUG) cout << "Check previous logging to get error details?" << endl;
         }
 
     } catch (runtime_error &e) {
-        cout << "Error: " << e.what() << " occured!" << endl;
-        cout << "Was your passphrase wrong?" << endl;
+        if (RDB_DEBUG) cout << "Error: " << e.what() << " occured!" << endl;
+        if (RDB_DEBUG) cout << "Was your passphrase wrong?" << endl;
     }
 }
 
@@ -123,7 +123,7 @@ void rdb_vaults::insert(rdb_uuid *id, rdb_token *token, string file_id, map<stri
 
     /* Make sure that we throw out any intruder */
     if (!accepted) {
-        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
         return;
     }
 
@@ -131,13 +131,13 @@ void rdb_vaults::insert(rdb_uuid *id, rdb_token *token, string file_id, map<stri
     if (!(*active_vaults)[id]->check_file_existance(file_id)) {
 
         (*active_vaults)[id]->add_file(file_id);
-        cout << "Adding file '" << file_id << "'..." << endl;
+        if (RDB_DEBUG) cout << "Adding file '" << file_id << "'..." << endl;
     }
 
     /* Then either write into the new or existing file. But we don't care anymore at this point */
     (*active_vaults)[id]->update_file(file_id, content);
 
-    cout << "File insertion complete" << endl;
+    if (RDB_DEBUG) cout << "File insertion complete" << endl;
 
 }
 
@@ -150,11 +150,11 @@ map<string, string> *rdb_vaults::query_file(rdb_uuid *id, rdb_token *token, stri
 
     /* Make sure that we throw out any intruder */
     if (!accepted) {
-        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
         return nullptr;
     }
 
-    cout << "Token was accepted for file queury" << endl;
+    if (RDB_DEBUG) cout << "Token was accepted for file queury" << endl;
 
     /** Check that the file exists first */
     if ((*active_vaults)[id]->check_file_existance(query)) {
@@ -162,7 +162,7 @@ map<string, string> *rdb_vaults::query_file(rdb_uuid *id, rdb_token *token, stri
         return (*active_vaults)[id]->read_file(query);
 
     } else {
-        cout << "[ERROR] Query unsuccessful. No files found!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Query unsuccessful. No files found!" << endl;
     }
 }
 
@@ -176,11 +176,11 @@ void rdb_vaults::destroy(rdb_uuid *id, rdb_token *token) {
 
     /* Make sure that we throw out any intruder */
     if (!accepted) {
-        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
         return;
     }
 
-    cout << "Not implemented!" << endl;
+    if (RDB_DEBUG) cout << "Not implemented!" << endl;
 }
 
 void rdb_vaults::remove(rdb_uuid *id, rdb_token *token, string file_id, list <string> *fields) {
@@ -193,15 +193,13 @@ void rdb_vaults::remove(rdb_uuid *id, rdb_token *token, string file_id, list <st
 
     /* Make sure that we throw out any intruder */
     if (!accepted) {
-        cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
+        if (RDB_DEBUG) cout << "[ERROR] Token wasn't authorised for this vault!" << endl;
         return;
     }
 
     /* Log and throw an error if the file doesn't exists */
     if (!(*active_vaults)[id]->check_file_existance(file_id)) {
-        cout << "[ERROR] File '" << file_id << "' doesn't exists..." << endl;
+        if (RDB_DEBUG) cout << "[ERROR] File '" << file_id << "' doesn't exists..." << endl;
         return;
     }
-
-    // (*active_vaults)[id];
 }

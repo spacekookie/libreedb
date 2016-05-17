@@ -25,6 +25,8 @@
 #include <vector>
 #include <map>
 
+#include <malloc.h>
+
 // Internal system dependencies
 #include <reedb/vaults.h>
 #include "crypto/rcry_engine.h"
@@ -34,7 +36,7 @@ using namespace std;
 
 reedb::reedb() {
     this->finalised = false;
-    cout << "Preparing to start a new Reedb instance...";
+    if (RDB_DEBUG) cout << "Preparing to start a new Reedb instance...";
 
     /* Populate sane defaults */
     this->daemon = false;
@@ -42,7 +44,7 @@ reedb::reedb() {
 }
 
 reedb::~reedb() {
-    cout << "=== Running cleanup ===" << endl;
+    if (RDB_DEBUG) cout << "=== Running cleanup ===" << endl;
 
     for (rdb_vaults *interface : this->vault_interfaces) {
         delete (interface);
@@ -57,20 +59,24 @@ void reedb::register_vinterface(rdb_vaults *interface) {
     string interface_id = interface->get_id();
     for (rdb_vaults *rv : this->vault_interfaces) {
         if (rv->get_id() == interface_id) {
-            cout << "[ERROR] This interface is already registered! Skipping..." << endl;
+            if (RDB_DEBUG) if (RDB_DEBUG) cout << "[ERROR] This interface is already registered! Skipping..." << endl;
             return;
         }
     }
-    if (this->verbose) cout << "Adding interface with id " << interface_id << " to reedb instance..." << endl;
+    if (this->verbose) if (RDB_DEBUG) cout << "Adding interface with id " << interface_id << " to reedb instance..." << endl;
     this->vault_interfaces.push_back(interface);
 }
 
 void reedb::finalise() {
-    if (verbose) cout << "Checking user settings and starting Reedb" << endl;
+    if (RDB_DEBUG) if (RDB_DEBUG) cout << "Checking user settings and starting Reedb" << endl;
 
     /* Make sure that the singleton context exists  */
     rcry_context *context = rcry_context::instance();
     int count = context->get_count_incr();
+
+    #if verbose
+    #define RDB_DEBUG true
+    #endif
 
     rcry_engine **engines = (rcry_engine **) malloc(sizeof(rcry_engine *) * 4);
 
@@ -86,6 +92,6 @@ void reedb::finalise() {
 }
 
 void reedb::terminate() {
-    cout << "Instance " << this << " is being terminated. All active vaults_interface to be closed..." << endl;
+    if (RDB_DEBUG) cout << "Instance " << this << " is being terminated. All active vaults_interface to be closed..." << endl;
     delete (this);
 }

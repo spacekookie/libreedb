@@ -16,9 +16,10 @@
 #include <stdlib.h>
 
 using namespace CryptoPP;
+using namespace std;
 
 void vault_token_helper::destroy(rdb_token *token) {
-    std::cout << "Destroying token from " << token->created << std::endl;
+    if (RDB_DEBUG) cout << "Destroying token from " << token->created << std::endl;
     free(token->contents);
     free(token);
 }

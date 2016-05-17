@@ -22,13 +22,9 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-//#include "reedb/core.h"
-//#include "reedb/vaults.h"
-//
-//#include <map>
-//#include <string>
-
+#include <map>
 #include <iostream>
+
 #include <reedb/core.h>
 #include <reedb/vaults.h>
 
@@ -40,7 +36,7 @@ int main(void)
     reedb *rdb = new reedb();
     rdb->set_os(LINUX);
     rdb->set_distro(FEDORA);
-    rdb->set_verbose(true);
+    rdb->set_verbose(false);
     rdb->finalise();
 
     // Then attach a new vaults interface to it
