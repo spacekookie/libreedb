@@ -1,0 +1,14 @@
+image: spacekookie/reedb-docker
+
+stages:
+  - build
+#  - test
+#  - deploy
+
+build_libreedb:
+  stage: deploy
+  script:
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build
