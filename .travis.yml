@@ -43,6 +43,10 @@ before_install:
   - export CC="gcc-4.8 -std=c99"
   - $CC --version
   - $CXX --version
+  - lscpu
+  - wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
+  - tar -xzvf protobuf-2.4.1.tar.gz
+  - cd protobuf-2.4.1 && ./configure --prefix=/usr && make && sudo make install
 
 # Run the Build script
 script:

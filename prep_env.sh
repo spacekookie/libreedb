@@ -31,13 +31,13 @@ cd ./_my_boost && sudo ./bootstrap.sh --prefix=/usr/local && sudo ./b2 install
 
 
 # Check for protobuf existance.
-if [ ! -d "$HOME/protobuf/lib" ]; then
-  wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
-  tar -xzvf protobuf-2.4.1.tar.gz
-  cd protobuf-2.4.1 && ./configure --prefix=$HOME/protobuf && make && make install
-else
-  echo "Using cached directory."
-fi
+# if [ ! -d "$HOME/protobuf/lib" ]; then
+#   wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
+#   tar -xzvf protobuf-2.4.1.tar.gz
+#   cd protobuf-2.4.1 && ./configure --prefix=$HOME/protobuf && make && make install
+# else
+#   echo "Using cached directory."
+# fi
 
 # Download and install libboost-filesystem
 # wget --no-check-certificate http://ftp.de.debian.org/debian/pool/main/b/boost-defaults/libboost-filesystem-dev_1.58.0.1_amd64.deb -O boost-filesystem-dev.deb
