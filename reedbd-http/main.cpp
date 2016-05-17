@@ -22,16 +22,14 @@
  * Initialisation of reedbd-http is done automatically (mostly).
  */
 
-#include <map>
-#include <iostream>
-
-#include <reedb/core.h>
 #include <reedb/vaults.h>
+#include <reedb/core.h>
+#include <iostream>
 
 using namespace std;
 
-int main(void)
-{
+int main(void) {
+
     // First create our reedb core
     reedb *rdb = new reedb();
     rdb->set_os(LINUX);
