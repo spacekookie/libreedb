@@ -4,11 +4,12 @@
 #                           #
 #############################
 
-os: linux
+language: cpp
+compiler: g++
+
+# Fixes issue with disallowed packages
+sudo: true
 dist: trusty
-sudo: required
-services: docker
-language: c++
 
 # Stop spamming me please...
 notifications:
@@ -16,14 +17,51 @@ notifications:
 
 env:
   global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   # Secure key in public repo. Much security. Such awesome. Wow!
    - secure: "X6Vs5IfJBseYJoirGHQIigEbYE6k8gdl9fCP9SyW+ErDACFRCusWjHMkUjVEmfbcqaUtBetQcsKZip7twHNCgxvxzydXOa30jn4tzBkkVIcUgSw5Zd3nruUy6D3pdNuf0/5YhZYH2nL9slU81kgApqD9kg2o/Fkw27mqdNAk/6g="
 
-services:
-  - docker
+compiler:
+  - gcc
 
 before_install:
-  - docker pull spacekookie/reedb-docker
-  - docker run spacekookie/reedb-docker /bin/bash -c "pacman --noconfirm -Sy git; git clone https://github.com/reepass/libreedb/ -b develop ; mkdir libreedb/build ; cd libreedb/build ; cmake .. ; cmake --build ."
+  - uname -a
+  - cat /etc/os-release
+  - pwd
+  - free -tm
+  - make --version
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update
+  - sudo apt-get install g++-4.8
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
+  - sudo apt-get install libstdc++-4.8-dev
+  - which g++
+  - g++ -v
+  - export CXX="g++-4.8 -std=c++11"
+  - export CC="gcc-4.8 -std=c99"
+  - $CC --version
+  - $CXX --version
+  - lscpu
+  - wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz
+  - tar -xzvf protobuf-2.6.1.tar.gz
+  - cd protobuf-2.6.1 && ./configure --prefix=/usr && make && sudo make install
+
+# Run the Build script
+script:
+  - ./travis.sh
+
+# Install required packages
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
+      - clang
+      # - libmicrohttpd-dev   # Micro C HTTP server
 
 # This is turning into a huge cluster fuck
   coverity_scan:
