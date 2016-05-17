@@ -29,6 +29,10 @@ wget --no-check-certificate http://sourceforge.net/projects/boost/files/boost/1.
 mkdir _my_boost && tar xf boost.tar.bz2 -C _my_boost --strip 1
 cd ./_my_boost && sudo ./bootstrap.sh --prefix=/usr/local && sudo ./b2 install
 
+wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz
+tar -xzvf protobuf-2.6.1.tar.gz
+cd protobuf-2.6.1 && ./configure --prefix=/usr && make && sudo make install
+
 
 # Check for protobuf existance.
 # if [ ! -d "$HOME/protobuf/lib" ]; then

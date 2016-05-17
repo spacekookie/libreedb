@@ -17,6 +17,8 @@ if [ ! -f $PWD/my_cmake/bin/cmake ]; then
 	# export cmake="$PWD/my_cmake/bin/cmake"
 fi
 
+HOME=$PWD
+
 # Remove old build folders that might still exist
 rm -rf $PWD/_build
 
