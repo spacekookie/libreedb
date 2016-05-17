@@ -6,7 +6,7 @@ stages:
 #  - deploy
 
 build_libreedb:
-  stage: deploy
+  stage: build
   script:
     - mkdir build
     - cd build
