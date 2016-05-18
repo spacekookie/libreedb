@@ -56,9 +56,9 @@ addons:
 # This is turning into a huge cluster fuck
 coverity_scan:
   project:
-    name: "reepass/reedb"
-    description: "Fully encrypted document-oriented database"
+    name: "reepass/libreedb"
+    description: "Encrypted document-oriented database for the paranoid"
   notification_email: sabel.katharina@gmail.com
-  build_command_prepend: "./get_cmake.sh && ./prep_env.sh && mkdir _build && cd _build && ../../# my_cmake/bin/cmake .."
+  build_command_prepend: "./get_cmake.sh && ./prep_env.sh && mkdir _build && cd _build && ../../my_cmake/bin/cmake .."
   build_command: "../../my_cmake/bin/cmake --build ."
   branch_pattern: develop
