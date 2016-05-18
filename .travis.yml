@@ -50,6 +50,7 @@ addons:
     packages:
       - gcc-4.8
       - g++-4.8
+      - libconfig-dev
 
 # This is turning into a huge cluster fuck
 # coverity_scan:
