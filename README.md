@@ -1,9 +1,12 @@
 ![Reedb Logo](https://raw.githubusercontent.com/reepass/reedb/develop/extras/logo.png)
 
+<!--[![Build Status](https://codeship.com/projects/414c23f0-fa36-0133-64c5-46c303037c21/status?branch=develop)](https://codeship.com/projects/414c23f0-fa36-0133-64c5-46c303037c21/status?branch=develop)-->
+
 [![Build Status](https://gitlab.com/SpaceKookie/reedb-mirror/badges/develop/build.svg)](https://gitlab.com/SpaceKookie/reedb-mirror/builds)
 [![Build Status](https://travis-ci.org/reepass/libreedb.svg?branch=develop)](https://travis-ci.org/reepass/libreedb)
-[![Build Status](https://codeship.com/projects/414c23f0-fa36-0133-64c5-46c303037c21/status?branch=develop)](https://codeship.com/projects/414c23f0-fa36-0133-64c5-46c303037c21/status?branch=develop)
 [![Coverity Status](https://scan.coverity.com/projects/6872/badge.svg)](https://scan.coverity.com/projects/reepass-reedb)
+[![Code Health](https://landscape.io/github/reepass/libreedb/master/landscape.svg?style=flat)](https://landscape.io/github/reepass/libreedb/master)
+[![Coverage Status](https://coveralls.io/repos/github/reepass/libreedb/badge.svg?branch=master)](https://coveralls.io/github/reepass/libreedb?branch=master)
 
 
 :lock: Fully encrypted, document-oriented database with per-user encryption, nested ciphers and zones to allow for selective sharing, rights management and even revocation of rights.
