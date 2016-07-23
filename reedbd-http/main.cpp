@@ -42,7 +42,7 @@ int main(void) {
     rdb->register_vinterface(v);
 
     /* Create a vault and then query its state */
-    string passphrase = "foobar32";
+    const string passphrase = "foobar32";
     vault_meta *vault = v->create("default", "~/Documents/", passphrase);
     rdb_token token = v->authenticate(vault->id, passphrase);
 
@@ -60,8 +60,24 @@ int main(void) {
         cout << "[" << iter.first << "] -> [" << iter.second << "]" << endl;
     }
 
-    cout << "====================" << endl;
+    cout << "=====================================" << endl;
+
+    /** Close the vault to force a sync TODO: Add a function for that */
+    v->close(vault->id, &token);
+
+    /** Open vault again */
+    token = v->authenticate(vault->id, passphrase);
+    map<string, string> *recovered_two = v->query_file(vault->id, &token, filename);
+
+    cout << "========== Recovered Data 2 ==========" << endl;
+    for(auto &iter : *recovered_two)
+    {
+        cout << "[" << iter.first << "] -> [" << iter.second << "]" << endl;
+    }
+
+    cout << "======================================" << endl;
 
     // Just exit everything
+    v->close(vault->id, &token);
     rdb->terminate();
 }

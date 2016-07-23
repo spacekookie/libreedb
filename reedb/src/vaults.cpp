@@ -47,6 +47,15 @@ vector<vault_meta> *rdb_vaults::list_vaults() {
     return scoped_vaults;
 }
 
+void rdb_vaults::close(rdb_uuid *id, rdb_token *token) {
+    if (RDB_DEBUG) cout << "Closing Vault with id: " << id->id << endl;
+
+    /** First find out how many agents we need to shut down */
+    // size_t busy_tokens = (*token_map)[id]->size();
+
+    
+}
+
 vault_meta *rdb_vaults::create(string name, string path, string passphrase) {
 
     if (RDB_DEBUG) cout << "Creating a new vault with name " << name << " and path " << path << endl;

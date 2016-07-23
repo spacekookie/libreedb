@@ -130,7 +130,7 @@ public:
      */
     unsigned int end_batch(rcry_token *token);
 
-    /**
+   /**
     * Generate a master key for a vault with a specific token.
     * Token must be known and context loaded
     *
@@ -140,7 +140,7 @@ public:
     */
     void master_keygen(byte *key, rdb_uuid *uuid);
 
-    /**_____________________
+   /**_____________________
     * !! NOT IMPLEMENTED !! (See roadmap on github.com/reepass/reedb/wiki)
     *
     * Generate a key for a specific zone inside a vault. The zone needs to be specified
