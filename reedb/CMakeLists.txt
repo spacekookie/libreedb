@@ -42,7 +42,7 @@ set(REEDB_SOURCE
         src/crypto/rcry_token.cpp
         src/crypto/rcry_token.h
         include/reedb/utils/prettyprint.h
-        include/reedb/reedb.h)
+        include/reedb/reedb.h include/reedb/utils.h include/reedb/errors.h src/reedb.cpp)
 
 # Define our library in cmake
 add_library(reedb ${REEDB_SOURCE})
