@@ -1,6 +1,6 @@
 #include "ree_vault.h"
 
-#include "reedb/utils/errors.h"
+#include <reedb/errors.h>
 #include <iostream>
 #include <cstring>
 
@@ -56,7 +56,7 @@ ree_vault::ree_vault(rcry_engine *e, string name, string path, string passphrase
     wordexp_t expantion;
     wordexp(path.c_str(), &expantion, 0);
 
-    bool created = true;
+    bool created;
     string combined = name;
     combined.append(".vault");
 

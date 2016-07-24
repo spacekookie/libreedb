@@ -34,15 +34,24 @@ set(REEDB_SOURCE
 
         # Data storage (+ protobuf support)
         src/protos/rdb_data.pb.cc
-        src/protos/rdb_data.pb.h
+        src/protos/rdb_config.pb.cc
+
         src/ree_vault.cpp
         src/datafile.cpp
 
         src/crypto/rcry_context.cpp
         src/crypto/rcry_token.cpp
         src/crypto/rcry_token.h
+
         include/reedb/utils/prettyprint.h
-        include/reedb/reedb.h include/reedb/utils.h include/reedb/errors.h src/reedb.cpp)
+
+        include/reedb/reedb.h
+        include/reedb/utils.h
+        include/reedb/errors.h
+
+        src/reedb.cpp
+        include/reedb/platform.h
+        src/utils/platform.cpp)
 
 # Define our library in cmake
 add_library(reedb ${REEDB_SOURCE})

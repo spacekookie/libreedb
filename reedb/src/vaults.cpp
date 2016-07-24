@@ -1,4 +1,5 @@
-#include "reedb/crypto/vault_token.h"
+#include <reedb/reedb.h>
+
 #include "crypto/rcry_context.h"
 #include "reedb/vaults.h"
 #include "ree_vault.h"
@@ -61,7 +62,7 @@ vault_meta *rdb_vaults::create(string name, string path, string passphrase) {
     if (RDB_DEBUG) cout << "Creating a new vault with name " << name << " and path " << path << endl;
 
     rdb_uuid *uuid;
-    uuid_helper::rdb_uuid_generate(&uuid, ONE);
+//    uuid_helper::rdb_uuid_generate(&uuid, ONE);
 
     rcry_engine *engine = new rcry_engine(rcry_context::instance()->get_count_incr());
     rcry_context::instance()->add_engine(engine);
@@ -71,9 +72,9 @@ vault_meta *rdb_vaults::create(string name, string path, string passphrase) {
 
     /* Create a vault meta to be scoped publicly */
     vault_meta meta;
-    meta.id = uuid;
-    meta.name = new string(name);
-    meta.path = new string(path);
+    meta.id = rdb_uuid(*uuid);
+    meta.name = name;
+    meta.path = path;
     meta.size = 0;
     meta.active = true;
 
@@ -101,7 +102,7 @@ rdb_token rdb_vaults::authenticate(rdb_uuid *uuid, string passphrase, bool perma
 
             /* Then generate an access token and return it to the user */
             rdb_token *token;
-            vault_token_helper::create(&token, 0);
+//            vault_token_helper::create(&token, 0);
 
             /* Assign the token to the vault ID */
             (*token_map)[uuid]->push_back(token);

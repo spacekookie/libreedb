@@ -1,0 +1,14 @@
+syntax = "proto2";
+package reedb_proto;
+
+message rdb_config {
+    message vault {
+        required string name = 1;
+        required string path = 2;
+        required string uuid = 3;
+        required int64 size = 4;
+    }
+
+    required string machine = 1;
+    repeated vault scoped = 2;
+}

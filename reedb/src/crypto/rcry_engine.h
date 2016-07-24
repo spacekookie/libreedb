@@ -21,7 +21,7 @@
 #ifndef REEDB_RCRYENGINE_H
 #define REEDB_RCRYENGINE_H
 
-#include "reedb/utils/uuid.h"
+#include <reedb/reedb.h>
 #include "rcry_token.h"
 
 extern "C" {

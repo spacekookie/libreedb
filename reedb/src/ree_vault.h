@@ -6,7 +6,7 @@
 #include <list>
 #include <map>
 
-#include "reedb/utils/uuid.h"
+#include <reedb/reedb.h>
 #include "datafile.h"
 
 // Internal crypto includes

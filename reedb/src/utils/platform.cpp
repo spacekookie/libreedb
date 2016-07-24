@@ -11,7 +11,7 @@
  *
  * @return long flag from platform.h
  */
-long reedb_platform_getos() {
+long rdb_platform::get_os() {
 #ifdef __linux__
     return RDB_PLATFORM_LINUX;
 #elif __unix || __unix__
@@ -21,23 +21,14 @@ long reedb_platform_getos() {
 #endif
 }
 
-int reedb_platform_machine(char *(*buffer)) {
+string rdb_platform::get_machine() {
     char host[128];
     gethostname(host, 128);
 
-    int host_len = strlen(host);
-    *buffer = (char *) malloc(sizeof(char) * host_len);
-    if(*buffer == NULL) {
-        free((*buffer));
-        return MALLOC_FAILED;
-    }
-
-    printf("Buffer size: %d", strlen(*buffer));
-
-    memcpy((*buffer), host, host_len);
-    return 0;
+    string s = string(host);
+    return s;
 }
 
-int reedb_platform_usrname(char *(*buffer)) {
+string rdb_platform::get_username() {
     char b[128];
 }
