@@ -6,8 +6,7 @@ extern "C" { // C includes
 }
 
 // Utility Reedb includes
-#include "reedb/utils/uuid.h"
-#include "reedb/crypto/vault_token.h"
+#include <reedb/reedb.h>
 
 // Runtime includes
 #include <string>
@@ -16,22 +15,6 @@ extern "C" { // C includes
 #include <map>
 
 using namespace std;
-
-/* Contains metadata about a vault returned to the dev */
-typedef struct {
-    rdb_uuid *id;
-    string *name, *path;
-    unsigned int size;
-    bool active;
-} vault_meta;
-
-/* Contains metadata fields about a file */
-typedef struct {
-    unsigned int revisions;
-    string *category;
-    string *title;
-    list<string *> *tags;
-} file_meta;
 
 class rdb_vaults {
 

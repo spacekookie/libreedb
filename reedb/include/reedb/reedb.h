@@ -28,8 +28,7 @@
 #define REEDB_REEDB_H
 
 // Reedb internal requirements
-#include <reedb/utils/helper.h>
-#include <reedb/errors.h>
+#include <reedb/utils.h>
 
 // Runtime requirements
 #include <string>
@@ -40,6 +39,10 @@ using std::list;
 
 #include <map>
 using std::map;
+
+#include <fstream>
+using std::fstream;
+using std::ios;
 
 /** Some flags that can be used to configure a vault after creation **/
 #define RDB_FLG_ROOT                    (1 << 0)
@@ -67,9 +70,11 @@ using std::map;
 #define RDB_FLG_FTR_MULTI_RECORD        (1 << 17)
 #define RDB_FLG_FTR_RECORD_TREE         (1 << 18)
 #define RDB_FLG_FTR_DISABLE_LUT         (1 << 19)
-#define RDB_FLG_FTR_DISABLE_LUT         (1 << 20)
+#define RDB_FLG_FTR_DISABLE_RQL         (1 << 20)
 #define RDB_FLG_FTR_PERMISSIVE          (1 << 21)
 #define RDB_FLG_FTR_DISABLE_HEADERS     (1 << 22)
+
+// #define RDB_FLAG_RQLSYNTAX_SIMPLE       (1 << 23)
 
 #define RDB_ZONE_ROOT                   0x00000000
 #define RDB_USER_ROOT                   0x00000000
@@ -99,8 +104,8 @@ typedef struct rdb_uuid {
 
 /* Contains metadata about a vault returned to the dev */
 typedef struct {
-    rdb_uuid *id;
-    string *name, *path;
+    rdb_uuid id;
+    string name, path;
     unsigned int size;
     bool active;
 } vault_meta;
@@ -112,6 +117,9 @@ typedef struct {
     string *title;
     list<string *> *tags;
 } file_meta;
+
+/* Forward declare so we don't need to move code around */
+class rdb_vault;
 
 /**
  * Core reedb class. Acts as a management and utility layer between the developer
@@ -130,16 +138,16 @@ public:
     ~rdb_core();
 
 /** Set a custom path for logs */
-SETTER(string, log_path);
+SET(string, log_path);
 
 /** Set a custom path for configuration */
-SETTER(string, cfg_path);
+SET(string, cfg_path);
 
 /** Enable verbose logging */
-SETTER(bool, verbose);
+SET(bool, verbose);
 
 /** Defines how far this instance will scale */
-ACCESS(size_t, max_scl);
+DATA(size_t, max_scl);
 
     /** Gain information about all available vaults in this instance */
     list<vault_meta> list_vaults();
@@ -205,7 +213,14 @@ ACCESS(size_t, max_scl);
 
 private:
     map<rdb_uuid*, rdb_vault*>  *active_vaults;
-    list<vault_meta*>           *vault_scope;
+
+    class rdb_cfg_wrapper *rdb_scope;
+
+    /** Fields for load balancing & scalability */
+    list<class rcry_engine*>    *r_cryptons;
+
+    /** Some utility fields */
+    fstream *input, *output;
 };
 
 /**
@@ -355,7 +370,7 @@ public:
 
 
 private:
-GETTER(string, id)
+GET(string, id)
 
     /** Forward declare ree_vault class so we don't need to expose it */
     class ree_vault *self;

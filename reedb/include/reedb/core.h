@@ -10,7 +10,7 @@ extern "C" {
 #include "reedb/utils/helper.h"
 }
 
-#include <reedb/utils/uuid.h>
+#include <reedb/reedb.h>
 #include <reedb/vaults.h>
 
 using namespace std;
