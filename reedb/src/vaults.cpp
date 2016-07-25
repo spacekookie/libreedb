@@ -49,7 +49,7 @@ vector<vault_meta> *rdb_vaults::list_vaults() {
 }
 
 void rdb_vaults::close(rdb_uuid *id, rdb_token *token) {
-    if (RDB_DEBUG) cout << "Closing Vault with id: " << id->id << endl;
+    if (RDB_DEBUG) cout << "Closing Vault with id: " << id->x << endl;
 
     /** First find out how many agents we need to shut down */
     // size_t busy_tokens = (*token_map)[id]->size();

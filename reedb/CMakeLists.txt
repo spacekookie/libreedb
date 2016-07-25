@@ -51,7 +51,7 @@ set(REEDB_SOURCE
 
         src/reedb.cpp
         include/reedb/platform.h
-        src/utils/platform.cpp)
+        src/utils/platform.cpp src/utils/uuid.h)
 
 # Define our library in cmake
 add_library(reedb ${REEDB_SOURCE})

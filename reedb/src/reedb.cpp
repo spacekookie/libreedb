@@ -49,6 +49,7 @@ using namespace libconfig;
 #include <wordexp.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <utils/uuid.h>
 
 
 ////////////////////////////////////////////////////
@@ -246,7 +247,7 @@ rdb_core::~rdb_core() {
     if(input) delete(input);
     if(output) delete(output);
 
-    this->rdb_scope->cfg.Clear();
+    google::protobuf::ShutdownProtobufLibrary();
 
     delete(this->r_cryptons);
     delete(this->active_vaults);
@@ -255,9 +256,7 @@ rdb_core::~rdb_core() {
 
 /** Creates a new vault object to play with */
 rdb_vault* rdb_core::create_vault(string name, string path) {
-    rdb_uuid *uuid;
-    // TODO: Generate UUID here
-
+    rdb_uuid *uuid = uuid_helper::generate();
     rdb_vault *vault = new rdb_vault(name, path);
 
     /* Scope it now, we might not get a chance later */
@@ -292,7 +291,7 @@ list<vault_meta> rdb_core::list_vaults() {
 
         rdb_uuid id;
         string uuid = v.uuid();
-        memcpy(id.id, uuid.c_str(), uuid.length());
+        memcpy((unsigned char*) id.x, uuid.c_str(), 32);
 
         bool active = (*this->active_vaults)[&id] == NULL;
 
@@ -313,21 +312,48 @@ void rdb_core::scope_vault(vault_meta *meta) {
     rdb_config_vault *v = this->rdb_scope->cfg.add_scoped();
     v->set_name(meta->name);
     v->set_path(meta->path);
-    v->set_uuid(string(meta->id.id));
+
+    unsigned char *uuid = (unsigned char*) malloc(sizeof(unsigned char) * sizeof(meta->id.x));
+    memcpy(uuid, meta->id.x, sizeof(meta->id.x));
+    string buf_uuid = string((char*) uuid);
+    v->set_uuid(buf_uuid);
+    delete(uuid);
+
     v->set_size(meta->size);
 }
 
 void rdb_core::unscope_vault(rdb_uuid *id) {
-    int pos;
-
+    // Convert our fixed array into a C++ string. Why do we even bother?
+    cout << "Preparing to unscope vault with id: " << id->x << endl;
     auto scoped = this->rdb_scope->cfg.mutable_scoped();
-    for(auto &v : *scoped) {
-        string uuid = v.uuid();
-        rdb_uuid _id;
-        memcpy(&_id.id, uuid.c_str(), uuid.length());
 
-        if(_id.id == id->id) {
-            v.Clear();
+    /** Iterate over our mutable record set and find the vault */
+    for(int i = 0; i < scoped->size(); i++) {
+        auto &v = scoped->Get(i);
+        string _uuid = v.uuid();
+
+        /** Copy the uuid from C++ string to more usable format */
+        unsigned char uuid[32];
+        memcpy(uuid, _uuid.c_str(), 32 * sizeof(unsigned char));
+
+        // FIXME: Put this in a function or something.
+        // Not sure why normal string compares don't work on the UUID but hey!
+        bool hit = true;
+        {
+            for(int a = 0; a < 32 ; a++) {
+                char f = uuid[a];
+                char g = id->x[a];
+                if(f != g) {
+                    hit = false;
+                    break;
+                }
+            }
+        }
+
+        if(hit) {
+            scoped->DeleteSubrange(i, i + 1);
+            cout << "Removed vault " << i << " from scope..." << endl;
+            return;
         }
     }
 }

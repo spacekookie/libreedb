@@ -4,8 +4,8 @@
  * appear in your application. Reedb implements several error types
  * extending the std::runtime_error for you to catch.
  *
- * Each error contains a message describing the issue as well as
- * a well-defined error code.
+ * Each error contains a message describing the issue as in
+ * addition to a well-defined error code.
  *
  * (c) 2015-2016                Lonely Robot.
  * Authors:                     Katharina 'spacekookie' Sabel
@@ -39,73 +39,79 @@
 /** Define some generic error codes first that we can propagate **/
 typedef enum rdb_err_t {
     /* BOOLEAN STATES */
-            TRUE, FALSE,                    // Have boolean values in a standard function return
+    TRUE, FALSE,                    // Have boolean values in a standard function return
 
     /* General purpose error codes */
-            FAILURE = -1,                   // To be used when cause of error not known.
+    FAILURE = -1,                   // To be used when cause of error not known.
     SUCCESS = 0,                    // When something went according to plan.
     HUGE_SUCCESS = 0,               // Little Portal easter egg :)
+
     INVALID_PARAMS,                 // An invalid combination of parameters were provided
     MALLOC_FAILED,                  // Is returned when program failed to malloc.
-    // Basically means there isn't enough RAM left.
+                                    // Basically means there isn't enough RAM left.
 
     OS_NOT_SUPPORTED,               // Running on an OS that is currently not supported
     FILE_PARSE_FAILED,              // Indicates that parsing a config or datafile failed
 
     OPERATION_NOT_SUPPORTED,        // Something you're trying to do isn't supported. And might never be!
-    // (See NOT IMPLEMENTED")
-            NOT_IMPLEMENTED,                // Different to "NOT SUPPORTED" because it indicates missing
-    // code base and might change.
+                                    // (See NOT IMPLEMENTED")
+    NOT_IMPLEMENTED,                // Different to "NOT SUPPORTED" because it indicates missing
+                                    // code base and might change.
 
     INVALID_PATH,                   // Path dprovided for config is invalid.
     SHORT_PASSPHRASE,               // Passphrase violates security standards
     NOT_INITIALISED,                // Tried to use Reedb without having initialised it first
 
     /* Vault error returns */
-            VAULT_CREATE_FAILED,            // Something went wrong when creating a new vault.
-    VAULT_ALREADY_SCOPED,           // Tried to scope a vault that was already in config
-    VAULT_NOT_SCOPED,               // Tried to operate on vault that wasn't scope before
-    VAULT_ALREADY_LOADED,           // Tried to load a vault that has already been loaded.
-    VAULT_NOT_LOADED,               // Tried to operate on vault that isn't loaded yet.
+    VAULT_CREATE_FAILED,            // Something went wrong when creating a new vault.
+    VAULT_NOT_SCOPED,               // Tried to operate on vault that wasn't scoped before
+    VAULT_PERMISSISION_DENIED,      // Tried to operate on a vault without getting authenticated first
     VAULT_DOESNT_EXIST,             // Tried to load vault that doesn't physically exist
-    // anymore. This indicates a broken config!
-            VAULT_ALREADY_EXISTS,           // Tried to create a vault that already exists on the FS.
+                                    // anymore. This indicates a broken config!
+    VAULT_ALREADY_EXISTS,           // Tried to create a vault that already exists at that location
 
     /* File specific failures */
-            FILE_INSERT_FAILED,             // A generic failure return when a file can't accept new data
-    FILE_LOCK_TIMEOUT,              // Inserting into a file timed-out because of a lock
-    FILE_RM_FAILED,                 // Tried to remove a field from a version that doesn't exist.
+    FILE_INSERT_FAILED,             // A generic failure return when a file can't accept new data
+    FILE_LOCK_TIMEOUT,              // Inserting took too long and the lock timed out
+    FILE_RM_FAILED,                 // Tried to remove a field from a version and failed
     FILE_EMPTY_VERSION,             // Tried to finalise an empty version. Bad [boy|girl]!
     FILE_BAD_HEADER,                // Means that the header of a file is somehow damaged
 
-    /* Crypto error returns */
-            CRYPTO_FAILED_BOOT,             // An error occured while starting the crypto engine
+    /* Write operation failures */
+    WRITE_FAILED,                   // A generic error to indicate that writing failed
+    WRITE_PERMISSION_DENIED,        // Write failed due to insufficient permissions!
+    WRITE_NO_SPACE,                 // Write failed because of low disk space
+    WRITE_CORRUPT,                  // The data was currupted and failed to write to it's handle
+    READ_CORRUPT,                   // The read back data is not intact. This either means a previous
+                                    // write failure or indicates file tampering!
+
+    /* Crypto errors are bad */
+    CRYPTO_FAILED_BOOT,             // An error occured while starting the crypto engine
     CRYPTO_INVALID_KEY,             // Returns when a crypto operation failed because the
-    // wrong block cypher was applied.
-            CRYPTO_MISSING_KEY,             // Key is NULL for some bizzare reason (This is not good)
+                                    // wrong block cypher was applied.
+    CRYPTO_MISSING_KEY,             // Key is NULL for some bizzare reason (This is not good)
     CRYPTO_CORRUPT_KEY,             // Key is corrupt for some more bizzare reason (This is even worse)
-    CRYPTO_WRONG_BLOCKSIZE,         //
-    CRYPTO_INVALID_CONTEXT,         // For some reason the crypto context is invalid.
+    CRYPTO_WRONG_BLOCKSIZE,         // You have manually specified a block size that is invalid. Don't do that!
+    CRYPTO_INVALID_CONTEXT,         // For some reason the crypto context is invalid or too old
     CRYPTO_WRONG_CONTEXT,           // Crypto context is invalid. Hints to someone trying to access files
-    // they do not have access to via some weird hack!
-            CRYPTO_MISSING_CRYRAM,          // We ran out of secure memory and can't allocate more in this session
+                                    // they do not have access to via some weird hack!
+    CRYPTO_MISSING_CRYRAM,          // We ran out of secure memory and can't allocate more in this session
     CRYPTO_UNKNOWN_FAILURE,         // A generic crypto failure.
 
-    TEST_FAILED,                  // Indicates that a unittest has failed
-    TEST_ALLOC_FAILED,            // Indicates that the allocation to a test suite failed
-    TEST_NOT_VALID,               // Indicates that the testcase invoked invalid conditions
+    TEST_FAILED,                    // Indicates that a unittest has failed
+    TEST_ALLOC_FAILED,              // Indicates that the allocation to a test suite failed
+    TEST_NOT_VALID,                 // Indicates that the testcase invoked invalid conditions
 
 } rdb_err_t;
 
 #ifdef __cplusplus
+
 #include <stdexcept>
 
 using std::runtime_error;
-
 #include <string>
 
 using std::string;
-
 #include <reedb/utils.h>
 
 
@@ -149,5 +155,4 @@ GET(rdb_err_t, code);
 };
 
 #endif // C++ guard
-
 #endif //REEDB_ERRORS_H

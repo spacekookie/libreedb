@@ -88,19 +88,8 @@ typedef struct rdb_token {
     unsigned int timed;
 } rdb_token;
 
-/**
- * @deprecated
- * Specifies the type of UUID used
- */
-typedef enum uuid_type {
-    ONE, TWO, THREE
-} uuid_type;
-
 /** UUID handle to identify vaults internally and to the user */
-typedef struct rdb_uuid {
-    char id[32];
-    uuid_type type;
-} rdb_uuid;
+typedef struct rdb_uuid { unsigned char x[32]; } rdb_uuid;
 
 /* Contains metadata about a vault returned to the dev */
 typedef struct {
