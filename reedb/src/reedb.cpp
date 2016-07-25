@@ -52,6 +52,12 @@ using namespace libconfig;
 #include <utils/uuid.h>
 
 
+class rdb_cfg_wrapper {
+public:
+    reedb_proto::rdb_config     cfg;
+    string                      scope_path;
+};
+
 ////////////////////////////////////////////////////
 /////////////////                  ////////////////
 //////////////// MANAGEMENT CLASS ////////////////
@@ -98,10 +104,34 @@ map<string, string> read_config(const char *path) {
     return result;
 }
 
-class rdb_cfg_wrapper {
-public:
-    reedb_proto::rdb_config  cfg;
-};
+void update_scopefile(rdb_cfg_wrapper *cfg, fstream **out) {
+
+    if(*out == NULL) {
+        *out = new fstream(cfg->scope_path, ios::out | ios::binary);
+    }
+
+    if(!cfg->cfg.SerializeToOstream(*out)) {
+        throw config_error("Failed to update main scope file!", WRITE_FAILED);
+    }
+
+    /* Flush the file to disk :) */
+    (*out)->flush();
+    delete(*out);
+    *out = NULL;
+}
+
+void read_scopefile(rdb_cfg_wrapper *cfg, fstream **in) {
+    if(*in == NULL) {
+        *in = new fstream(cfg->scope_path, ios::in | ios::binary);
+    }
+
+    if (!cfg->cfg.ParseFromIstream(*in)) {
+        throw config_error("Unable to parse scope file!", FILE_PARSE_FAILED);
+    }
+
+    delete(*in);
+    *in = NULL;
+}
 
 /** Simple constructor */
 rdb_core::rdb_core() {
@@ -191,14 +221,18 @@ rdb_core::rdb_core() {
     /** Get current hostname */
     string hostname = rdb_platform::get_machine();
 
+    /** Save our scope file path for later */
+    this->rdb_scope->scope_path = path_trgt.string();
+
     if(!filesystem::exists(scope_file) ) {
 
+        create_scope_file:
         /** Make a new default scope file */
         cout << "Scope file doesn't exists!" << endl;
 
         this->rdb_scope->cfg.set_machine(string(hostname));
 
-        this->output = new fstream(path_trgt.string(), ios::out | ios::trunc | ios::binary);
+        this->output = new fstream(path_trgt.string(), ios::out | ios::binary);
         if(!this->rdb_scope->cfg.SerializeToOstream(output)) {
             throw config_error("Failed to write scope file: " + path_trgt.string(), FILE_PARSE_FAILED);
         }
@@ -206,13 +240,22 @@ rdb_core::rdb_core() {
         /* Flush the file to disk :) */
         this->output->flush();
 
+        delete(this->output);
+        this->output = NULL;
+
     } else {
 
         /** Attempt to read the scope file that should exist :) */
         this->input = new fstream(path_trgt.string(), ios::in | ios::binary);
         if (!this->rdb_scope->cfg.ParseFromIstream(input)) {
-            throw config_error("Unable to parse scope file " + path_trgt.string(), FILE_PARSE_FAILED);
+            cout << "[ERROR " << FILE_PARSE_FAILED << "] Invalid scope file. Creating new one..." << endl;
+            goto create_scope_file;
+
+            // throw config_error("Unable to parse scope file " + path_trgt.string(), FILE_PARSE_FAILED);
         }
+
+        delete(this->input);
+        this->input = NULL;
 
         const string scope_name = this->rdb_scope->cfg.machine();
 
@@ -244,8 +287,8 @@ rdb_core::rdb_core() {
 
 /** Cleans up all resources */
 rdb_core::~rdb_core() {
-    if(input) delete(input);
-    if(output) delete(output);
+    if(input != NULL) delete(input);
+    if(output != NULL) delete(output);
 
     google::protobuf::ShutdownProtobufLibrary();
 
@@ -313,6 +356,7 @@ void rdb_core::scope_vault(vault_meta *meta) {
     v->set_name(meta->name);
     v->set_path(meta->path);
 
+    /** Dealing with the UUID is slightly more complicated :/ */
     unsigned char *uuid = (unsigned char*) malloc(sizeof(unsigned char) * sizeof(meta->id.x));
     memcpy(uuid, meta->id.x, sizeof(meta->id.x));
     string buf_uuid = string((char*) uuid);
@@ -320,15 +364,24 @@ void rdb_core::scope_vault(vault_meta *meta) {
     delete(uuid);
 
     v->set_size(meta->size);
+
+    /** Make it update the file! */
+    update_scopefile(this->rdb_scope, &this->output);
 }
 
 void rdb_core::unscope_vault(rdb_uuid *id) {
+    if(id == NULL) return;  // Return for safety. TODO Should this throw an exception?
+
+    char *foo = new char[33];
+    strcpy(foo, (char*) id->x);
+
     // Convert our fixed array into a C++ string. Why do we even bother?
-    cout << "Preparing to unscope vault with id: " << id->x << endl;
+    cout << "Preparing to unscope vault with id: " << foo << endl;
     auto scoped = this->rdb_scope->cfg.mutable_scoped();
+    int i = -1;
 
     /** Iterate over our mutable record set and find the vault */
-    for(int i = 0; i < scoped->size(); i++) {
+    for(i = 0; i < scoped->size(); i++) {
         auto &v = scoped->Get(i);
         string _uuid = v.uuid();
 
@@ -339,23 +392,19 @@ void rdb_core::unscope_vault(rdb_uuid *id) {
         // FIXME: Put this in a function or something.
         // Not sure why normal string compares don't work on the UUID but hey!
         bool hit = true;
-        {
-            for(int a = 0; a < 32 ; a++) {
-                char f = uuid[a];
-                char g = id->x[a];
-                if(f != g) {
-                    hit = false;
-                    break;
-                }
-            }
+        for(int a = 0; a < 32 && hit ; a++) {
+            if(uuid[a] != id->x[a]) hit = false;
         }
 
-        if(hit) {
-            scoped->DeleteSubrange(i, i + 1);
-            cout << "Removed vault " << i << " from scope..." << endl;
-            return;
-        }
+        if(hit) break;
     }
+
+    /** Remove the apropriate items from the list */
+    cout << "Removed vault " << i << " from scope..." << endl;
+    scoped->DeleteSubrange(i, i);
+
+    /** Write the new changes to disk! \o/ */
+    update_scopefile(this->rdb_scope, &this->output);
 }
 
 ////////////////////////////////////////////////////

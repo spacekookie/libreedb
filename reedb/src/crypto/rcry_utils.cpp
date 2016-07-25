@@ -53,14 +53,21 @@ char *rcry_utils::generate_random(unsigned int length, bool clear) {
 }
 
 /** Used for UUIDs randomness */
-void rcry_utils::generate_weak_rand(char **data, unsigned int length) {
+void rcry_utils::generate_weak_rand(char **data, unsigned int l) {
+    unsigned int length = l / 2;
+    char *w_ptr = *data;
+
     string encoded;
     char *buffer = (char *) gcry_random_bytes(length, GCRY_WEAK_RANDOM);
     StringSource((byte *) buffer, length, true, new HexEncoder(new StringSink(encoded)));
     free(buffer);
+    buffer = NULL;
 
-    (*data) = (char *) malloc(sizeof(char) * strlen(encoded.c_str()));
-    strcpy((*data), encoded.c_str());
+    w_ptr = (char *) calloc(sizeof(char), strlen(encoded.c_str()));
+    memcpy(w_ptr, encoded.c_str(), l);
+    cout << "Random Data: " << w_ptr << endl;
+    (*data) = w_ptr;
+    // strcpy((*data), encoded.c_str());
 }
 
 /** Used for tokens & access keys */

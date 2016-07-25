@@ -38,7 +38,8 @@ int main(void) {
         rdb_core *core = new rdb_core();
 
         /* Create a new vault to play with */
-        rdb_vault *vault = core->create_vault("my_vault", "~/Documents/");
+//        core->create_vault("my_vault", "~/Documents/");
+//        core->create_vault("my_vault", "~/Documents/");
 
         /** For sanity check get a list of vaults */
         list<vault_meta> vaults = core->list_vaults();
@@ -51,15 +52,14 @@ int main(void) {
             cout << "Name: '" << iter.name << "'" << endl;
             cout << "Path: '" << iter.path << "'" << endl;
             cout << "Size: " << iter.size << endl;
+            core->unscope_vault(&meta->id);
         }
 
-        core->unscope_vault(&meta->id);
-
         /** Then check if it worked */
-        list<vault_meta> vaults2 = core->list_vaults();
-        cout << vaults2.size() << " vaults found!" << endl;
+        // list<vault_meta> vaults2 = core->list_vaults();
+        // cout << vaults2.size() << " vaults found!" << endl;
 
-        delete(vault);
+        //delete(vault);
         delete(core);
 
     } catch (reedb_error &e) {
@@ -69,6 +69,10 @@ int main(void) {
         cout << "=> " << "Error Message: '" << e.what() << "'" << endl;
 
         return e.get_code();    // Quit our application with this code
+    } catch(runtime_error &e) {
+        cout << endl;
+
+        cout << "A non reedb related issue occured: " << e.what() << endl;
     }
 
     cout << "Test run: COMPLETE!" << endl;

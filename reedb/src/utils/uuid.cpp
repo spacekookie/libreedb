@@ -12,10 +12,10 @@ rdb_uuid *uuid_helper::generate() {
 
     /** Generate random data in 4 packets */
     char *A, *B, *C, *D;
-    rcry_utils::generate_weak_rand(&A, 4);
-    rcry_utils::generate_weak_rand(&B, 4);
-    rcry_utils::generate_weak_rand(&C, 3);
-    rcry_utils::generate_weak_rand(&D, 4);
+    rcry_utils::generate_weak_rand(&A, 8);
+    rcry_utils::generate_weak_rand(&B, 8);
+    rcry_utils::generate_weak_rand(&C, 6);
+    rcry_utils::generate_weak_rand(&D, 8);
 
     /** Then copy our random data into our ID */
     strcpy((char*) uuid->x, A);
@@ -27,10 +27,10 @@ rdb_uuid *uuid_helper::generate() {
     strcat((char*) uuid->x, D);
 
       /** Then free our buffer arrays */
-    free(A);
-    free(B);
-    free(C);
-    free(D);
+    free(A); A = NULL;
+    free(B); B = NULL;
+    free(C); C = NULL;
+    free(D); D = NULL;
 
     return uuid;
 }
