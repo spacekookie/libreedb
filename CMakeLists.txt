@@ -25,10 +25,12 @@ set(RDB_SRC
     src/reedb.c
     src/vaults.c
     src/error.c
-    )
+        include/reedb/data.h src/data.c)
 
 # Define our library in cmake
 add_library(libreedb STATIC ${RDB_SRC})
+
+link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # Dynamically linked libraries
 target_link_libraries(libreedb
@@ -36,6 +38,7 @@ target_link_libraries(libreedb
         protobuf-c
         config
         apr-1
+        gdsl
 )
 
 # Include the subdirectories to search for headers
