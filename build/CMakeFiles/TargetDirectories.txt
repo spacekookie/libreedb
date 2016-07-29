@@ -1,4 +1,0 @@
-/home/spacekookie/Projects/personal/reedb-new/build/CMakeFiles/edit_cache.dir
-/home/spacekookie/Projects/personal/reedb-new/build/CMakeFiles/reedbd.dir
-/home/spacekookie/Projects/personal/reedb-new/build/CMakeFiles/rebuild_cache.dir
-/home/spacekookie/Projects/personal/reedb-new/build/CMakeFiles/libreedb.dir

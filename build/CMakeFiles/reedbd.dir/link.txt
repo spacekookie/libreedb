@@ -1,1 +1,0 @@
-/usr/bin/cc  -g   CMakeFiles/reedbd.dir/bin/main.c.o  -o reedbd -rdynamic libreedb.a -lgcrypt -lprotobuf-c -lconfig -lapr-1 
