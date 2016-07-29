@@ -1,0 +1,2 @@
+/usr/bin/ar qc libreedb.a  CMakeFiles/libreedb.dir/src/reedb.c.o CMakeFiles/libreedb.dir/src/vaults.c.o CMakeFiles/libreedb.dir/src/error.c.o
+/usr/bin/ranlib libreedb.a

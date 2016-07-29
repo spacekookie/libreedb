@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/reedb/reedb.h
+
+/home/spacekookie/Projects/personal/reedb-new/bin/main.c
+reedb/reedb.h
+-
+

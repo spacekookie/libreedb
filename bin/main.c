@@ -1,0 +1,14 @@
+//////////////////////////////////////////////////
+// Simple testing client
+// TODO: move this to testing directory
+//
+////////////////////////////////////////////////
+
+// All we need :)
+#include <reedb/reedb.h>
+
+int main(int argc, char **argv)
+{
+
+    return 0;
+}
