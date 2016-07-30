@@ -126,6 +126,46 @@ rdb_err_t rdb_data_mallocrecursive(rdb_data *data, rdb_data *(*new_data))
     return SUCCESS;
 }
 
+rdb_err_t rdb_data_mallocpair(rdb_data *data, rdb_data *(*key), rdb_data *(*value))
+{
+    /* Make sure we are a literal or unset data object */
+    if(data->type != UNSET) return INVALID_PAYLOAD;
+
+    rdb_err_t err;
+
+    /* Malloc two nodes */
+    err = rdb_data_malloc(key);
+    if(err) goto cleanup;
+
+    err = rdb_data_malloc(value);
+    if(err) goto cleanup;
+
+    /** Malloc space for PAIR */
+    data->size = 2;
+    rdb_data **tmp = (rdb_data**) malloc(sizeof(rdb_data*) * data->size);
+    if(!tmp) goto cleanup;
+
+    data->payload.recursive = tmp;
+
+    { /* Assign data to new array */
+        data->payload.recursive[data->used] = *key;
+        data->used++;
+        data->payload.recursive[data->used] = *value;
+        data->used++;
+    }
+
+    /* Assign our new type and return */
+    data->type = PAIR;
+    return SUCCESS;
+
+    /* Code we run when we can't allocate structs anymore */
+    cleanup:
+    free(*key);
+    free(*value);
+    free(tmp);
+    return MALLOC_FAILED;
+}
+
 rdb_err_t rdb_data_free(rdb_data *data)
 {
     if(data->type == LITERAL) {
