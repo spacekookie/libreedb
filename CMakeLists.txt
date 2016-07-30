@@ -19,6 +19,9 @@ INCLUDE(FindProtobuf)
 #INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
 #PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HEADER src/protos/rdb_data.proto)
 
+# Add the libgdsl build path
+add_subdirectory(lib/libgdsl)
+
 set(RDB_SRC
 
         # Core interfaces
@@ -44,7 +47,7 @@ target_link_libraries(libreedb
         protobuf-c
         config
         apr-1
-        gdsl
+        libgdsl
 )
 
 # Include the subdirectories to search for headers
