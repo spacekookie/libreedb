@@ -1,0 +1,3 @@
+[submodule "libgdsl"]
+	path = libgdsl
+	url = https://github.com/reepass/libgdsl.git
