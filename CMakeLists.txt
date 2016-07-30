@@ -20,7 +20,7 @@ INCLUDE(FindProtobuf)
 #PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HEADER src/protos/rdb_data.proto)
 
 # Add the libgdsl build path
-add_subdirectory(lib/libgdsl)
+add_subdirectory(lib/libcdsl)
 
 set(RDB_SRC
 
@@ -34,7 +34,7 @@ set(RDB_SRC
 
         # Utility and small subroutines
         src/utils/encoding.c
-        src/utils/random.c)
+        src/utils/random.c include/reedb/platform.h)
 
 # Define our library in cmake
 add_library(libreedb STATIC ${RDB_SRC})
@@ -47,7 +47,7 @@ target_link_libraries(libreedb
         protobuf-c
         config
         apr-1
-        libgdsl
+        libcdsl
 )
 
 # Include the subdirectories to search for headers
