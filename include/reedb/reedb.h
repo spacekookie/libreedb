@@ -128,13 +128,77 @@ rdb_err_t rdb_ctx_maxscl(rdb_context *ctx, unsigned int scl);
  *
  * @param ctx An active context for reedb
  * @param vault A pointer to a vault object somewhere
+ * @param name The name of the vault on the FS
+ * @param path Path of the vault on the FS
  * @return
  */
-rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *vault);
+rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *vault, const char *name, const char *path);
 
 rdb_err_t rdb_ctx_scpvault(rdb_context *ctx, const char *name, const char *path);
 
 rdb_err_t rdb_ctx_uscpvault(rdb_context *ctx, rdb_uuid *uuid);
+
+/********************************************
+ *
+ * Vault manipulation functions. Work on a vault provided
+ *   by a context. A vault is a collection of records (commonly
+ *   referred to as a "database").
+ *
+ *   Contents of vault are unknown to user because of forward declared scope
+ *
+ ********************************************/
+
+rdb_err_t rdb_vlts_setflags(rdb_vault *vault, long flags);
+
+/**
+ * A zone is a collection of files that a collection of users have
+ * access to. Zones can be created during runtime. Each zone has a numeric
+ * ID that makes it unique inside it's own vault.
+ *
+ * Users can then get bound to zone IDs. By default the ID 0 is taken for
+ * the root zone.
+ *
+ * @param vault
+ * @param name
+ * @return
+ */
+rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name);
+
+/**
+ * Adds a new user to the vault. The name in the vault must be unique.
+ *
+ * @param name Unique username
+ * @param zones A list of zones to add the user to
+ * @return The vault user ID
+ */
+rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones);
+
+/**
+ * Get the user id for a user in this vault. Will return -1 if the user
+ * doesn't exist
+ *
+ * @param username
+ * @return
+ */
+long rdb_vlts_getuser(const char *username);
+
+/**
+ * Sets the passphrase for a specific user ID. ID 0 is by default always
+ * the ROOT user. This function can only be used to do initial passphrase
+ * setup
+ *
+ * @param user Unique user ID
+ * @param passphrase
+ */
+rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, long user, const char *passphrase);
+
+/**
+ * Take currently loaded settings, finalise them and finish setup. Only
+ * past this point are changes to the vault final and persistent!
+ *
+ * This function will throw detailed errors about wrong setup parameters
+ */
+rdb_err_t rdb_vlts_finalise(rdb_vault *vault);
 
 #ifdef __cplusplus
 }

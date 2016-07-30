@@ -1,4 +1,4 @@
-#include <reedb/encoding.h>
+#include <utils/encoding.h>
 #include <string.h>
 
 static const unsigned char asciilk[256] =
