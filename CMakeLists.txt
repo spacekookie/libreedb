@@ -21,11 +21,17 @@ INCLUDE(FindProtobuf)
 
 set(RDB_SRC
 
-    # Core interfaces
-    src/reedb.c
-    src/vaults.c
-    src/error.c
-        include/reedb/data.h src/data.c)
+        # Core interfaces
+        src/reedb.c
+        src/vaults.c
+        src/error.c
+        src/data.c
+
+        # Core functionality
+
+        # Utility and small subroutines
+        src/utils/encoding.c
+        src/utils/random.c)
 
 # Define our library in cmake
 add_library(libreedb STATIC ${RDB_SRC})
@@ -50,7 +56,7 @@ set_target_properties(libreedb PROPERTIES PREFIX "")
 
 ################### TESTING CODE BELOW ###################
 
-set(TEST_SRC bin/main.c)
+set(TEST_SRC bin/data_test.c bin/main.c)
 add_executable(reedbd ${TEST_SRC})
 
 # Library dependencies for the http extention

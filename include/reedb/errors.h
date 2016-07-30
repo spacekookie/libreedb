@@ -16,9 +16,14 @@ typedef enum rdb_err_t {
     SUCCESS = 0,                    // When something went according to plan.
     HUGE_SUCCESS = 0,               // Little Portal easter egg :)
 
+    INVALID_PARAMS,
+    MALLOC_FAILED,                  // A memory allocation couldn't be completed!
+    INVALID_PAYLOAD,                // A common data return problem
+    INVALID_BUFFER_SIZE,
+
 } rdb_err_t;
 
-const char *rdb_error_getmsg(rdb_err_t &e);
+const char *rdb_error_getmsg(rdb_err_t *e);
 
 #ifdef __cplusplus
 }

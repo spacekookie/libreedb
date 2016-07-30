@@ -119,7 +119,10 @@ rdb_err_t rdb_data_mallocrecursive(rdb_data *data, rdb_data *(*new_data))
     err = rdb_data_malloc(new_data);
     if(err) return err;
 
-    data->payload.recursive[data->used++] = *new_data;
+    /* Reference the slot, assign it, then move our ctr */
+    data->payload.recursive[data->used] = *new_data;
+    data->used++;
+
     return SUCCESS;
 }
 
@@ -134,6 +137,8 @@ rdb_err_t rdb_data_free(rdb_data *data)
             err = rdb_data_free(data->payload.recursive[i]);
             if(err) return err;
         }
+
+        free(data->payload.recursive);
     }
 
     free(data);
