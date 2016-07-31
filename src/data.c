@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include <stdbool.h>
+#include <reedb/reedb.h>
 
 #define RDB_REC_DEF_SIZE    2
 #define RDB_REC_MULTIPLY    2
@@ -25,7 +26,7 @@ rdb_err_t rdb_data_resettype(rdb_data *data)
 {
     if(data->type == LITERAL) {
         if(data->payload.literal) free(data->payload.literal);
-    } else if(data->type == RECURSIVE) {
+    } else if(data->type == RECURSIVE || data->type == PAIR) {
 
         /* Iterate over all children and clear them */
         int i;
@@ -83,7 +84,7 @@ rdb_err_t rdb_data_addnumeral(rdb_data *data, int numeral)
     return SUCCESS;
 }
 
-rdb_err_t rdb_data_mallocrecursive(rdb_data *data, rdb_data *(*new_data))
+rdb_err_t rdb_data_addrecursive(rdb_data *data, rdb_data *(*new_data))
 {
     /* Make sure we are a literal or unset data object */
     if(data->type != UNSET)
@@ -126,7 +127,7 @@ rdb_err_t rdb_data_mallocrecursive(rdb_data *data, rdb_data *(*new_data))
     return SUCCESS;
 }
 
-rdb_err_t rdb_data_mallocpair(rdb_data *data, rdb_data *(*key), rdb_data *(*value))
+rdb_err_t rdb_data_addpair(rdb_data *data, rdb_data *(*key), rdb_data *(*value))
 {
     /* Make sure we are a literal or unset data object */
     if(data->type != UNSET) return INVALID_PAYLOAD;
@@ -166,11 +167,102 @@ rdb_err_t rdb_data_mallocpair(rdb_data *data, rdb_data *(*key), rdb_data *(*valu
     return MALLOC_FAILED;
 }
 
+void recursive_print(rdb_data *data, const char *offset)
+{
+    rdb_uni_t type = data->type;
+
+    switch(type) {
+        case UNSET:
+            printf("[NULL]\n");
+            break;
+        case LITERAL:
+            printf("%s['%s']\n", offset, data->payload.literal);
+            break;
+        case NUMERAL:
+            printf("%s[%d]\n", offset, data->payload.numeral);
+            break;
+        case PAIR:
+            {
+                rdb_uni_t k_type = data->payload.recursive[0]->type;
+                rdb_uni_t v_type = data->payload.recursive[1]->type;
+
+                if(k_type == LITERAL) printf("%s['%s']", offset, data->payload.recursive[0]->payload.literal);
+                if(k_type == NUMERAL) printf("%s[%d]", offset, data->payload.recursive[0]->payload.numeral);
+
+                char new_offset[REAL_STRLEN(offset) + 2];
+                strcpy(new_offset, offset);
+                strcat(new_offset, "  ");
+
+                if(k_type == RECURSIVE || k_type == PAIR) recursive_print(data->payload.recursive[0], new_offset);
+
+                /* Print the value now */
+
+                if(k_type == LITERAL) printf(" => ['%s']\n", data->payload.recursive[1]->payload.literal);
+                if(k_type == NUMERAL) printf(" => [%d]\n", data->payload.recursive[1]->payload.numeral);
+
+                if(k_type == RECURSIVE || k_type == PAIR) recursive_print(data->payload.recursive[1], new_offset);
+            }
+            break;
+
+        case RECURSIVE:
+        {
+            int i;
+            printf("%s[RECURSIVE]\n", offset);
+            for(i = 0; i < data->used; i++) {
+                rdb_uni_t type = data->payload.recursive[i]->type;
+
+
+                char new_offset[REAL_STRLEN(offset) + 2];
+                strcpy(new_offset, offset);
+                strcat(new_offset, "  ");
+
+                if(type == LITERAL || type == NUMERAL) {
+                    recursive_print(data->payload.recursive[i], new_offset);
+                    continue;
+                }
+
+                if(type == RECURSIVE)
+                {
+                    recursive_print(data->payload.recursive[i], new_offset);
+                    continue;
+                }
+
+                if(type == PAIR) {
+                    printf("%s[PAIR] <==> ", new_offset);
+                    recursive_print(data->payload.recursive[i], new_offset);
+                }
+            }
+            break;
+        }
+
+        default:
+            break;
+
+    }
+}
+
+void rdb_data_print(rdb_data *data)
+{
+    recursive_print(data, "");
+}
+
+rdb_err_t rdb_data_get(rdb_data *data, void *(*val))
+{
+    if(data->type == LITERAL) *val = (char*) data->payload.literal;
+    if(data->type == NUMERAL) *val = (int*) &data->payload.numeral;
+    if(data->type == RECURSIVE || data->type == PAIR)
+        *val = (rdb_data*) data->payload.recursive;
+
+    return SUCCESS;
+}
+
 rdb_err_t rdb_data_free(rdb_data *data)
 {
+    if(data == NULL) return SUCCESS;
+
     if(data->type == LITERAL) {
         if(data->payload.literal) free(data->payload.literal);
-    } else if(data->type == RECURSIVE) {
+    } else if(data->type == RECURSIVE || data->type == PAIR) {
         int i;
         rdb_err_t err;
         for(i = 0; i < data->size; i++) {

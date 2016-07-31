@@ -9,6 +9,7 @@ const char *rdb_error_getmsg(rdb_err_t *e)
         case INVALID_BUFFER_SIZE:       return "Invalid sized buffer provided";
         case INVALID_PAYLOAD:           return "Invalid data payload in struct";
         case INVALID_PARAMS:            return "Invalid parameters provided";
+        case UNSUPPORTED_ENV:           return "This platform is not supported";
         default:                        return "Unknown Issue";
     }
 }

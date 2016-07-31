@@ -21,6 +21,7 @@ INCLUDE(FindProtobuf)
 
 # Add the libgdsl build path
 add_subdirectory(lib/libcdsl)
+add_subdirectory(lib/libdyntree)
 
 set(RDB_SRC
 
@@ -34,12 +35,10 @@ set(RDB_SRC
 
         # Utility and small subroutines
         src/utils/encoding.c
-        src/utils/random.c include/reedb/platform.h)
+        src/utils/random.c include/reedb/platform.h src/utils/platform.c src/config.h)
 
 # Define our library in cmake
 add_library(libreedb STATIC ${RDB_SRC})
-
-link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # Dynamically linked libraries
 target_link_libraries(libreedb
@@ -48,6 +47,7 @@ target_link_libraries(libreedb
         config
         apr-1
         libcdsl
+        libdyntree
 )
 
 # Include the subdirectories to search for headers
