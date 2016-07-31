@@ -4,4 +4,4 @@
 
 [submodule "lib/libcdsl"]
 	path = lib/libcdsl
-	path = https://github.com/reepass/libcdsl.git
+	url = https://github.com/reepass/CDSL.git
