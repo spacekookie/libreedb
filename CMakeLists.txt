@@ -35,7 +35,9 @@ set(RDB_SRC
 
         # Utility and small subroutines
         src/utils/encoding.c
-        src/utils/random.c include/reedb/platform.h src/utils/platform.c src/config.h)
+        src/utils/random.c
+        src/utils/platform.c
+        src/utils/uuid.c)
 
 # Define our library in cmake
 add_library(libreedb STATIC ${RDB_SRC})

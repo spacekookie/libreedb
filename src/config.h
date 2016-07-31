@@ -1,4 +1,4 @@
-/* libreedb -config.h
+/* libreedb - config.h
  *
  * A header only file that contains definitions for config values, default
  * ranges as well as indexes that can easily be substituted into different
@@ -24,6 +24,12 @@
 #ifndef REEDB_CONFIG_H
 #define REEDB_CONFIG_H
 
+/* Also make sure we're _always_ interpreted as a C file */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #define CFG_SCOPE               "scoped"
 #define CFG_CREATION_DATE       "creation_date"
 #define CFG_MODIFY_DATE         "last_modified"
@@ -38,5 +44,11 @@
 #define CFG_SCOPE_UUID          "uuid"
 #define CFG_SCOPE_PATH          "path"
 #define CFG_SCOPE_SIZE          "size"
+
+/* Also make sure we're _always_ interpreted as a C file */
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif //REEDB_CONFIG_H

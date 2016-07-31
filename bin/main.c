@@ -5,11 +5,14 @@
 
 int main(void)
 {
+    rdb_err_t err;
     rdb_context ctx;
-    rdb_ctx_init(&ctx);
+    err = rdb_ctx_init(&ctx);
 
-    rdb_vault *vault;
-    rdb_ctx_vaultctr(&ctx, &vault, "default", "~/Documents");
+//    rdb_vault *vault;
+//    err = rdb_ctx_vaultctr(&ctx, &vault, "default", "~/Documents");
 
-    return 0;
+    err = rdb_ctx_free(&ctx);
+
+    return err;
 }

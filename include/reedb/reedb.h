@@ -149,6 +149,8 @@ rdb_err_t rdb_ctx_verbose(rdb_context *ctx, bool verbose);
 
 rdb_err_t rdb_ctx_maxscl(rdb_context *ctx, unsigned int scl);
 
+rdb_err_t rdb_ctx_free(rdb_context *ctx);
+
 /**
  * Provides the user with a partially initialised vault context.
  *

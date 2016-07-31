@@ -3,23 +3,25 @@
 #include <reedb/platform.h>
 #include <reedb/data.h>
 
+#include "utils/uuid.h"
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdbool.h>
 
 #include <apr-1/apr_file_io.h>
+#include <list.h>
 
 #include <libconfig.h>
-
 #include <hashtable.h>
+
 #include <wordexp.h>
-#include <list.h>
 
 // System functions
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
-#include "config.h"
 
 /*
     map<rdb_uuid*, rdb_vault*>  *active_vaults;
@@ -137,6 +139,43 @@ rdb_err_t rdb_ctx_init(rdb_context *ctx)
     return MALLOC_FAILED;
 }
 
+rdb_err_t rdb_ctx_free(rdb_context *ctx)
+{
+    /*
+     * Function to free a context. What does that mean? We need to free:
+     *
+     *  - hashtable of active vaults
+     *  - list of crypto engines
+     *  - config (and scope)
+     *  - Path variables
+     *  - Inner context
+     *
+     *  In that order. So let's get to it :)
+     */
+
+    // TODO: Iterate over all vaults in "ctx->inner->active"
+    hashtable_free(ctx->inner->active);
+
+    // TODO: Iterate over all crypto engines in "ctx->inner->cryptons"
+    list_free(ctx->inner->cryptons);
+
+    /* Save config one last time, then clear it */
+    save_config(ctx->inner->cfg, ctx->inner->cfg_path);
+    config_destroy(ctx->inner->cfg);
+
+    free(ctx->inner->scope);
+
+    /* Free path variables */
+    free(ctx->inner->cfg_path);
+    free(ctx->inner->log_path);
+    free(ctx->inner->dir_path);
+
+    /* Free inner context */
+    free(ctx->inner);
+
+    return SUCCESS;
+}
+
 rdb_err_t rdb_ctx_logpath(rdb_context *ctx, const char *path)
 {
 //    free(ctx->inner->cfg_path);
@@ -162,7 +201,14 @@ rdb_err_t rdb_ctx_maxscl(rdb_context *ctx, unsigned int scl)
 rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *(*vault), const char *name, const char *path)
 {
 
-    /* Add the vault to the scope of this context */
+    /**
+     * Add the vault to scope first. We might find out that it's not
+     * unique and we need to abort the creation start.
+     *
+     * We add this here even though we don't know if the user will finalise
+     * her transaction. We can always syndicate our scope collection later.
+     *
+     */
     rdb_err_t err = rdb_ctx_scpvault(ctx, name, path);
     if(err) return err;
 
@@ -188,22 +234,37 @@ rdb_err_t rdb_ctx_scpvault(rdb_context *ctx, const char *name, const char *path)
         return ALREADY_SCOPED;
     }
 
+    /* Create a unique identifier for this vault */
+    rdb_uuid uuid;
+    rdb_uuid_create(&uuid);
+
+    char *str_uuid;
+    size_t str_len;
+    rdb_uuid_tostring(&uuid, &str_uuid, &str_len);
+
     config_setting_t *us = config_setting_add(scope, name, CONFIG_TYPE_GROUP);
 
-    /* Add the UUID  */
+    /* Add the UUID to the scope object */
+    setting = config_setting_add(us, CFG_SCOPE_UUID, CONFIG_TYPE_STRING);
+    config_setting_set_string(setting, str_uuid);
+
+    /* Add the name */
     setting = config_setting_add(us, CFG_SCOPE_NAME, CONFIG_TYPE_STRING);
     config_setting_set_string(setting, name);
 
-
-    setting = config_setting_add(us, CFG_SCOPE_NAME, CONFIG_TYPE_STRING);
-    config_setting_set_string(setting, name);
-
+    /* Add the path */
     setting = config_setting_add(us, CFG_SCOPE_PATH, CONFIG_TYPE_STRING);
     config_setting_set_string(setting, path);
 
-    setting = config_setting_add(us, CFG_SCOPE_SIZE, CONFIG_TYPE_STRING);
+    /* Set the size to 0 because it's new or unknown */
+    setting = config_setting_add(us, CFG_SCOPE_SIZE, CONFIG_TYPE_INT64);
     config_setting_set_int(setting, 0);
 
+    /* Safe the new config with the new scope */
+    save_config(ctx->inner->cfg, ctx->inner->cfg_path);
+
+    /* Free some of the resources we allocated */
+    free(str_uuid);
 }
 
 rdb_err_t rdb_ctx_uscpvault(rdb_context *ctx, rdb_uuid *uuid)
