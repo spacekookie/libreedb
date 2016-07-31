@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <reedb/reedb.h>
 
+
+#define STB_LEAKCHECK_IMPLEMENTATION
+#include <stb_leakcheck.h>
+
 #define RDB_REC_DEF_SIZE    2
 #define RDB_REC_MULTIPLY    2
 

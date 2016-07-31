@@ -1,5 +1,8 @@
 #include <utils/random.h>
 
+#define STB_LEAKCHECK_IMPLEMENTATION
+#include <stb_leakcheck.h>
+
 // Privatly include crypto lib
 #include <gcrypt.h>
 

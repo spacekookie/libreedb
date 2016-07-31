@@ -21,6 +21,9 @@
 #include <time.h>
 #include "config.h"
 
+
+#include <stb_leakcheck.h>
+
 /*
     map<rdb_uuid*, rdb_vault*>  *active_vaults;
 
