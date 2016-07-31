@@ -20,13 +20,13 @@ int main2(int argc, char **argv)
     int ctr = 0;
     for(ctr; ctr < 10000; ctr++) {
         rdb_data *d;
-        err = rdb_data_mallocrecursive(root, &d);
+        err = rdb_data_addrecursive(root, &d);
         printf("Malloc #%d returned: %d\n", ctr, err);
 
         for(int a = 0; a < 50; a++) {
             rdb_data *inner;
 
-            err = rdb_data_mallocrecursive(d, &inner);
+            err = rdb_data_addrecursive(d, &inner);
             printf("Malloc #%d returned: %d\n", ctr, err);
 
             rdb_data_addnumeral(inner, a);
