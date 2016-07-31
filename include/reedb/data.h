@@ -82,12 +82,17 @@ rdb_err_t rdb_data_addliteral(rdb_data *data, const char *literal, size_t length
 rdb_err_t rdb_data_addnumeral(rdb_data *data, int numeral);
 
 /** Add two new elements as a PAIR node under an existing node */
-rdb_err_t rdb_data_mallocpair(rdb_data *data, rdb_data *(*key), rdb_data *(*value));
+rdb_err_t rdb_data_addpair(rdb_data *data, rdb_data *(*key), rdb_data *(*value));
 
 /** Add a new data element to the resursive data store */
-rdb_err_t rdb_data_mallocrecursive(rdb_data *data, rdb_data *(*new_data));
+rdb_err_t rdb_data_addrecursive(rdb_data *data, rdb_data *(*new_data));
+
+rdb_err_t rdb_data_get(rdb_data *data, void *(*val));
 
 const char *rdb_data_dtype(rdb_uni_t type);
+
+/** Prints*/
+void rdb_data_print(rdb_data *data);
 
 /** Will free all memory allocated by this element and it's children */
 rdb_err_t rdb_data_free(rdb_data *data);

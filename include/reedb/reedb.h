@@ -125,8 +125,8 @@ typedef struct ree_vault ree_vault;
 
 typedef struct rdb_vault {
     struct ree_vault    *inner;
-    char                **zones;
-    size_t              no_zones;
+    const char          *name, *path;
+    size_t              size;
 } rdb_vault;
 
 /********************************************
@@ -158,7 +158,7 @@ rdb_err_t rdb_ctx_maxscl(rdb_context *ctx, unsigned int scl);
  * @param path Path of the vault on the FS
  * @return
  */
-rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *vault, const char *name, const char *path);
+rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *(*vault), const char *name, const char *path);
 
 rdb_err_t rdb_ctx_scpvault(rdb_context *ctx, const char *name, const char *path);
 

@@ -31,6 +31,7 @@
 extern "C" {
 #endif
 
+#define RDB_DEF_LINUX_PATH "~/.config/reedb/"
 
 #define RDB_PLATFORM_LINUX      0x0
 #define RDB_PLATFORM_FREEBSD    0x1
