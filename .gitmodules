@@ -1,3 +1,6 @@
 [submodule "libgdsl"]
 	path = libgdsl
 	url = https://github.com/reepass/libgdsl.git
+[submodule "lib/libdyntree"]
+	path = lib/libdyntree
+	url = https://github.com/reepass/libdyntree.git
