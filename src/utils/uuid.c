@@ -85,10 +85,10 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
     ret = rdb_coding_base64enc(C64, C, (int) s_blk);
     ret = rdb_coding_base64enc(D64, D, (int) l_blk);
 
-    printf("A64: %s\n", A64);
-    printf("B64: %s\n", B64);
-    printf("C64: %s\n", C64);
-    printf("D64: %s\n", D64);
+    //    printf("A64: %s\n", A64);
+    //    printf("B64: %s\n", B64);
+    //    printf("C64: %s\n", C64);
+    //    printf("D64: %s\n", D64);
 
     int cpyctr = 0;
 

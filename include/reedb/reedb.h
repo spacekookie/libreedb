@@ -42,41 +42,50 @@ extern "C" {
 #include <stdbool.h>
 
 /** Some flags that can be used to configure a vault after creation **/
-#define RDB_FLG_ROOT                    (1 << 0)
-#define RDB_FLG_MULTI_USER              (1 << 1)
-#define RDB_FLG_MANAGED                 (1 << 2)
-#define RDB_FLG_ANARCHY                 (1 << 3)
+#define RDB_FLG_ROOT                    (1 << 0)    // Single user - only root
+#define RDB_FLG_MULTI_USER              (1 << 1)    // Possibly deprecated ? Multi user - with admin
+#define RDB_FLG_MANAGED                 (1 << 2)    // Multiple users with a root user (admin)
+#define RDB_FLG_ANARCHY                 (1 << 3)    // Multiple users - no admin
 
-#define RDB_FLG_CACHE_SECURE            (1 << 4)
-#define RDB_FLG_CACHE_QUICK             (1 << 5)
-#define RDB_FLG_CACHE_BUFFERED          (1 << 6)
+#define RDB_FLG_CACHE_SECURE            (1 << 4)    // Be careful what you cache - only cache in secmem
+#define RDB_FLG_CACHE_QUICK             (1 << 5)    // Cache everything - don't care for security too much
+#define RDB_FLG_CACHE_BUFFERED          (1 << 6)    // Buffer headers but don't cache private data - Use secmem a lot
 
-#define RDB_FLG_WRITE_BLOCK             (1 << 7)
-#define RDB_FLG_WRITE_TREE              (1 << 8)
+#define RDB_FLG_WRITE_BLOCK             (1 << 7)    // Write into a block device (single blob)
+#define RDB_FLG_WRITE_TREE              (1 << 8)    // Write into a filesystem tree (slow)
 
-#define RDB_FLG_SCALE_DYNAMIC           (1 << 9)
-#define RDB_FLG_SCALE_ENDLESS           (1 << 10)
+#define RDB_FLG_SCALE_FIXED             (1 << 9)
+#define RDB_FLG_SCALE_DYNAMIC           (1 << 10)   // Scale around a fix-value (offset can be tweaked)
+#define RDB_FLG_SCALE_ENDLESS           (1 << 11)   // Scale as much as a computer will give you resources
 
-#define RDB_FLG_LOG_VERBOSE             (1 << 11)
-#define RDB_FLG_LOG_INFO                (1 << 12)
-#define RDB_FLG_LOG_WARN                (1 << 13)
-#define RDB_FLG_LOG_ERROR               (1 << 14)
-#define RDB_FLG_LOG_SILENT              (1 << 15)
+#define RDB_FLG_LOG_VERBOSE             (1 << 12)   // Set logging level to verbose
+#define RDB_FLG_LOG_INFO                (1 << 13)   // Set logging level to info
+#define RDB_FLG_LOG_WARN                (1 << 14)   // Set logging level to warning
+#define RDB_FLG_LOG_ERROR               (1 << 15)   // Set logging level to error
+#define RDB_FLG_LOG_SILENT              (1 << 16)   // Disable logging completely (not recommended)
 
-#define RDB_FLG_FTR_SINGLE_RECORD       (1 << 16)
-#define RDB_FLG_FTR_MULTI_RECORD        (1 << 17)
-#define RDB_FLG_FTR_RECORD_TREE         (1 << 18)
-#define RDB_FLG_FTR_DISABLE_LUT         (1 << 19)
-#define RDB_FLG_FTR_DISABLE_RQL         (1 << 20)
-#define RDB_FLG_FTR_PERMISSIVE          (1 << 21)
-#define RDB_FLG_FTR_DISABLE_HEADERS     (1 << 22)
+#define RDB_FLG_FTR_SINGLE_RECORD       (1 << 17)   // Redudant: Only allow records to be single depth
+#define RDB_FLG_FTR_MULTI_RECORD        (1 << 18)   // Allow records to be lists that can be addressed sequentially
+#define RDB_FLG_FTR_RECORD_TREE         (1 << 19)   // Allow records to contain tree-like children
+#define RDB_FLG_FTR_DISABLE_LUT         (1 << 20)   // Disable header lookup-table (for super-security)
+#define RDB_FLG_FTR_DISABLE_RQL         (1 << 21)   // Disable queury processor with RQL - for speed and security
+#define RDB_FLG_FTR_PERMISSIVE          (1 << 22)   // Be permissive about certain token errors
+#define RDB_FLG_FTR_DISABLE_HEADERS     (1 << 23)   // Disable header part of files - Only index by record name
 
-// #define RDB_FLAG_RQLSYNTAX_SIMPLE       (1 << 23)
+#define RDB_FLG_RQLSYNTAX_SIMPLE        (1 << 24)   // Use the simple (fast) RQL syntax
+#define RDB_FLG_RQLSYNTAX_COMPLEX       (1 << 25)   // Enable complex RQL features - emulated and slower
 
-#define RDB_ZONE_ROOT                   0x00000000
-#define RDB_USER_ROOT                   0x00000000
-
+#define RDB_ZONE_ROOT                   0x0000000
+#define RDB_USER_ROOT                   0x0000000
 #define REAL_STRLEN(string) (strlen(string) + 1)
+
+/********* Default configuration values **********/
+
+#define RDB_FLG_DEFAULT_SCALE           RDB_FLG_SCALE_FIXED
+#define RDB_FLG_DEFAULT_WRITE_MODE      RDB_FLG_WRITE_TREE
+#define RDB_FLG_DEFAULT_LOGLEVEL        RDB_FLG_LOG_INFO
+#define RDB_FLAG_DEFAULT_CACHING        RDB_FLG_CACHE_BUFFERED
+#define RDB_FLG_DEFAULT_RQLSYNTAX       RDB_FLG_RQLSYNTAX_SIMPLE
 
 /********************************************
  *
@@ -125,7 +134,7 @@ typedef struct ree_vault ree_vault;
 
 typedef struct rdb_vault {
     struct ree_vault    *inner;
-    const char          *name, *path;
+    char                *name, *path, *combined;
     size_t              size;
 } rdb_vault;
 
@@ -160,7 +169,7 @@ rdb_err_t rdb_ctx_free(rdb_context *ctx);
  * @param path Path of the vault on the FS
  * @return
  */
-rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *(*vault), const char *name, const char *path);
+rdb_err_t rdb_ctx_vaultcreate(rdb_context *ctx, rdb_vault *(*vault), const char *name, const char *path);
 
 rdb_err_t rdb_ctx_scpvault(rdb_context *ctx, const char *name, const char *path);
 
@@ -176,7 +185,7 @@ rdb_err_t rdb_ctx_uscpvault(rdb_context *ctx, rdb_uuid *uuid);
  *
  ********************************************/
 
-rdb_err_t rdb_vlts_setflags(rdb_vault *vault, long flags);
+rdb_err_t rdb_vlts_setflags(rdb_vault *vault, unsigned long flags);
 
 /**
  * A zone is a collection of files that a collection of users have

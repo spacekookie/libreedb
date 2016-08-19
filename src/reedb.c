@@ -52,22 +52,6 @@ struct ree_context {
     struct rdb_scope_d  *scope;
 };
 
-struct ree_vault {
-    unsigned long       type;
-    unsigned long       cache;
-    unsigned long       write_m;
-    unsigned long       scale_t;
-    unsigned long       log_t;
-    unsigned long       ftr_single, ftr_multi, ftr_tree;
-    unsigned long       ftr_lut_dis, ftr_rql_dis;
-    unsigned long       ftr_perm;
-    unsigned long       ftr_head_dis;
-
-    /* Vault contents */
-    Hashtable           *headers, *files;
-    List                *tags, *categories;
-};
-
 /**************************************************************************/
 /*************        Forward declaration of functions        *************/
 /**************************************************************************/
@@ -198,7 +182,7 @@ rdb_err_t rdb_ctx_maxscl(rdb_context *ctx, unsigned int scl)
 }
 
 
-rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *(*vault), const char *name, const char *path)
+rdb_err_t rdb_ctx_vaultcreate(rdb_context *ctx, rdb_vault *(*vault), const char *name, const char *path)
 {
 
     /**
@@ -214,11 +198,41 @@ rdb_err_t rdb_ctx_vaultctr(rdb_context *ctx, rdb_vault *(*vault), const char *na
 
     (*vault) = (rdb_vault*) malloc(sizeof(rdb_vault));
     if(*vault == NULL) return MALLOC_FAILED;
+    memset((*vault), 0, sizeof(rdb_vault));
 
-    (*vault)->inner = (ree_vault*) malloc(sizeof(ree_vault));
-    if((*vault)->inner == NULL) return MALLOC_FAILED;
+    /* Expand the vault location path */
+    wordexp_t exp;
+    wordexp(path, &exp, 0);
+    char *exp_path = exp.we_wordv[0];
 
+    /* Copy the full path over then */
+    (*vault)->path = malloc(sizeof(char) * REAL_STRLEN(exp_path));
+    if((*vault)->path == NULL) return MALLOC_FAILED;
+    strcpy((*vault)->path, exp_path);
 
+    /* And then the name */
+    (*vault)->name = malloc(sizeof(char) * REAL_STRLEN(name));
+    if((*vault)->name == NULL) return MALLOC_FAILED;
+    strcpy((*vault)->name, name);
+
+    /* Combine paths together for future reference */
+    size_t pathlen = strlen(exp_path);
+    size_t namelen = strlen(name);
+
+    /* Include 7 spaces for ".vault/" */
+    size_t fulllen = strlen(RDB_DEF_VAULT_END);
+    if(strcmp(&exp_path[pathlen - 1], "/") != 0)    fulllen += pathlen + namelen; // We already have a "/"
+    else                                            fulllen += pathlen + namelen + 1; // We still need a "/"
+
+    /** Allocate some space for it */
+    (*vault)->combined = malloc(sizeof(char) * fulllen);
+    if((*vault)->combined == NULL) return MALLOC_FAILED;
+
+    /** Copy the path into the space - char by char */
+    strcpy((*vault)->combined, exp_path);
+    if(strcmp(&exp_path[pathlen - 1], "/") != 0) strcat((*vault)->combined, "/");
+    strcat((*vault)->combined, name);
+    strcat((*vault)->combined, RDB_DEF_VAULT_END);
 
     return SUCCESS;
 }
@@ -361,6 +375,7 @@ rdb_err_t populate_paths(char *(*cfg_path), char *(*log_path), char *(*dir_path)
     /* Some objects require for file handling */
     wordexp_t expantion;
 
+    // TODO: Change out path here for platform
     wordexp(RDB_DEF_LINUX_PATH, &expantion, 0);
     char *exp = expantion.we_wordv[0];
 

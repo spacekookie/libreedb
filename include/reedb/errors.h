@@ -51,6 +51,7 @@ typedef enum rdb_err_t {
     HUGE_SUCCESS = 0,               // Little Portal easter egg :)
 
     INVALID_PARAMS,
+    MISSING_PARAMETERS,
     MALLOC_FAILED,                  // A memory allocation couldn't be completed!
     INVALID_PAYLOAD,                // A common data return problem
     INVALID_BUFFER_SIZE,
@@ -62,7 +63,9 @@ typedef enum rdb_err_t {
     /* Vault management */
     ALREADY_SCOPED,
     NOT_SCOPED,
-
+    INVALID_VAULT,
+    ALREADY_INITIALISED,
+    NOT_INITIALISED,
 
 } rdb_err_t;
 

@@ -22,6 +22,7 @@ INCLUDE(FindProtobuf)
 # Add the libgdsl build path
 add_subdirectory(lib/libcdsl)
 add_subdirectory(lib/libdyntree)
+add_subdirectory(lib/cthpool)
 
 set(RDB_SRC
 
@@ -48,8 +49,11 @@ target_link_libraries(libreedb
         protobuf-c
         config
         apr-1
+
+        # Dependencies in lib/
         libcdsl
         libdyntree
+        libcthpool
 )
 
 # Include the subdirectories to search for headers
