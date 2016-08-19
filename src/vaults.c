@@ -14,6 +14,15 @@
     if(vault->path == NULL) return INVALID_VAULT; \
     if(vault->combined == NULL) return INVALID_VAULT; \
 
+#define MEMCHECK \
+{ \
+    if(vault->inner == NULL) { \
+        vault->inner = (ree_vault*) malloc(sizeof(ree_vault)); \
+        if(vault->inner == NULL) return MALLOC_FAILED; \
+        memset(vault->inner, 0, sizeof(ree_vault)); \
+    } \
+};
+
 #define ASSIGN(field, fl) \
     if(flags & (fl)) field = fl;
 
@@ -46,12 +55,7 @@ rdb_err_t check_flagmask(unsigned long flags, unsigned long mask);
 
 rdb_err_t rdb_vlts_setflags(rdb_vault *vault, unsigned long flags)
 {
-    VAULT_SANE
-
-    /** Allocate inner scope and clean memory */
-    vault->inner = (ree_vault*) malloc(sizeof(ree_vault));
-    if(vault->inner == NULL) return MALLOC_FAILED;
-    memset(vault->inner, 0, sizeof(ree_vault));
+    VAULT_SANE MEMCHECK
 
     rdb_err_t err;
 
@@ -204,6 +208,7 @@ rdb_err_t rdb_vlts_setflags(rdb_vault *vault, unsigned long flags)
  */
 rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name)
 {
+    VAULT_SANE MEMCHECK
 
     return SUCCESS;
 }
@@ -217,6 +222,8 @@ rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name)
  */
 rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
 {
+    VAULT_SANE MEMCHECK
+
 
     return SUCCESS;
 }
@@ -247,6 +254,7 @@ long rdb_vlts_getuser(const char *username)
  */
 rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, long user, const char *passphrase)
 {
+    VAULT_SANE MEMCHECK
 
     return SUCCESS;
 }
@@ -259,6 +267,13 @@ rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, long user, const char *passphrase)
  */
 rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
 {
+    VAULT_SANE
+
+    /* Make sure that the inner vault actually exists (and might have been configured!) */
+    if(vault->inner == NULL) {
+        printf("Can't initialise empty inner context! Provide configuration parameters first!\n");
+        return INVALID_VAULT;
+    }
 
     return SUCCESS;
 }

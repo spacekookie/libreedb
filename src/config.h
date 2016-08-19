@@ -4,6 +4,10 @@
  * ranges as well as indexes that can easily be substituted into different
  * parts of the database.
  *
+ * In addition to that it provides a struct that describes how a vault should
+ * function after configuration. This struct is passed around different
+ * parts of the library to change behaviour.
+ *
  * (c) 2016 					Lonely Robot.
  * Authors:						Katharina 'spacekookie' Sabel
  *
@@ -44,6 +48,10 @@ extern "C" {
 #define CFG_SCOPE_UUID          "uuid"
 #define CFG_SCOPE_PATH          "path"
 #define CFG_SCOPE_SIZE          "size"
+
+typedef struct rdb_config {
+    
+} rdb_config;
 
 /* Also make sure we're _always_ interpreted as a C file */
 #ifdef __cplusplus
