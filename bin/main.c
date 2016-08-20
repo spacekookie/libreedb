@@ -6,8 +6,7 @@
 int main(void)
 {
     rdb_err_t err;
-
-
+    
     rdb_context ctx;
     err = rdb_ctx_init(&ctx);
     printf("Context init...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;
@@ -23,6 +22,11 @@ int main(void)
     /* Setup some flags */
     err = rdb_vlts_setflags(vault, RDB_FLG_ROOT);
     printf("Set flags...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;
+
+    rdb_vlts_adduser(vault, "spacekookie", 0);
+    rdb_uuid spacekookie = rdb_vlts_getuser(vault, "spacekookie");
+
+    rdb_vlts_setlogin(vault, &spacekookie, "mega_passphrase!");
 
     err = rdb_ctx_free(&ctx);
     printf("Context free...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;

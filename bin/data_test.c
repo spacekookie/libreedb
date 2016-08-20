@@ -8,7 +8,7 @@
 #include <reedb/reedb.h>
 #include <reedb/data.h>
 #include <stdio.h>
-#include "../src/utils/encoding.h"
+#include "../src/datastore/encoding.h"
 
 int main2(int argc, char **argv)
 {
