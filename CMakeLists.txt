@@ -34,11 +34,16 @@ set(RDB_SRC
 
         # Core functionality
 
+        # Data store
+        src/datastore/hashmap.c
+        src/datastore/encoding.c
+
         # Utility and small subroutines
-        src/utils/encoding.c
         src/utils/random.c
         src/utils/platform.c
-        src/utils/uuid.c)
+        src/utils/uuid.c
+        )
+
 
 # Define our library in cmake
 add_library(libreedb STATIC ${RDB_SRC})

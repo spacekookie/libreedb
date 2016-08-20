@@ -67,6 +67,18 @@ typedef enum rdb_err_t {
     ALREADY_INITIALISED,
     NOT_INITIALISED,
 
+    /* User contexts */
+    USER_EXISTS,
+    USER_DOESNT_EXIST,
+
+    /* Crypto errors */
+    SHORT_PASSPHRASE,               // Passphrase too short or NULL
+    HASHING_FAILED,                 // A hashing process couldn't complete
+    ENCRYPTION_FAILED,              // Encrypting some data returned a problem
+    DECRYPTION_FAILED,              // Decrypting some data returned a problem
+    INVALID_TYPE,                   // Usually indicates bad cipher types
+    PERMISSION_DENIED,              // Your token isn't powerful enough :)
+
 } rdb_err_t;
 
 unsigned int rdb_error_getcode(rdb_err_t *e);

@@ -50,7 +50,7 @@ extern "C" {
 #define CFG_SCOPE_SIZE          "size"
 
 typedef struct rdb_config {
-    
+
 } rdb_config;
 
 /* Also make sure we're _always_ interpreted as a C file */

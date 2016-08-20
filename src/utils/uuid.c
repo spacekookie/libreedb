@@ -26,7 +26,7 @@
 
 #include "uuid.h"
 #include "random.h"
-#include "encoding.h"
+#include "datastore/encoding.h"
 
 /**
  * Allocates a new UUID object. Will need to be freed at a later time

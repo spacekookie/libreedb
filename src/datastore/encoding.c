@@ -1,4 +1,4 @@
-#include <utils/encoding.h>
+#include <datastore/encoding.h>
 #include <string.h>
 
 static const unsigned char asciilk[256] =

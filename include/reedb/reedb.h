@@ -217,7 +217,21 @@ rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones);
  * @param username
  * @return
  */
-long rdb_vlts_getuser(const char *username);
+rdb_uuid rdb_vlts_getuser(rdb_vault *vault, const char *username);
+
+/**
+ * A simple function which can be used to extract the username of a UUID
+ * after the user has already been created.
+ *
+ * This function could be considered a security risk and should be thought
+ * over.
+ *
+ * @param vault
+ * @param uuid
+ * @param username
+ * @return
+ */
+rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid *uuid, char *(*username));
 
 /**
  * Sets the passphrase for a specific user ID. ID 0 is by default always
@@ -227,7 +241,7 @@ long rdb_vlts_getuser(const char *username);
  * @param user Unique user ID
  * @param passphrase
  */
-rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, long user, const char *passphrase);
+rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid *user, const char *passphrase);
 
 /**
  * Take currently loaded settings, finalise them and finish setup. Only

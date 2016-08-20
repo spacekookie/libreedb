@@ -4,8 +4,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <list.h>
+#include <datastore/hashmap.h>
+#include <err.h>
+#include <gcrypt.h>
 
 #include "utils/uuid.h"
+#include "defines.h"
 #include "config.h"
 
 #define VAULT_SANE \
@@ -47,6 +51,11 @@ struct ree_vault {
     Hashtable           *headers, *files;
     List                *tags, *categories;
     struct threadpool   *thpool;
+
+    /** Add metadata **/
+    map_t               *users;
+    struct vault_zone   **zones;
+    size_t              zone_s, usd_zones;
 };
 
 /**********************************************************************/
@@ -210,6 +219,31 @@ rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name)
 {
     VAULT_SANE MEMCHECK
 
+    /* If our zones fields are still empty */
+    if(vault->inner->zones == NULL) {
+        vault->inner->zones = (struct vault_zone**) malloc(sizeof(struct vault_zone) * MINIMUM_BUFFER_SIZE);
+        if(vault->inner->zones == NULL) return MALLOC_FAILED;
+        vault->inner->zone_s = MINIMUM_BUFFER_SIZE;
+        vault->inner->usd_zones = 0;
+    }
+
+    /* Potentially increase buffer size for zones */
+    if(vault->inner->usd_zones >= vault->inner->zone_s) {
+        vault->inner->zone_s += 2;
+        vault->inner->zones = realloc(vault->inner->zones, vault->inner->zone_s);
+        if(vault->inner->zones == NULL) return MALLOC_FAILED;
+    }
+
+    struct vault_zone *zone = malloc(sizeof(struct vault_zone) * 1);
+    memset(zone, 0, sizeof(struct vault_zone));
+
+    /* Add the provided name for the zone */
+    zone->name = (char*) malloc(sizeof(char) * REAL_STRLEN(name));
+    strcpy(zone->name, name);
+
+    /* Add the new zone */
+    vault->inner->zones[vault->inner->usd_zones++] = zone;
+
     return SUCCESS;
 }
 
@@ -224,6 +258,34 @@ rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
 {
     VAULT_SANE MEMCHECK
 
+    if(vault->inner->users == NULL) {
+        vault->inner->users = hashmap_new();
+        if(vault->inner->users == NULL) return MALLOC_FAILED;
+    }
+
+    // TODO: Change the user index to the UUID
+    struct vault_user user;
+    int exists = hashmap_get(vault->inner->users, name, (any_t*) &user);
+
+    /* Check if the user already existed */
+    if(exists == MAP_OK) {
+        printf("User with name %s already exists!\n", name);
+        return USER_EXISTS;
+    }
+
+    /* We know the user is new - Create a new one */
+    struct vault_user *new = malloc(sizeof(struct vault_user));
+    memset(new, 0, sizeof(struct vault_user));
+
+    /* Copy over the name */
+    new->name = malloc(sizeof(char) * REAL_STRLEN(name));
+    strcpy(new->name, name);
+
+    /* Generate a unique-id for our user */
+    rdb_uuid_alloc(&new->id);
+
+    /* Set creation time - leave last login empty */
+    new->created = time(0);
 
     return SUCCESS;
 }
@@ -235,13 +297,13 @@ rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
  * @param username
  * @return
  */
-long rdb_vlts_getuser(const char *username)
+rdb_uuid rdb_vlts_getuser(rdb_vault *vault, const char *username)
 {
-#define NO_SUCH_USER_RETURN -1 // Very specific for this function
+    struct vault_user user;
 
-
-
-    return NO_SUCH_USER_RETURN;
+    /* Attempt to retrieve a user from the map and return if it's OK */
+    int ret = hashmap_get(vault->inner->users, username, (any_t*) &user);
+    return (ret == MAP_OK) ? user : NULL;
 }
 
 /**
@@ -252,9 +314,52 @@ long rdb_vlts_getuser(const char *username)
  * @param user Unique user ID
  * @param passphrase
  */
-rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, long user, const char *passphrase)
+rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid *user, const char *passphrase)
 {
     VAULT_SANE MEMCHECK
+
+    if(user == NULL) return USER_DOESNT_EXIST;
+    if(passphrase == NULL) return SHORT_PASSPHRASE;
+
+    /* Define some fields we may need */
+    gcry_md_hd_t md_ctx;
+    char *username;
+
+    gcry_error_t err;
+    rdb_err_t ret;
+
+    /* Get the username for the salt :) */
+    ret = rdb_vlts_getplainuser(vault, user, &username);
+    if(ret) {
+        printf("Failed to retrieve username from vault!\n");
+        return ret;
+    }
+
+    /* Get a reference to our user struct in the table */
+    struct vault_user ref_user;
+    hashmap_get(vault->inner->users, username, (any_t*) &ref_user);
+    if(ref_user.id == NULL) return USER_DOESNT_EXIST;
+
+    /* Open a hashing context to secure the passphrase */
+    err = gcry_md_open(&md_ctx, PASSWD_HASH_FUNCT, GCRY_MD_FLAG_SECURE);
+    if(err) {
+        printf("Failed to open digest context!\n");
+        return HASHING_FAILED;
+    }
+
+    /* Add the data into our context */
+    gcry_md_write(md_ctx, username, strlen(username));
+    gcry_md_write(md_ctx, SALT_SEPERATOR, strlen(SALT_SEPERATOR)); // Add ":::"
+    gcry_md_write(md_ctx, passphrase, strlen(passphrase));
+
+    /* Compute passwrod digest (Tiger2) */
+    gcry_md_final(md_ctx);
+    unsigned char *pw_digest = gcry_md_read(md_ctx, PASSWD_HASH_FUNCT);
+    memcpy(ref_user.passwd, pw_digest, PASSWD_HASH_LEN);
+
+    /* Clean up */
+    gcry_md_close(md_ctx);
+    free(username);
 
     return SUCCESS;
 }
