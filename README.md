@@ -1,8 +1,8 @@
-![Reedb Logo](https://raw.githubusercontent.com/reepass/reedb/develop/extras/logo.png)
+![Reedb Logo](https://raw.githubusercontent.com/reepass/libreedb/master/extras/logo.png)
 
 :lock: Fully encrypted, document-table-hybrid oriented database with per-user encryption, nested ciphers, groups and zones for selective sharing, rights management and revocation of privilages. Encrypt single datasets, multisets or even filesystem nodes via FUSE.
 
-Bugs are being tracked on this github repository - if you find issues, please open an issue. Exact progress can be tracked on the {Lonely Robot wekan](https://plan.lonelyrobot.io/b/WEDvddNHrxBzmqCLs/reedb#)
+Bugs are being tracked on this github repository - if you find issues, please open an issue. Exact progress can be tracked on the [Lonely Robot wekan](https://plan.lonelyrobot.io/b/WEDvddNHrxBzmqCLs/reedb#)
 
 Build
 -----
