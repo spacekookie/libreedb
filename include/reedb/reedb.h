@@ -208,7 +208,7 @@ rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name);
  * @param zones A list of zones to add the user to
  * @return The vault user ID
  */
-rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones);
+rdb_uuid rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones);
 
 /**
  * Get the user id for a user in this vault. Will return -1 if the user
@@ -231,7 +231,7 @@ rdb_uuid rdb_vlts_getuser(rdb_vault *vault, const char *username);
  * @param username
  * @return
  */
-rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid *uuid, char *(*username));
+rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid uuid, char *(*username));
 
 /**
  * Sets the passphrase for a specific user ID. ID 0 is by default always
@@ -241,7 +241,7 @@ rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid *uuid, char *(*userna
  * @param user Unique user ID
  * @param passphrase
  */
-rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid *user, const char *passphrase);
+rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid user, const char *passphrase);
 
 /**
  * Take currently loaded settings, finalise them and finish setup. Only

@@ -60,6 +60,8 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid);
  */
 rdb_err_t rdb_uuid_tostring(rdb_uuid *uuid, char *(*string), size_t *size);
 
+char *rdb_uuid_stringify(rdb_uuid uuid);
+
 
 /* Also make sure we're _always_ interpreted as a C file */
 #ifdef __cplusplus

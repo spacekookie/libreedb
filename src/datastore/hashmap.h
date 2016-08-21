@@ -37,6 +37,14 @@ typedef int (*PFany)(any_t, any_t);
  */
 typedef any_t map_t;
 
+/* We need to keep keys and values */
+typedef struct _hashmap_element {
+    char* key;
+    int in_use;
+    any_t data;
+} hashmap_element;
+
+
 /*
  * Return an empty hashmap. Returns NULL if empty.
 */
@@ -50,6 +58,17 @@ extern map_t hashmap_new();
  * not reenter any hashmap functions, or deadlock may arise.
  */
 extern int hashmap_iterate(map_t in, PFany f, any_t item);
+
+/**
+ * Returns the raw table of the hashmap for inspection. Can be used to manually
+ * search for items inside it that aren't indexed via a hashable key
+ *
+ * @param in
+ * @param data
+ * @param size
+ * @return
+ */
+extern int hashmap_rawdata(map_t in, hashmap_element **data, int *size);
 
 /*
  * Add an element to the hashmap. Return MAP_OK or MAP_OMEM.
@@ -81,8 +100,5 @@ extern void hashmap_free(map_t in);
  * Get the current size of a hashmap
  */
 extern int hashmap_length(map_t in);
-
-#endif /* __HASHMAP_H__ */
-
 
 #endif //REEDB_HASHMAP_H

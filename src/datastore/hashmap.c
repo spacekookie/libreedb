@@ -10,13 +10,6 @@
 #define INITIAL_SIZE (256)
 #define MAX_CHAIN_LENGTH (8)
 
-/* We need to keep keys and values */
-typedef struct _hashmap_element {
-    char* key;
-    int in_use;
-    any_t data;
-} hashmap_element;
-
 /* A hashmap has some maximum size and current size,
  * as well as the data to hold. */
 typedef struct _hashmap_map {
@@ -368,12 +361,27 @@ int hashmap_iterate(map_t in, PFany f, any_t item) {
     /* Linear probing */
     for(i = 0; i< m->table_size; i++)
         if(m->data[i].in_use != 0) {
+
             any_t data = (any_t) (m->data[i].data);
             int status = f(item, data);
             if (status != MAP_OK)
                 return status;
         }
 
+    return MAP_OK;
+}
+
+int hashmap_rawdata(map_t in, hashmap_element **data, int *size)
+{
+    /* Cast the hashmap */
+    hashmap_map* m = (hashmap_map*) in;
+
+    /* On empty hashmap, return immediately */
+    if (hashmap_length(m) <= 0) return MAP_MISSING;
+
+    /* Assign the data */
+    (*data) = m->data;
+    (*size) = m->table_size;
     return MAP_OK;
 }
 

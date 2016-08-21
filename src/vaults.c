@@ -7,6 +7,7 @@
 #include <datastore/hashmap.h>
 #include <err.h>
 #include <gcrypt.h>
+#include <datastore/encoding.h>
 
 #include "utils/uuid.h"
 #include "defines.h"
@@ -254,24 +255,30 @@ rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name)
  * @param zones A list of zones to add the user to
  * @return The vault user ID
  */
-rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
+rdb_uuid rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
 {
-    VAULT_SANE MEMCHECK
+    rdb_uuid ret;
+    memset(&ret, 0, sizeof(rdb_uuid));
+
+    if(vault == NULL) goto exit;
+    if(vault->name == NULL) goto exit;
+    if(vault->path == NULL) goto exit;
+    if(vault->combined == NULL) goto exit;
+
+    if(vault->inner == NULL) {
+        vault->inner = (ree_vault*) malloc(sizeof(ree_vault));
+        if(vault->inner == NULL) goto exit;
+        memset(vault->inner, 0, sizeof(ree_vault));
+    }
 
     if(vault->inner->users == NULL) {
         vault->inner->users = hashmap_new();
-        if(vault->inner->users == NULL) return MALLOC_FAILED;
+        if(vault->inner->users == NULL) goto exit;
     }
 
-    // TODO: Change the user index to the UUID
-    struct vault_user user;
-    int exists = hashmap_get(vault->inner->users, name, (any_t*) &user);
-
-    /* Check if the user already existed */
-    if(exists == MAP_OK) {
-        printf("User with name %s already exists!\n", name);
-        return USER_EXISTS;
-    }
+    /* Check if a UUID exists - if it does, the user already exists */
+    char *uuid = rdb_uuid_stringify(rdb_vlts_getuser(vault, name));
+    if(uuid != NULL) goto exit;
 
     /* We know the user is new - Create a new one */
     struct vault_user *new = malloc(sizeof(struct vault_user));
@@ -284,10 +291,19 @@ rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
     /* Generate a unique-id for our user */
     rdb_uuid_alloc(&new->id);
 
+    char *str_uuid = rdb_uuid_stringify(*new->id);
+
     /* Set creation time - leave last login empty */
     new->created = time(0);
 
-    return SUCCESS;
+    /* Save the new user in the table */
+    hashmap_put(vault->inner->users, str_uuid, new);
+
+    /* Copy an instance and return that */
+    memcpy(&ret, &new->id, sizeof(rdb_uuid));
+    exit:
+    free(str_uuid);
+    return ret;
 }
 
 /**
@@ -299,11 +315,27 @@ rdb_err_t rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
  */
 rdb_uuid rdb_vlts_getuser(rdb_vault *vault, const char *username)
 {
-    struct vault_user user;
+    int err, size, i;
+    rdb_uuid uuid = {0};
+    hashmap_element *data;
 
-    /* Attempt to retrieve a user from the map and return if it's OK */
-    int ret = hashmap_get(vault->inner->users, username, (any_t*) &user);
-    return (ret == MAP_OK) ? user : NULL;
+    err = hashmap_rawdata(vault->inner->users, &data, &size);
+    if(err != MAP_OK) goto exit;
+
+    for(i = 0; i< size; i++) {
+        if(data[i].in_use) {
+            struct vault_user *user = data[i].data;
+
+            if(strcmp(user->name, username) == 0) {
+                uuid = *user->id;
+                goto exit;
+            }
+        }
+    }
+
+    /* Return either way - either NULL or valid */
+    exit:
+    return uuid;
 }
 
 /**
@@ -314,11 +346,11 @@ rdb_uuid rdb_vlts_getuser(rdb_vault *vault, const char *username)
  * @param user Unique user ID
  * @param passphrase
  */
-rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid *user, const char *passphrase)
+rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid user, const char *passphrase)
 {
     VAULT_SANE MEMCHECK
 
-    if(user == NULL) return USER_DOESNT_EXIST;
+    if(user.x == NULL) return USER_DOESNT_EXIST;
     if(passphrase == NULL) return SHORT_PASSPHRASE;
 
     /* Define some fields we may need */
@@ -335,10 +367,14 @@ rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid *user, const char *passph
         return ret;
     }
 
+    char *uuid = rdb_uuid_stringify(user);
+
     /* Get a reference to our user struct in the table */
     struct vault_user ref_user;
-    hashmap_get(vault->inner->users, username, (any_t*) &ref_user);
+    hashmap_get(vault->inner->users, uuid, (any_t*) &ref_user);
+    free(uuid);
     if(ref_user.id == NULL) return USER_DOESNT_EXIST;
+
 
     /* Open a hashing context to secure the passphrase */
     err = gcry_md_open(&md_ctx, PASSWD_HASH_FUNCT, GCRY_MD_FLAG_SECURE);
@@ -354,8 +390,20 @@ rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid *user, const char *passph
 
     /* Compute passwrod digest (Tiger2) */
     gcry_md_final(md_ctx);
-    unsigned char *pw_digest = gcry_md_read(md_ctx, PASSWD_HASH_FUNCT);
-    memcpy(ref_user.passwd, pw_digest, PASSWD_HASH_LEN);
+    unsigned char *bin_digest = gcry_md_read(md_ctx, PASSWD_HASH_FUNCT);
+//    memcpy(ref_user.passwd, pw_digest, PASSWD_HASH_LEN);
+
+    /* Calculate length for base64 encoding */
+    int base64_s = rdb_coding_base64enclen((int) PASSWD_HASH_LEN);
+    ref_user.passwd = (char*) malloc(sizeof(char) * base64_s);
+
+    rdb_coding_base64enc(ref_user.passwd, (char*) bin_digest, (int) PASSWD_HASH_LEN);
+
+    int out_len;
+    unsigned char *tmp = NBase58Encode(bin_digest, (int) PASSWD_HASH_LEN, &out_len);
+    ref_user.passwd = (char*) malloc(sizeof(char) * out_len);
+
+    strcpy(ref_user.passwd, tmp);
 
     /* Clean up */
     gcry_md_close(md_ctx);
@@ -380,6 +428,25 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
         return INVALID_VAULT;
     }
 
+    return SUCCESS;
+}
+
+
+rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid uuid, char *(*username))
+{
+    VAULT_SANE MEMCHECK
+
+    struct vault_user *user;
+    char *uuid_str = rdb_uuid_stringify(uuid);
+    int ret = hashmap_get(vault->inner->users, uuid_str, (void**) &user);
+    free(uuid_str);
+    if(ret != MAP_OK) return USER_DOESNT_EXIST;
+
+    (*username) = (char*) malloc(sizeof(char) * REAL_STRLEN(user->name));
+    if((*username) == NULL) return MALLOC_FAILED;
+
+    /* Copy over username and return SUCCESS */
+    strcpy((*username), user->name);
     return SUCCESS;
 }
 

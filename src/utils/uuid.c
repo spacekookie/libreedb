@@ -36,7 +36,16 @@
  */
 rdb_err_t rdb_uuid_alloc(rdb_uuid *(*uuid))
 {
+    (*uuid) = (rdb_uuid*) malloc(sizeof(rdb_uuid));
+    if(*uuid == NULL) return MALLOC_FAILED;
 
+    rdb_err_t err = rdb_uuid_create(*uuid);
+    if(err) {
+        free(*uuid);
+        return err;
+    }
+
+    return SUCCESS;
 }
 
 /**
@@ -55,12 +64,12 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
     size_t s_blk = 6, l_blk = 8;
 
     /* Calculate the required base64 str length */
-    int base64_s = rdb_coding_base64enclen((int) s_blk);
-    int base64_l = rdb_coding_base64enclen((int) l_blk);
+//    int base64_s = rdb_coding_base64enclen((int) s_blk);
+//    int base64_l = rdb_coding_base64enclen((int) l_blk);
 
     /** Create some arrays to store data in **/
     char *A = NULL, *B = NULL, *C = NULL, *D = NULL;
-    char A64[base64_l], B64[base64_l], C64[base64_s], D64[base64_l];
+    unsigned char *A64, *B64, *C64, *D64;
 
 
     /**** Generate enough random data for us to generate a unique ID ****/
@@ -80,10 +89,21 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
 
     /**** Encode the data in base64 for easy readability ****/
 
-    ret = rdb_coding_base64enc(A64, A, (int) l_blk);
-    ret = rdb_coding_base64enc(B64, B, (int) l_blk);
-    ret = rdb_coding_base64enc(C64, C, (int) s_blk);
-    ret = rdb_coding_base64enc(D64, D, (int) l_blk);
+//    ret = rdb_coding_base64enc(A64, A, (int) l_blk);
+//    ret = rdb_coding_base64enc(B64, B, (int) l_blk);
+//    ret = rdb_coding_base64enc(C64, C, (int) s_blk);
+//    ret = rdb_coding_base64enc(D64, D, (int) l_blk);
+
+
+    char *indec = "Foobar20000000!!!";
+    int inLen = (int) strlen(indec);
+
+    int outLen;
+    A64 = NBase58Encode((unsigned char*) A, (int) l_blk, &outLen);
+    B64 = NBase58Encode((unsigned char*) B, (int) l_blk, &outLen);
+    C64 = NBase58Encode((unsigned char*) C, (int) s_blk, &outLen);
+    D64 = NBase58Encode((unsigned char*) D, (int) l_blk, &outLen);
+
 
     //    printf("A64: %s\n", A64);
     //    printf("B64: %s\n", B64);
@@ -102,8 +122,8 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
 
     memcpy(uuid->x + cpyctr++, "-", 1);
 
-    memcpy(uuid->x + cpyctr, C64, 6);
-    cpyctr += 6;
+    memcpy(uuid->x + cpyctr, C64, 5);
+    cpyctr += 5;
 
     memcpy(uuid->x + cpyctr++, "-", 1);
 
@@ -131,8 +151,19 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
  */
 rdb_err_t rdb_uuid_tostring(rdb_uuid *uuid, char *(*string), size_t *size)
 {
-    (*size) = strlen(uuid->x);
+    (*size) = strlen((char*) uuid->x);
 
     (*string) = (char*) malloc(sizeof(char) * (*size));
-    strcpy((*string), uuid->x);
+    strcpy((*string), (char*) uuid->x);
+}
+
+char *rdb_uuid_stringify(rdb_uuid uuid)
+{
+    size_t size = 33;
+    if(strcmp((char*) uuid.x, "") == 0) return NULL;
+    char *string = (char*) malloc(sizeof(char) * size);
+
+    memcpy(string, (char*) uuid.x, size - 1);
+    memcpy(string + size, "\0", 1);
+    return string;
 }

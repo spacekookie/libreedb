@@ -41,9 +41,7 @@
 
 typedef struct vault_user {
     rdb_uuid    *id;
-    char        *name;
-    char        secname[USER_HASH_LEN];     // Future support?
-    char        passwd[PASSWD_HASH_LEN];
+    char        *name, *secname, *passwd;
     time_t      last_login, created;
 };
 
