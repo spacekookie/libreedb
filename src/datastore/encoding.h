@@ -41,6 +41,10 @@ int rdb_coding_hexenc(char *(*encoded), const char *plain_src, int src_len);
 
 int rdb_coding_hexdec(char *(*decoded), const char *hex_src, int src_len);
 
+
+unsigned char *NBase58Encode(unsigned char *in, int inLen, int *outLen);
+unsigned char *NBase58Decode(unsigned char *in, int inLen);
+
 #ifdef __cplusplus
 }
 #endif
