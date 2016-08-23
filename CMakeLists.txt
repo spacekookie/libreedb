@@ -42,7 +42,7 @@ set(RDB_SRC
         src/utils/random.c
         src/utils/platform.c
         src/utils/uuid.c
-        )
+        src/wstore.h src/datastore/record.h)
 
 
 # Define our library in cmake
