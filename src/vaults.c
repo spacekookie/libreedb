@@ -391,14 +391,8 @@ rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid user, const char *passphr
     /* Compute passwrod digest (Tiger2) */
     gcry_md_final(md_ctx);
     unsigned char *bin_digest = gcry_md_read(md_ctx, PASSWD_HASH_FUNCT);
-//    memcpy(ref_user.passwd, pw_digest, PASSWD_HASH_LEN);
 
-    /* Calculate length for base64 encoding */
-    int base64_s = rdb_coding_base64enclen((int) PASSWD_HASH_LEN);
-    ref_user.passwd = (char*) malloc(sizeof(char) * base64_s);
-
-    rdb_coding_base64enc(ref_user.passwd, (char*) bin_digest, (int) PASSWD_HASH_LEN);
-
+    /* Calculate length for base58 encoding */
     int out_len;
     unsigned char *tmp = NBase58Encode(bin_digest, (int) PASSWD_HASH_LEN, &out_len);
     ref_user.passwd = (char*) malloc(sizeof(char) * out_len);
@@ -426,6 +420,29 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     if(vault->inner == NULL) {
         printf("Can't initialise empty inner context! Provide configuration parameters first!\n");
         return INVALID_VAULT;
+    }
+
+    /* Store a inner reference for convenience */
+    ree_vault *v = vault->inner;
+
+    /**** Switch over vault type ****/
+    switch(v->type) {
+        case RDB_FLG_ROOT:
+        {
+            rdb_vlts_adduser(vault, RDB_USER_ROOT, RDB_ZONE_ROOT);
+            break;
+        }
+        default: break;
+    }
+
+    /**** Switch over write type ****/
+    switch(v->write_m) {
+        case RDB_FLG_WRITE_TREE:
+        {
+            
+            break;
+        }
+        default: break;
     }
 
     return SUCCESS;

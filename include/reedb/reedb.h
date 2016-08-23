@@ -76,7 +76,7 @@ extern "C" {
 #define RDB_FLG_RQLSYNTAX_COMPLEX       (1 << 25)   // Enable complex RQL features - emulated and slower
 
 #define RDB_ZONE_ROOT                   0x0000000
-#define RDB_USER_ROOT                   0x0000000
+#define RDB_USER_ROOT                   "__root__"
 #define REAL_STRLEN(string) (strlen(string) + 1)
 
 /********* Default configuration values **********/
