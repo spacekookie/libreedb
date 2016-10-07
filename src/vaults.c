@@ -1,13 +1,17 @@
 #include <reedb/reedb.h>
+#include <reedb/errors.h>
 
 #include <hashtable.h>
+#include <list.h>
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <list.h>
+
 #include <datastore/hashmap.h>
-#include <err.h>
-#include <gcrypt.h>
 #include <datastore/encoding.h>
+
+#include <gcrypt.h>
+#include <err.h>
 
 #include "utils/uuid.h"
 #include "defines.h"
@@ -71,11 +75,10 @@ rdb_err_t rdb_vlts_setflags(rdb_vault *vault, unsigned long flags)
 
     /**
      *
-     * This function is a bit insane. Three MACROs are invoked over and over again and this should
+     * This function is a bit insane. Two MACROs are invoked over and over again and this should
      * quickly explain what they do for future contributers.
      *
-     * SINGLE_BIT checks if a number is power of 2 (aka only has 1 bit set) in a range. The range is
-     *      determined by OR-ing all valid flags together. Thus we make sure we don't have conflicts.
+     * First we check the unique-ness of a field in the flag with `check_flagmask`
      *
      * ASSIGNs (badum-tss) a field in the inner vault to a flag (if that flag is set)
      *      No further checking is done by this MACRO.
@@ -445,9 +448,17 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
         default: break;
     }
 
+    /** Generate keys for users that were registered */
+
+    /**  */
+
+    /** Write basic file layout to disk */
+
     return SUCCESS;
 }
 
+
+/**************** PRIVATE UTILITY FUNCTIONS ****************/
 
 rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid uuid, char *(*username))
 {

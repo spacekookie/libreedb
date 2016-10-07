@@ -22,6 +22,9 @@
 #include <reedb/errors.h>
 #include <reedb/data.h>
 
+/* Replacement for rdb_data */
+#include <dtree/dtree.h>
+
 #include <stdbool.h>
 #include <list.h>
 
@@ -48,7 +51,15 @@ typedef struct record {
     unsigned int    version;
     bool            locked;
 
-    rdb_data        *root;
+    /* Union data store*/
+    union {
+        dtree       *root;
+        dtree       **list;
+    } data;
+
+    /* Additional pointers for transfer caching */
+    char            *encode;
+    char            *cry_encode;
 } record;
 
 rdb_err_t rdb_df_createnew(record *rec);

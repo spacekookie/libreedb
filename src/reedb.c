@@ -162,13 +162,7 @@ rdb_err_t rdb_ctx_free(rdb_context *ctx)
 
 rdb_err_t rdb_ctx_logpath(rdb_context *ctx, const char *path)
 {
-//    free(ctx->inner->cfg_path);
-//
-//    ctx->inner->cfg_path = (char*) malloc(sizeof(char) * REAL_STRLEN(path));
-//    strcpy(ctx->inner->cfg_path, path);
-//
-//    /* Then call the setup function again */
-//    populate_paths(&ctx->inner->cfg_path, &ctx->inner->log_path);
+    return NOT_IMPLEMENTED;
 }
 
 rdb_err_t rdb_ctx_cfgpath(rdb_context *ctx, const char *path)
@@ -221,7 +215,7 @@ rdb_err_t rdb_ctx_vaultcreate(rdb_context *ctx, rdb_vault *(*vault), const char 
 
     /* Include 7 spaces for ".vault/" */
     size_t fulllen = strlen(RDB_DEF_VAULT_END);
-    if(strcmp(&exp_path[pathlen - 1], "/") != 0)    fulllen += pathlen + namelen; // We already have a "/"
+    if(strcmp(&exp_path[pathlen - 1], "/") != 0)    fulllen += pathlen + namelen;     // We already have a "/"
     else                                            fulllen += pathlen + namelen + 1; // We still need a "/"
 
     /** Allocate some space for it */
