@@ -58,6 +58,7 @@ rdb_err_t rcry_keystore_add(rcry_keystore *ks, char *id, char *key, enum rcry_st
 
     /** Define a macro that does all the work locally */
 #define FILL_KEY(location) \
+    if(location != NULL) free(location); \
     location = (char*) calloc(size, 1); \
     if(location == NULL) return MALLOC_FAILED; \
     memcpy(location, key, size); \
