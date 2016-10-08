@@ -42,7 +42,7 @@ set(RDB_SRC
         src/utils/random.c
         src/utils/platform.c
         src/utils/uuid.c
-        src/wstore.h src/datastore/record.h src/crypto/crypto.h src/crypto/queue.h src/crypto/queue.c src/crypto/engine.c src/crypto/keygen.c)
+        src/wstore.h src/datastore/record.h src/crypto/crypto.h src/crypto/queue.h src/crypto/queue.c src/crypto/engine.c src/crypto/keygen.c src/crypto/keystore.h src/crypto/keystore.c)
 
 
 # Define our library in cmake
