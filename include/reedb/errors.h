@@ -79,6 +79,7 @@ typedef enum rdb_err_t {
     DECRYPTION_FAILED,              // Decrypting some data returned a problem
     INVALID_TYPE,                   // Usually indicates bad cipher types
     PERMISSION_DENIED,              // Your token isn't powerful enough :)
+    INVALID_TARGET,                 // The job target retrieved from the queue is invalid
 
 } rdb_err_t;
 

@@ -190,11 +190,13 @@ rdb_err_t rcry_engine_result(rcry_engine *e, unsigned long id, rcry_result **dat
 
 
 /**
+ * Threadsafe operation! Can be performed on worker threads!
+ *
  * Compute the next job in the queue, blocking on this thread. Each job is an atomic unit with duplicated
  * initialisation data, this function can be called from multiple threads while being completely thread-safe.
  *
  * The only check that is performed is if the engine is still in a valid state, which is the case if the
- * provided pointer is not NULL
+ * provided pointer is not NULL and the seed isn't in the process of being renewed
  *
  * @param e             The engine that should have work invoked next
  * @return

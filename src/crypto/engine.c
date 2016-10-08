@@ -8,6 +8,11 @@
 
 #define CHECK_ENGINE if(e == NULL) return INVALID_PARAMS;
 
+#define CHECK_TARGET(t) \
+    if(t == NULL || t->key == NULL || \
+            t->data == NULL || t->mode == NULL) return INVALID_TARGET;
+
+
 rdb_err_t rcry_engine_init(rcry_engine *(*e), bool realtime, unsigned char *seed, size_t seed_len)
 {
     rdb_err_t err;
@@ -109,4 +114,20 @@ rdb_err_t rcry_engine_addjob(rcry_engine *e, unsigned long *id, target_t type, c
     /* Finally assign the job ID and return */
     *id = _id;
     return SUCCESS;
+}
+
+
+rdb_err_t rcry_engine_nextjob(rcry_engine *e)
+{
+    CHECK_ENGINE
+
+    if(e->lock) return CONTEXT_LOCKED;
+
+    /* Retrieve the next job from the queue */
+    rcry_target *t;
+    rdb_queue_pop(e->job_queue, (void**) &t);
+
+    CHECK_TARGET(t)
+
+    printf("Job processing...done!");
 }
