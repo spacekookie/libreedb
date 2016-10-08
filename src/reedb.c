@@ -40,7 +40,6 @@ struct rdb_scope_d {
 
 struct ree_context {
     Hashtable       *active;
-    List            *cryptons;  // TODO: Change this to a ring queue
     char            *cfg_path;
     char            *log_path;
     char            *dir_path;
@@ -86,7 +85,6 @@ rdb_err_t rdb_ctx_init(rdb_context *ctx)
 
     /* Create the inner data storage */
     inner->active = newHashtable(4);
-    inner->cryptons = newList();
 
     /* Assign inner to outer ctx */
     ctx->inner = inner;
@@ -129,7 +127,6 @@ rdb_err_t rdb_ctx_free(rdb_context *ctx)
      * Function to free a context. What does that mean? We need to free:
      *
      *  - hashtable of active vaults
-     *  - list of crypto engines
      *  - config (and scope)
      *  - Path variables
      *  - Inner context
@@ -139,9 +136,6 @@ rdb_err_t rdb_ctx_free(rdb_context *ctx)
 
     // TODO: Iterate over all vaults in "ctx->inner->active"
     hashtable_free(ctx->inner->active);
-
-    // TODO: Iterate over all crypto engines in "ctx->inner->cryptons"
-    list_free(ctx->inner->cryptons);
 
     /* Save config one last time, then clear it */
     save_config(ctx->inner->cfg, ctx->inner->cfg_path);

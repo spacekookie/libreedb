@@ -12,6 +12,9 @@
 
 #include <gcrypt.h>
 #include <err.h>
+#include <crypto/crypto.h>
+#include <thpool.h>
+#include <utils/random.h>
 
 #include "utils/uuid.h"
 #include "defines.h"
@@ -55,7 +58,8 @@ struct ree_vault {
     /* Vault contents */
     Hashtable           *headers, *files;
     List                *tags, *categories;
-    struct threadpool   *thpool;
+    rdb_pool            *thpool;
+    rcry_engine         *engine;
 
     /** Add metadata **/
     map_t               *users;
@@ -428,27 +432,28 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     /* Store a inner reference for convenience */
     ree_vault *v = vault->inner;
 
-    /**** Switch over vault type ****/
-    switch(v->type) {
-        case RDB_FLG_ROOT:
-        {
-            rdb_vlts_adduser(vault, RDB_USER_ROOT, RDB_ZONE_ROOT);
-            break;
-        }
-        default: break;
-    }
+    /** Intialise */
+    v->thpool = calloc(sizeof(rdb_pool), 1);
+    v->thpool->pool = thpool_init(4);
+    v->thpool->threads = 4;             // FIXME: One thread pool for all vaults?
 
-    /**** Switch over write type ****/
-    switch(v->write_m) {
-        case RDB_FLG_WRITE_TREE:
-        {
-            
-            break;
-        }
-        default: break;
-    }
+    /** Generate a seed for this vault */
+    char *seed;
+    size_t seed_len = 256;
+    rdb_rand_genset(&seed, seed_len, RDB_RAND_SUPER_RAND);
+
+    /** Initialise a crypto engine with a unique seed */
+    v->engine = calloc(sizeof(struct rcry_engine), 1);
+    rcry_engine_init(&v->engine, false, (unsigned char*) seed, seed_len);
+
+    /** Create headers & file storage */
+    v->files = newHashtable(11);
+    v->headers = newHashtable(11);
+
+    // TODO: Evaluate settings that were provided - Turn flags into options
 
     /** Generate keys for users that were registered */
+    
 
     /**  */
 
@@ -464,7 +469,7 @@ rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid uuid, char *(*usernam
 {
     VAULT_SANE MEMCHECK
 
-    struct vault_user *user;
+;    struct vault_user *user;
     char *uuid_str = rdb_uuid_stringify(uuid);
     int ret = hashmap_get(vault->inner->users, uuid_str, (void**) &user);
     free(uuid_str);
