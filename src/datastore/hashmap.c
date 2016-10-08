@@ -312,7 +312,7 @@ int hashmap_get(map_t in, const char *key, any_t *arg) {
     *arg = NULL;
 
     /* Not found */
-    return MAP_MISSING;
+    return NOT_FOUND;
 }
 
 /*
@@ -326,7 +326,7 @@ int hashmap_get_one(map_t in, any_t *arg, int remove) {
     m = (hashmap_map *) in;
 
     /* On empty hashmap return immediately */
-    if (hashmap_length(m) <= 0) return MAP_MISSING;
+    if (hashmap_length(m) <= 0) return NOT_FOUND;
 
     /* Linear probing */
     for(i = 0; i< m->table_size; i++) {
@@ -341,7 +341,7 @@ int hashmap_get_one(map_t in, any_t *arg, int remove) {
             return MAP_OK;
         }
     }
-    return MAP_MISSING;
+    return NOT_FOUND;
 }
 
 /*
@@ -349,21 +349,21 @@ int hashmap_get_one(map_t in, any_t *arg, int remove) {
  * additional any_t argument is passed to the function as its first
  * argument and the hashmap element is the second.
  */
-int hashmap_iterate(map_t in, PFany f, any_t item) {
+int hashmap_iterate(map_t in, PFany f) {
     int i;
 
     /* Cast the hashmap */
     hashmap_map* m = (hashmap_map*) in;
 
     /* On empty hashmap, return immediately */
-    if (hashmap_length(m) <= 0) return MAP_MISSING;
+    if (hashmap_length(m) <= 0) return NOT_FOUND;
 
     /* Linear probing */
     for(i = 0; i< m->table_size; i++)
         if(m->data[i].in_use != 0) {
 
             any_t data = (any_t) (m->data[i].data);
-            int status = f(item, data);
+            int status = f(data);
             if (status != MAP_OK)
                 return status;
         }
@@ -377,7 +377,7 @@ int hashmap_rawdata(map_t in, hashmap_element **data, int *size)
     hashmap_map* m = (hashmap_map*) in;
 
     /* On empty hashmap, return immediately */
-    if (hashmap_length(m) <= 0) return MAP_MISSING;
+    if (hashmap_length(m) <= 0) return NOT_FOUND;
 
     /* Assign the data */
     (*data) = m->data;
@@ -419,7 +419,7 @@ int hashmap_remove(map_t in, char* key) {
     }
 
     /* Data not found */
-    return MAP_MISSING;
+    return NOT_FOUND;
 }
 
 /* Deallocate the hashmap */

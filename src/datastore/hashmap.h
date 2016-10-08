@@ -16,7 +16,7 @@
 #define MAP_OK              0 	/* OK */
 #define MAP_OMEM            1 	/* Out of Memory */
 #define MAP_FULL            2 	/* Hashmap is full */
-#define MAP_MISSING         3  /* No such element */
+#define NOT_FOUND           3  /* No such element */
 
 /*
  * any_t is a pointer.  This allows you to put arbitrary structures in
@@ -28,7 +28,7 @@ typedef void *any_t;
  * PFany is a pointer to a function that can take two any_t arguments
  * and return an integer. Returns status code..
  */
-typedef int (*PFany)(any_t, any_t);
+typedef int (*PFany)(any_t);
 
 /*
  * map_t is a pointer to an internally maintained data structure.
@@ -57,7 +57,7 @@ extern map_t hashmap_new();
  * than MAP_OK the traversal is terminated. f must
  * not reenter any hashmap functions, or deadlock may arise.
  */
-extern int hashmap_iterate(map_t in, PFany f, any_t item);
+extern int hashmap_iterate(map_t in, PFany function);
 
 /**
  * Returns the raw table of the hashmap for inspection. Can be used to manually
@@ -76,17 +76,17 @@ extern int hashmap_rawdata(map_t in, hashmap_element **data, int *size);
 extern int hashmap_put(map_t in, const char* key, any_t value);
 
 /*
- * Get an element from the hashmap. Return MAP_OK or MAP_MISSING.
+ * Get an element from the hashmap. Return MAP_OK or NOT_FOUND.
  */
 extern int hashmap_get(map_t in, const char* key, any_t *arg);
 
 /*
- * Remove an element from the hashmap. Return MAP_OK or MAP_MISSING.
+ * Remove an element from the hashmap. Return MAP_OK or NOT_FOUND.
  */
 extern int hashmap_remove(map_t in, char* key);
 
 /*
- * Get any element. Return MAP_OK or MAP_MISSING.
+ * Get any element. Return MAP_OK or NOT_FOUND.
  * remove - should the element be removed from the hashmap
  */
 extern int hashmap_get_one(map_t in, any_t *arg, int remove);
