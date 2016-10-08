@@ -58,14 +58,12 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
 {
     int ret;
     rdb_err_t err;
+    int cpyctr = 0;
+
     memset(uuid, 0, sizeof(rdb_uuid));
 
     /* Target string lengths */
     size_t s_blk = 6, l_blk = 8;
-
-    /* Calculate the required base64 str length */
-//    int base64_s = rdb_coding_base64enclen((int) s_blk);
-//    int base64_l = rdb_coding_base64enclen((int) l_blk);
 
     /** Create some arrays to store data in **/
     char *A = NULL, *B = NULL, *C = NULL, *D = NULL;
@@ -89,28 +87,11 @@ rdb_err_t rdb_uuid_create(rdb_uuid *uuid)
 
     /**** Encode the data in base64 for easy readability ****/
 
-//    ret = rdb_coding_base64enc(A64, A, (int) l_blk);
-//    ret = rdb_coding_base64enc(B64, B, (int) l_blk);
-//    ret = rdb_coding_base64enc(C64, C, (int) s_blk);
-//    ret = rdb_coding_base64enc(D64, D, (int) l_blk);
-
-
-    char *indec = "Foobar20000000!!!";
-    int inLen = (int) strlen(indec);
-
     int outLen;
     A64 = NBase58Encode((unsigned char*) A, (int) l_blk, &outLen);
     B64 = NBase58Encode((unsigned char*) B, (int) l_blk, &outLen);
     C64 = NBase58Encode((unsigned char*) C, (int) s_blk, &outLen);
     D64 = NBase58Encode((unsigned char*) D, (int) l_blk, &outLen);
-
-
-    //    printf("A64: %s\n", A64);
-    //    printf("B64: %s\n", B64);
-    //    printf("C64: %s\n", C64);
-    //    printf("D64: %s\n", D64);
-
-    int cpyctr = 0;
 
     memcpy(uuid->x + cpyctr, A64, 8);
     cpyctr += 8;
