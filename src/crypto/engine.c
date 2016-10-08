@@ -1,10 +1,11 @@
-#include <malloc.h>
+#include "crypto.h"
+
+#include <utils/random.h>
 #include <reedb/reedb.h>
 #include <utils/uuid.h>
 #include <defines.h>
-#include <utils/random.h>
 
-#include "crypto.h"
+#include <malloc.h>
 
 #define CHECK_ENGINE if(e == NULL) return INVALID_PARAMS;
 

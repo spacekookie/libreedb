@@ -453,7 +453,7 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     // TODO: Evaluate settings that were provided - Turn flags into options
 
     /** Generate keys for users that were registered */
-    
+
 
     /**  */
 

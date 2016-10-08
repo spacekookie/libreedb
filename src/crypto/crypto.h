@@ -35,8 +35,8 @@ typedef enum target_t{
     /* RSA encryption modes */
     RSA_ENC, RSA_DEC,
 
-    /* */
-    AES,
+    /* Symmetric ciphers */
+    AES, CAMELLIA,
 
     /* Axolotls asymetric */
     AXOLOTL_ENC, AXOLOTL_DEC
@@ -87,6 +87,8 @@ typedef struct rcry_engine {
 
 
 /********************************************
+ *
+ *           CRYPTOGRAPHY ENGINE
  *
  * Engine manipulation functions. Work on a crypto engine state
  *   that is held in a vault. An engine is unique in a vault
@@ -215,13 +217,48 @@ rdb_err_t rcry_engine_free(rcry_engine *e);
 
 /********************************************
  *
- * Engine manipulation functions. Work on a crypto engine state
- *   that is held in a vault. An engine is unique in a vault
- *   but can be worked on by multiple worker threads.
+ *         CIPHER KEY GENERATOR
+ *
+ * Keygen control functions. The key generator is a stateless entity that
+ * generate as many keys as you require of different types. Please use the apropriate
+ * functions to generate symmetric (AES & Camellia), RSA and axolotl keys.
+ *
+ * Key generators allocate their memory on the secure memory stack from gcrypt. Make sure
+ * to only use a key generator after initialising gcrypt properly.
  *
  *
  ********************************************/
 
-rdb_err_t rcry_keygen_init();
+typedef enum rcry_key_t {
+    AES256, CAMELLIA256, RSA4096, RSA8192, AXOLOTL
+} rcry_key_t;
+
+rdb_err_t rcry_keygen_aes(unsigned char **key);
+
+rdb_err_t rcry_keygen_camellia(unsigned char **key);
+
+rdb_err_t rcry_keygen_rsa(unsigned char **pub, unsigned char **pri);
+
+rdb_err_t rcry_keygen_axolotl(unsigned char **pub, unsigned char **pri);
+
+/**
+ * Returns the length of a key, dependant on it's type
+ *
+ * @param type
+ * @return
+ */
+size_t rcry_keygen_sizeinfo(rcry_key_t type);
+
+
+/********************************************
+ *
+ *           HASHING UTILITIES
+ *
+ *
+ *
+ *
+ ********************************************/
+
+
 
 #endif //REEDB_CRYPTO_H
