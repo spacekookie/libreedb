@@ -31,6 +31,7 @@
 
 #define MINIMUM_BUFFER_SIZE         4
 #define DEFAULT_BUFFER_SIZE         8
+#define DEFAULT_SEED_SIZE           256
 #define PASSWD_HASH_FUNCT           GCRY_MD_TIGER2
 #define PASSWD_HASH_LEN             gcry_md_get_algo_dlen(PASSWD_HASH_FUNCT)
 

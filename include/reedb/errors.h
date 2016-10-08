@@ -55,6 +55,7 @@ typedef enum rdb_err_t {
     MALLOC_FAILED,                  // A memory allocation couldn't be completed!
     INVALID_PAYLOAD,                // A common data return problem
     INVALID_BUFFER_SIZE,
+    CONTEXT_LOCKED,                 // Is thrown when a thread-lock error occurs
     UNSUPPORTED_ENV,
     NOT_IMPLEMENTED,
     CFG_READ_FAILED,
