@@ -6,6 +6,7 @@
 #include <defines.h>
 
 #include <malloc.h>
+#include <gcrypt.h>
 
 #define CHECK_ENGINE if(e == NULL) return INVALID_PARAMS;
 
@@ -30,7 +31,9 @@ rdb_err_t rcry_engine_init(rcry_engine *(*e), bool realtime, unsigned char *seed
     tmp->realtime = realtime;
     tmp->lock = false;
 
-    if(REAL_STRLEN((char*) seed) != seed_len) return INVALID_PAYLOAD;
+    size_t __seed_len = strlen((char*) seed);
+    if(__seed_len != seed_len) printf("[WARN]: Non- zero-term seed!\n");
+
     tmp->token_seed = (unsigned char*) malloc(sizeof(unsigned char) * seed_len);
     strcpy((char*) tmp->token_seed, (char*) seed);
 
@@ -131,4 +134,56 @@ rdb_err_t rcry_engine_nextjob(rcry_engine *e)
     CHECK_TARGET(t)
 
     printf("Job processing...done!");
+}
+
+
+/**
+ * STATELESS FUNCTION!
+ *
+ *
+ *
+ * @param data
+ * @param md
+ * @param type
+ * @return
+ */
+rdb_err_t rcry_hash_data(char *data, size_t d_len, unsigned char **md, enum rcry_hash_t type)
+{
+    int algo;
+
+    switch(type) {
+        case SHA256:
+            algo = GCRY_MD_SHA256;
+            break;
+
+        case TIGER2:
+            algo = GCRY_MD_TIGER2;
+            break;
+
+        default:
+            printf("Unknown hashing algorithm! Aborting.\n");
+            return HASHING_FAILED;
+    }
+
+    gcry_md_hd_t md_ctx;
+    gcry_error_t gerr;
+
+    /** Open hash context for USER cipher (default SHA256) */
+    gerr = gcry_md_open(&md_ctx, algo, GCRY_MD_FLAG_SECURE);
+    if(gerr) {
+        printf("Failed to open digest context!\n");
+        return HASHING_FAILED;
+    }
+
+    /** Add data to hash buffer either with or without provided d_len */
+    if(d_len == 0)      gcry_md_write(md_ctx, data, strlen(data));
+    else                gcry_md_write(md_ctx, data, d_len);
+
+    gcry_md_final(md_ctx);
+
+    /** Read md buffer and clear context */
+    (*md) = gcry_md_read(md_ctx, PASSWD_HASH_FUNCT);
+    gcry_md_close(md_ctx);
+
+    return SUCCESS;
 }

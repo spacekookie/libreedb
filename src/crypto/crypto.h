@@ -264,13 +264,21 @@ enum rcry_hash_t {
 };
 
 /**
- * Convenience function around gcrypt. Doesn't allow for much control but useful
- * for most use-cases.
+ *
+ * Stateless convenience function that wraps around the gcrypt hashing module. Try
+ * to avoid using this function in places with high throughput as it might slow
+ * things down.
+ *
+ * A new context is created for each hash operation and a context is never kept past the
+ * function. Provide any data with it's type. If the length isn't provided, the function
+ * will try to guess which can go wrong if input data is binary encoded!
  *
  * @param data
+ * @param d_len
  * @param md
+ * @param type
  * @return
  */
-rdb_err_t rcry_hash_data(char *data, char **md, enum rcry_hash_t type);
+rdb_err_t rcry_hash_data(char *data, size_t d_len, unsigned char **md, enum rcry_hash_t type);
 
 #endif //REEDB_CRYPTO_H
