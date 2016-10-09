@@ -43,14 +43,21 @@ rdb_err_t rcry_keystore_add(rcry_keystore *ks, char *id, char *key, enum rcry_st
     rcry_key_c *c;
 
     /* If no element was found, we need to create a new one */
-    if(stat == NOT_FOUND && ret == NULL) {
+    if(stat == NOT_FOUND || ret == NULL) {
 
         c = malloc(sizeof(rcry_key_c) * 1);
         if(c == NULL) return MALLOC_FAILED;
         memset(c, 0, sizeof(rcry_key_c));
 
-        /* For code re-use later */
+        /* Pretend that it was there all along */
         ret = (void*) c;
+
+        /* Retro-actively insert into map */
+        stat = hashmap_put(ks->keystore, id, ret);
+        if(stat != MAP_OK) {
+            free(c);
+            return STORAGE_REQ_FAILED;
+        }
     }
 
     c = (rcry_key_c*) ret;
@@ -72,6 +79,43 @@ rdb_err_t rcry_keystore_add(rcry_keystore *ks, char *id, char *key, enum rcry_st
         case PUBLIC:    FILL_KEY(c->pub);
 
         case __ALL__:   printf("Don't use __ALL__ to add a key!\n");
+        default:        return INVALID_PARAMS;
+    }
+
+    return SUCCESS;
+}
+
+
+rdb_err_t rcry_keystore_get(rcry_keystore *ks, char *id, enum rcry_store_t type, char **key)
+{
+    CHECK_STORE
+
+    void *ret;
+    int stat = hashmap_get(ks->keystore, id, &ret);
+
+    if(stat == NOT_FOUND || ret == NULL)
+        return KEY_MISSING;
+
+    rcry_key_c *c = (rcry_key_c*) ret;
+
+    switch(type) {
+        case PRIMARY:
+            (*key) = c->primary;
+            break;
+
+        case SECONDARY:
+            (*key) = c->secondary;
+            break;
+
+        case PRIVATE:
+            (*key) = c->pri;
+            break;
+
+        case PUBLIC:
+            (*key) = c->pub;
+            break;
+
+        case __ALL__:   printf("Don't use __ALL__ to retrieve a key!\n");
         default:        return INVALID_PARAMS;
     }
 

@@ -52,6 +52,7 @@ typedef enum rdb_err_t {
 
     INVALID_PARAMS,
     MISSING_PARAMETERS,
+    STORAGE_REQ_FAILED,             // Something failed to store something else
     MALLOC_FAILED,                  // A memory allocation couldn't be completed!
     INVALID_PAYLOAD,                // A common data return problem
     INVALID_BUFFER_SIZE,
@@ -77,9 +78,14 @@ typedef enum rdb_err_t {
     HASHING_FAILED,                 // A hashing process couldn't complete
     ENCRYPTION_FAILED,              // Encrypting some data returned a problem
     DECRYPTION_FAILED,              // Decrypting some data returned a problem
-    INVALID_TYPE,                   // Usually indicates bad cipher types
+    BAD_SIGNATURE = 666,            // The signature on an operation has been tempered with!
+
     PERMISSION_DENIED,              // Your token isn't powerful enough :)
     INVALID_TARGET,                 // The job target retrieved from the queue is invalid
+
+    KEY_MISSING,                    //
+    KEY_INVALID,                    //
+
 
 } rdb_err_t;
 
