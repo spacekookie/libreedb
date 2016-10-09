@@ -15,6 +15,7 @@
 #include <crypto/crypto.h>
 #include <thpool.h>
 #include <utils/random.h>
+#include <crypto/keystore.h>
 
 #include "utils/uuid.h"
 #include "defines.h"
@@ -56,10 +57,11 @@ struct ree_vault {
     unsigned long       ftr_perm;
 
     /* Vault contents */
-    Hashtable           *headers, *files;
-    List                *tags, *categories;
+    Hashtable           *hds, *fls;
+    List                *tags, *cats;
     rdb_pool            *thpool;
-    rcry_engine         *engine;
+    rcry_engine         *cry;
+    rcry_keystore       *ks;
 
     /** Add metadata **/
     map_t               *users;
@@ -431,8 +433,9 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
 
     /* Store a inner reference for convenience */
     ree_vault *v = vault->inner;
+    rdb_err_t err;
 
-    /** Intialise */
+    /** Intialise threads */
     v->thpool = calloc(sizeof(rdb_pool), 1);
     v->thpool->pool = thpool_init(4);
     v->thpool->threads = 4;             // FIXME: One thread pool for all vaults?
@@ -440,20 +443,42 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     /** Generate a seed for this vault */
     char *seed;
     size_t seed_len = 256;
-    rdb_rand_genset(&seed, seed_len, RDB_RAND_SUPER_RAND);
+    err = rdb_rand_genset(&seed, seed_len, RDB_RAND_SUPER_RAND);
+    if(err) return err;
 
     /** Initialise a crypto engine with a unique seed */
-    v->engine = calloc(sizeof(struct rcry_engine), 1);
-    rcry_engine_init(&v->engine, false, (unsigned char*) seed, seed_len);
+    v->cry = calloc(sizeof(struct rcry_engine), 1);
+    err = rcry_engine_init(&v->cry, false, (unsigned char*) seed, seed_len);
+    if(err) return err;
+
+    /** Create a keystore backend */
+    v->ks = (rcry_keystore*) malloc(sizeof(rcry_keystore) * 1);
+
+    size_t ks_len = REAL_STRLEN(vault->combined) + REAL_STRLEN("keystore");
+    char ks_path[ks_len];
+    memcpy(ks_path, 0, ks_len);
+
+    strcpy(ks_path, vault->combined);
+    strcat(ks_path, "keystore");
+
+    err = rcry_keystore_init(v->ks, ks_path);
+    if(err) return err;
 
     /** Create headers & file storage */
-    v->files = newHashtable(11);
-    v->headers = newHashtable(11);
+    v->fls = newHashtable(11);
+    v->hds = newHashtable(11);
 
     // TODO: Evaluate settings that were provided - Turn flags into options
 
-    /** Generate keys for users that were registered */
 
+    /**** GENERATE PRIMARY KEY, SECONDARY HASH KEY AND SUBMIT TO KEYSTORE ****/
+
+    char *primary;
+    err = rcry_keygen_camellia(&primary);
+    if(err) return err;
+    
+    err = rcry_keystore_add(v->ks, "root", primary, PRIMARY);
+    if(err) return err;
 
     /**  */
 
