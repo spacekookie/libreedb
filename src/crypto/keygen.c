@@ -11,7 +11,7 @@
 #include <stdarg.h>
 #include <gcrypt.h>
 
-rdb_err_t rcry_keygen_aes(unsigned char **key)
+rdb_err_t rcry_keygen_aes(char **key)
 {
     printf("Generating new AES256 key...\n");
 
@@ -26,7 +26,7 @@ rdb_err_t rcry_keygen_aes(unsigned char **key)
 }
 
 
-rdb_err_t rcry_keygen_camellia(unsigned char **key)
+rdb_err_t rcry_keygen_camellia(char **key)
 {
     printf("Generating new AES256 key...\n");
 

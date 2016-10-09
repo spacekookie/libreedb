@@ -233,9 +233,9 @@ typedef enum rcry_key_t {
     AES256, CAMELLIA256, RSA4096, RSA8192, AXOLOTL
 } rcry_key_t;
 
-rdb_err_t rcry_keygen_aes(unsigned char **key);
+rdb_err_t rcry_keygen_aes(char **key);
 
-rdb_err_t rcry_keygen_camellia(unsigned char **key);
+rdb_err_t rcry_keygen_camellia(char **key);
 
 rdb_err_t rcry_keygen_rsa(unsigned char **pub, unsigned char **pri);
 
@@ -259,6 +259,18 @@ size_t rcry_keygen_sizeinfo(rcry_key_t type);
  *
  ********************************************/
 
+enum rcry_hash_t {
+  SHA256, TIGER2
+};
 
+/**
+ * Convenience function around gcrypt. Doesn't allow for much control but useful
+ * for most use-cases.
+ *
+ * @param data
+ * @param md
+ * @return
+ */
+rdb_err_t rcry_hash_data(char *data, char **md, enum rcry_hash_t type);
 
 #endif //REEDB_CRYPTO_H
