@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Reedb by reepass</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Reedb</h1>
+        <h2>An encrypted document-oriented database toolkit for the paranoid</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/reepass/libreedb/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/reepass/libreedb/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/reepass/libreedb" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p><img src="https://raw.githubusercontent.com/reepass/libreedb/master/extras/logo_white.png" alt="Reedb Logo"></p>
+
+<p><g-emoji alias="lock" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f512.png" ios-version="6.0">🔒</g-emoji> Fully encrypted, document-table-hybrid oriented database with per-user encryption, nested ciphers, groups and zones for selective sharing, rights management and revocation of privilages. Encrypt single datasets, multisets or even filesystem nodes via FUSE.</p>
+
+<p>Bugs are being tracked on this github repository - if you find issues, please open an issue. Exact progress can be tracked on the <a href="https://plan.lonelyrobot.io/b/WEDvddNHrxBzmqCLs/reedb#">Lonely Robot wekan</a></p>
+
+<h2>
+<a id="build" class="anchor" href="#build" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Build</h2>
+
+<p>libreedb is built on a few libraries. Building has been tested on Fedora 24 and Arch Linux. If you have issues compiling the library, please open an issue for it.</p>
+
+<p>The current list of external dependencies is: "<strong>gcc cmake libgcrypt libapr libgdsl protobuf-c</strong>"</p>
+
+<p>An out-of-source build is recommended</p>
+
+<div class="highlight highlight-text-shell-session"><pre><span class="pl-mo">mkdir build &amp;&amp; cd build/</span>
+<span class="pl-mo">cmake ..</span>
+<span class="pl-mo">cmake --build .</span></pre></div>
+
+<p>By default libreeedb builds a static object. </p>
+
+<h2>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use</h2>
+
+<p>To start using a "ree" database you need to create a context. You can either do so on the stack or allocate memory by yourself and pass the pointer instead.</p>
+
+<pre><code>rdb_err_t err;
+rdb_context ctx;
+err = rdb_ctx_init(&amp;ctx);
+</code></pre>
+
+<p>Afterwards the context is available for further configuration or to create a new database. Reedb provides you access to fully encrypted databases called "vaults". </p>
+
+<p>This name was chosen to represent the added security over a normal database. This added security however doesn't have to come at the price of performance or convenience.</p>
+
+<pre><code>
+rdb_vault vault;
+err = rdb_ctx_vaultcreate(&amp;ctx, &amp;vault, "default", "~/Documents/");
+// Check for errors
+
+rdb_uuid user = rdb_vlts_adduser(vault, "spacekookie", 0);
+err = rdb_vlts_setlogin(vault, &amp;user, "mega_passphrase!");
+// Check for errors
+
+</code></pre>
+
+<p>When creating a vault flags need to be provided to control it's behaviour. Most flags are covered under default values, however there is one thing you need to set before you can start using your vault: the type.</p>
+
+<p>The vault type very profoundly changes the way the vault will behave and is thus required to be explicitly defined. An implicitly chosen behaviour might endanger data in your usecase. The following vault types are available:</p>
+
+<table>
+<thead>
+<tr>
+<th>Vault type</th>
+<th>Unique behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Root</td>
+<td>The vault is accessable and managed by only one "root" user</td>
+</tr>
+<tr>
+<td>Managed</td>
+<td>The vault has multi-user access however still has an administrator with super-access</td>
+</tr>
+<tr>
+<td>Multi-User</td>
+<td>The vault has mutliple users with no administrator but allows for zone management (aka hierarchy)</td>
+</tr>
+<tr>
+<td>Anarchy</td>
+<td>The vault has multiple users with no administrator. There is NO hierarchy</td>
+</tr>
+</tbody>
+</table>
+
+<p>You can then bitwise OR together whatever flags you want:</p>
+
+<pre><code>err = rdb_vlts_setflags(vault, RDB_FLG_ROOT | ...);
+</code></pre>
+
+<p>More documentation to follow :)</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
