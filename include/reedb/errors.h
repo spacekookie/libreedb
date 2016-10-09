@@ -71,6 +71,7 @@ typedef enum rdb_err_t {
 
     /* User contexts */
     USER_EXISTS,
+    ROOT_NOT_FOUND,
     USER_DOESNT_EXIST,
 
     /* Crypto errors */

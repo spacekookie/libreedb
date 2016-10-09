@@ -22,8 +22,12 @@ int main(void)
     err = rdb_vlts_setflags(vault, RDB_FLG_ROOT);
     printf("Set flags...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;
 
-    rdb_uuid spacekookie  = rdb_vlts_adduser(vault, "spacekookie", 0);
-    rdb_vlts_setlogin(vault, spacekookie, "mega_passphrase!");
+    rdb_uuid root = rdb_vlts_getuser(vault, "root");
+    err = rdb_vlts_setlogin(vault, root, "mega_passphrase!");
+    printf("Setting root login...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;
+
+    err = rdb_vlts_finalise(vault);
+    printf("Finalisation...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;
 
     err = rdb_ctx_free(&ctx);
     printf("Context free...%s!\n", (err == 0) ? "OK" : "FAILED"); if(err) goto exit;

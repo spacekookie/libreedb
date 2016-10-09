@@ -73,6 +73,10 @@ struct ree_vault {
 
 rdb_err_t check_flagmask(unsigned long flags, unsigned long mask);
 
+rdb_err_t get_root_uuid(rdb_vault *vault, char *(*uuid));
+
+rdb_err_t initialise_user_storage(rdb_vault *vault);
+
 rdb_err_t rdb_vlts_setflags(rdb_vault *vault, unsigned long flags)
 {
     VAULT_SANE MEMCHECK
@@ -209,6 +213,14 @@ rdb_err_t rdb_vlts_setflags(rdb_vault *vault, unsigned long flags)
         vault->inner->rqlsyn_t = RDB_FLG_DEFAULT_RQLSYNTAX;
     }
 
+    /*
+     * We initialise this here so that we can assure user storage is valid
+     * as well as that the root user exists when creating a login detail for
+     * ROOT vaults.
+     */
+    err = initialise_user_storage(vault);
+    if(err) return err;
+
     /* Return with success :) */
     return HUGE_SUCCESS;
 }
@@ -267,6 +279,7 @@ rdb_err_t rdb_vlts_addzone(rdb_vault *vault, const char *name)
 rdb_uuid rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
 {
     rdb_uuid ret;
+    rdb_err_t err;
     memset(&ret, 0, sizeof(rdb_uuid));
 
     if(vault == NULL) goto exit;
@@ -280,10 +293,9 @@ rdb_uuid rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
         memset(vault->inner, 0, sizeof(ree_vault));
     }
 
-    if(vault->inner->users == NULL) {
-        vault->inner->users = hashmap_new();
-        if(vault->inner->users == NULL) goto exit;
-    }
+    /* Setup user storage */
+    err = initialise_user_storage(vault);
+    if(err) return ret;
 
     /* Check if a UUID exists - if it does, the user already exists */
     char *uuid = rdb_uuid_stringify(rdb_vlts_getuser(vault, name));
@@ -309,7 +321,7 @@ rdb_uuid rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
     hashmap_put(vault->inner->users, str_uuid, new);
 
     /* Copy an instance and return that */
-    memcpy(&ret, &new->id, sizeof(rdb_uuid));
+    memcpy(&ret.x, &new->id->x, sizeof(unsigned char) * 32);
     exit:
     free(str_uuid);
     return ret;
@@ -348,8 +360,9 @@ rdb_uuid rdb_vlts_getuser(rdb_vault *vault, const char *username)
 }
 
 /**
- * Sets the passphrase for a specific user ID. ID 0 is by default always
- * the ROOT user. This function can only be used to do initial passphrase
+ * Sets the passphrase for a specific user UUID. To set the ROOT user passphrase you need
+ * to invoke @{rdb_vlts_getuser} first to get it's UUID. This function can only be
+ * used to do initial passphrase
  * setup
  *
  * @param user Unique user ID
@@ -435,6 +448,9 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     ree_vault *v = vault->inner;
     rdb_err_t err;
 
+    struct vault_user ref_user;
+    char *root_id;
+
     /** Intialise threads */
     v->thpool = calloc(sizeof(rdb_pool), 1);
     v->thpool->pool = thpool_init(4);
@@ -447,19 +463,18 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     if(err) return err;
 
     /** Initialise a crypto engine with a unique seed */
-    v->cry = calloc(sizeof(struct rcry_engine), 1);
     err = rcry_engine_init(&v->cry, false, (unsigned char*) seed, seed_len);
     if(err) return err;
 
     /** Create a keystore backend */
     v->ks = (rcry_keystore*) malloc(sizeof(rcry_keystore) * 1);
 
-    size_t ks_len = REAL_STRLEN(vault->combined) + REAL_STRLEN("keystore");
+    size_t ks_len = strlen(vault->combined) + strlen("keystore/");
     char ks_path[ks_len];
-    memcpy(ks_path, 0, ks_len);
+    memset(ks_path, 0, ks_len);
 
     strcpy(ks_path, vault->combined);
-    strcat(ks_path, "keystore");
+    strcat(ks_path, "keystore/");
 
     err = rcry_keystore_init(v->ks, ks_path);
     if(err) return err;
@@ -476,25 +491,39 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     char *primary;
     err = rcry_keygen_camellia(&primary);
     if(err) return err;
-    
+
+    /** Read root user storage info */
+    err = get_root_uuid(vault, &root_id);
+    if(err) return err;
+
+    hashmap_get(vault->inner->users, root_id, (any_t*) &ref_user);
+
+    /** Hash the hashed passphrase for a SHA256 key */
+    char *secondary;
+    err = rcry_hash_data(ref_user.passwd, strlen(ref_user.passwd), (unsigned char**) &secondary, SHA256);
+    if(err) return err;
+
+    /** Submit keys to keystore */
     err = rcry_keystore_add(v->ks, "root", primary, PRIMARY);
     if(err) return err;
 
-    /**  */
+    err = rcry_keystore_add(v->ks, "root", secondary, SECONDARY);
+    if(err) return err;
 
     /** Write basic file layout to disk */
 
+
+    /** Cleanup */
+    free(root_id);
     return SUCCESS;
 }
 
-
-/**************** PRIVATE UTILITY FUNCTIONS ****************/
 
 rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid uuid, char *(*username))
 {
     VAULT_SANE MEMCHECK
 
-;    struct vault_user *user;
+    struct vault_user *user;
     char *uuid_str = rdb_uuid_stringify(uuid);
     int ret = hashmap_get(vault->inner->users, uuid_str, (void**) &user);
     free(uuid_str);
@@ -509,7 +538,8 @@ rdb_err_t rdb_vlts_getplainuser(rdb_vault *vault, rdb_uuid uuid, char *(*usernam
 }
 
 
-/*****************************************************************/
+/**************** PRIVATE UTILITY FUNCTIONS ****************/
+
 
 rdb_err_t check_flagmask(unsigned long flags, unsigned long mask)
 {
@@ -519,6 +549,60 @@ rdb_err_t check_flagmask(unsigned long flags, unsigned long mask)
     if(x != 1) {
         while(((x % 2) == 0) && x > 1) x /= 2;
         if(x != 1) return INVALID_PARAMS;
+    }
+
+    return SUCCESS;
+}
+
+
+rdb_err_t get_root_uuid(rdb_vault *vault, char *(*uuid))
+{
+
+    int i, size;
+    hashmap_element *list;
+
+    /* Hacky function that gets the raw storage table from the map for easy iteration */
+    hashmap_rawdata(vault->inner->users, &list, &size);
+
+    for(i = 0; i < size; i++) {
+        hashmap_element e = list[i];
+        struct vault_user *u = (struct vault_user*) e.data;
+
+        if(strcmp(u->name, "root") == 0) {
+            char *uuid_str = rdb_uuid_stringify(*u->id);
+
+            (*uuid) = uuid_str;
+            return SUCCESS;
+        }
+    }
+
+    return ROOT_NOT_FOUND;
+}
+
+
+/**
+ * Utility function that allocates memory for a user table as well as a
+ * root user.
+ *
+ * In case this user isn't wanted or required, it will be removed again
+ * (including any set passphrase) in the finalisation step.
+ *
+ * This way we allow users to setup their root passphrase during initialisation
+ * while locking this functionality further down the road.
+ *
+ * @param vault
+ * @return
+ */
+rdb_err_t initialise_user_storage(rdb_vault *vault)
+{
+
+    /* Allocate user storage table if require */
+    if(vault->inner->users == NULL) {
+        vault->inner->users = hashmap_new();
+        if(vault->inner->users == NULL) return MALLOC_FAILED;
+
+        /* Register root user for root zone */
+        rdb_vlts_adduser(vault, "root", 0);
     }
 
     return SUCCESS;

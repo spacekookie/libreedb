@@ -61,22 +61,23 @@ rdb_err_t rcry_keystore_add(rcry_keystore *ks, char *id, char *key, enum rcry_st
     }
 
     c = (rcry_key_c*) ret;
-    size_t size = sizeof(char) * REAL_STRLEN(key);
+    size_t size;
 
     /** Define a macro that does all the work locally */
-#define FILL_KEY(location) \
+#define FILL_KEY(location, size) \
     if(location != NULL) free(location); \
     location = (char*) calloc(size, 1); \
     if(location == NULL) return MALLOC_FAILED; \
     memcpy(location, key, size); \
     break;
 
+    // TODO: Make these cipher types more configurable
     /** Then neatly switch over it with no bloat */
     switch (type) {
-        case PRIMARY:   FILL_KEY(c->primary);
-        case SECONDARY: FILL_KEY(c->secondary);
-        case PRIVATE:   FILL_KEY(c->pri);
-        case PUBLIC:    FILL_KEY(c->pub);
+        case PRIMARY:   FILL_KEY(c->primary, rcry_keygen_sizeinfo(CAMELLIA256));
+        case SECONDARY: FILL_KEY(c->secondary, rcry_keygen_sizeinfo(AES256));
+        case PRIVATE:   FILL_KEY(c->pri, rcry_keygen_sizeinfo(RSA4096));
+        case PUBLIC:    FILL_KEY(c->pub, rcry_keygen_sizeinfo(RSA4096));
 
         case __ALL__:   printf("Don't use __ALL__ to add a key!\n");
         default:        return INVALID_PARAMS;
