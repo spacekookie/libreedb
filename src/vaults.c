@@ -16,6 +16,7 @@
 #include <thpool.h>
 #include <utils/random.h>
 #include <crypto/keystore.h>
+#include <sys/stat.h>
 
 #include "utils/uuid.h"
 #include "defines.h"
@@ -45,29 +46,6 @@
         return INVALID_PARAMS; \
     }
 
-struct ree_vault {
-    unsigned long       type;
-    unsigned long       cache;
-    unsigned long       write_m;
-    unsigned long       scale_t;
-    unsigned long       log_t;
-    unsigned long       rqlsyn_t;
-    unsigned long       ftr_single, ftr_multi, ftr_tree;
-    unsigned long       ftr_lut_dis, ftr_rql_dis, ftr_head_dis;
-    unsigned long       ftr_perm;
-
-    /* Vault contents */
-    Hashtable           *hds, *fls;
-    List                *tags, *cats;
-    rdb_pool            *thpool;
-    rcry_engine         *cry;
-    rcry_keystore       *ks;
-
-    /** Add metadata **/
-    map_t               *users;
-    struct vault_zone   **zones;
-    size_t              zone_s, usd_zones;
-};
 
 /**********************************************************************/
 
@@ -511,7 +489,16 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     if(err) return err;
 
     /** Write basic file layout to disk */
+    mkdir(vault->combined, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(ks_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
+    size_t ds_len = strlen(vault->combined) + strlen("datastore/");
+    char ds_path[ds_len];
+    memset(ds_path, 0, ds_len);
+
+    strcpy(ds_path, vault->combined);
+    strcat(ds_path, "datastore/");
+    mkdir(ds_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
     /** Cleanup */
     free(root_id);
@@ -567,6 +554,8 @@ rdb_err_t get_root_uuid(rdb_vault *vault, char *(*uuid))
     for(i = 0; i < size; i++) {
         hashmap_element e = list[i];
         struct vault_user *u = (struct vault_user*) e.data;
+
+        if(u == NULL) continue;
 
         if(strcmp(u->name, "root") == 0) {
             char *uuid_str = rdb_uuid_stringify(*u->id);
