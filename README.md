@@ -51,11 +51,14 @@ When creating a vault flags need to be provided to control it's behaviour. Most 
 
 The vault type very profoundly changes the way the vault will behave and is thus required to be explicitly defined. An implicitly chosen behaviour might endanger data in your usecase. The following vault types are available:
 
- - ROOT (The vault is accessable and managed by only one "root" user)
- - MANAGED (The vault has multi-user access however still has an administrator with super-access)
- - MULTI USER (The vault has mutliple users with no administrator but allows for zone management (aka hirarchy))
- - ANARCHY (The vault has multiple users with no administrator. There is NO hirarchy)
+| Vault type  | Unique behaviour |
+| ------------- | ------------- |
+| Root  | The vault is accessable and managed by only one "root" user  |
+| Managed  | The vault has multi-user access however still has an administrator with super-access  |
+| Multi-User  | The vault has mutliple users with no administrator but allows for zone management (aka hierarchy)  |
+| Anarchy  | The vault has multiple users with no administrator. There is NO hierarchy  |
 
+ 
 You can then bitwise OR together whatever flags you want:
 
 ```
