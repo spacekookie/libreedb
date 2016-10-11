@@ -298,7 +298,7 @@ rdb_uuid rdb_vlts_adduser(rdb_vault *vault, const char *name, long zones)
     /* Save the new user in the table */
     hashmap_put(vault->inner->users, str_uuid, new);
 
-    /* Copy an instance and return that */
+    /* Copy the uuid instance and return that */
     memcpy(&ret.x, &new->id->x, sizeof(unsigned char) * 32);
     exit:
     free(str_uuid);
@@ -370,11 +370,10 @@ rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid user, const char *passphr
     char *uuid = rdb_uuid_stringify(user);
 
     /* Get a reference to our user struct in the table */
-    struct vault_user ref_user;
+    struct vault_user *ref_user;
     hashmap_get(vault->inner->users, uuid, (any_t*) &ref_user);
     free(uuid);
-    if(ref_user.id == NULL) return USER_DOESNT_EXIST;
-
+    if(ref_user->id == NULL) return USER_DOESNT_EXIST;
 
     /* Open a hashing context to secure the passphrase */
     err = gcry_md_open(&md_ctx, PASSWD_HASH_FUNCT, GCRY_MD_FLAG_SECURE);
@@ -395,9 +394,9 @@ rdb_err_t rdb_vlts_setlogin(rdb_vault *vault, rdb_uuid user, const char *passphr
     /* Calculate length for base58 encoding */
     int out_len;
     unsigned char *tmp = NBase58Encode(bin_digest, (int) PASSWD_HASH_LEN, &out_len);
-    ref_user.passwd = (char*) malloc(sizeof(char) * out_len);
+    ref_user->passwd = (char*) malloc(sizeof(char) * out_len);
 
-    strcpy(ref_user.passwd, tmp);
+    strcpy(ref_user->passwd, (char*) tmp);
 
     /* Clean up */
     gcry_md_close(md_ctx);
@@ -426,7 +425,7 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     ree_vault *v = vault->inner;
     rdb_err_t err;
 
-    struct vault_user ref_user;
+    struct vault_user *ref_user;
     char *root_id;
 
     /** Intialise threads */
@@ -474,11 +473,16 @@ rdb_err_t rdb_vlts_finalise(rdb_vault *vault)
     err = get_root_uuid(vault, &root_id);
     if(err) return err;
 
-    hashmap_get(vault->inner->users, root_id, (any_t*) &ref_user);
+    int ret = hashmap_get(vault->inner->users, root_id, (any_t*) &ref_user);
+    if(ret != 0 || ref_user == NULL) {
+        printf("No 'root' user found!\n");
+        return ROOT_NOT_FOUND;
+    }
 
     /** Hash the hashed passphrase for a SHA256 key */
     char *secondary;
-    err = rcry_hash_data(ref_user.passwd, strlen(ref_user.passwd), (unsigned char**) &secondary, SHA256);
+    size_t passwd_len = strlen(ref_user->passwd);
+    err = rcry_hash_data(ref_user->passwd, passwd_len, (unsigned char**) &secondary, SHA256);
     if(err) return err;
 
     /** Submit keys to keystore */
