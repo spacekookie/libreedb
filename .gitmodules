@@ -1,3 +1,9 @@
-[submodule "cthpool"]
+[submodule "lib/cthpool"]
 	path = lib/cthpool
 	url = https://github.com/Pithikos/C-Thread-Pool.git
+[submodule "lib/libcdsl"]
+	path = lib/libcdsl
+	url = https://github.com/reepass/CDSL.git
+[submodule "lib/libdyntree"]
+	path = lib/libdyntree
+	url = https://github.com/reepass/libdyntree.git
